@@ -31,9 +31,8 @@
 package sonos_test
 
 import (
+	"github.com/ianr0bkny/go-sonos"
 	"log"
-	"sonos"
-	_ "github.com/ianr0bkny/go-sonos"
 	"testing"
 )
 
@@ -63,29 +62,29 @@ func TestDiscover(t *testing.T) {
 			log.Printf("Found device %s `%s' '%s'", id, name, caps)
 
 			/*
-			// browse root-level metadata
-			s.Browse("0", "BrowseMetadata", "*", 0, 0, "")
-			// browse children of the root
-			s.Browse("0", "BrowseDirectChildren", "*", 0, 0, "")
-			// browse music shares
-			s.Browse("S:", "BrowseDirectChildren", "*", 0, 0, "")
-			// browse the //perseus/sonos share
-			s.Browse("S://perseus/sonos", "BrowseDirectChildren", "*", 0, 0, "")
-			// browse the //perseus/sonos/iTunes share
-			s.Browse("S://perseus/sonos/iTunes", "BrowseDirectChildren", "*", 0, 0, "")
-			// browse the //perseus/sonos/iTunes/Music share
-			s.Browse("S://perseus/sonos/iTunes/Music", "BrowseDirectChildren", "*", 0, 0, "")
-			// browse the //perseus/sonos/iTunes/Music/The Who share
-			s.Browse("S://perseus/sonos/iTunes/Music/The Who", "BrowseDirectChildren", "*", 0, 0, "")
+				// browse root-level metadata
+				s.Browse("0", "BrowseMetadata", "*", 0, 0, "")
+				// browse children of the root
+				s.Browse("0", "BrowseDirectChildren", "*", 0, 0, "")
+				// browse music shares
+				s.Browse("S:", "BrowseDirectChildren", "*", 0, 0, "")
+				// browse the //perseus/sonos share
+				s.Browse("S://perseus/sonos", "BrowseDirectChildren", "*", 0, 0, "")
+				// browse the //perseus/sonos/iTunes share
+				s.Browse("S://perseus/sonos/iTunes", "BrowseDirectChildren", "*", 0, 0, "")
+				// browse the //perseus/sonos/iTunes/Music share
+				s.Browse("S://perseus/sonos/iTunes/Music", "BrowseDirectChildren", "*", 0, 0, "")
+				// browse the //perseus/sonos/iTunes/Music/The Who share
+				s.Browse("S://perseus/sonos/iTunes/Music/The Who", "BrowseDirectChildren", "*", 0, 0, "")
 			*/
 			// browse the //perseus/sonos/iTunes/Music/The Who/Tommy share
 			s.Browse("S://perseus/sonos/iTunes/Music/The Who/Tommy", "BrowseDirectChildren", "*", 0, 0, "")
 
 			/*
-			// browse music attributes
-			s.Browse("A:", "BrowseDirectChildren", "*", 0, 0, "")
-			// return list of composers
-			s.Browse("A:COMPOSER", "BrowseDirectChildren", "dc:title", 0, 0, "")
+				// browse music attributes
+				s.Browse("A:", "BrowseDirectChildren", "*", 0, 0, "")
+				// return list of composers
+				s.Browse("A:COMPOSER", "BrowseDirectChildren", "dc:title", 0, 0, "")
 			*/
 		}
 	}
