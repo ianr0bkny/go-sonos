@@ -32,8 +32,8 @@ package sonos
 
 import (
 	"encoding/xml"
+	"github.com/ianr0bkny/go-sonos/upnp"
 	"log"
-	"sonos/upnp"
 )
 
 type DeviceProperties struct {

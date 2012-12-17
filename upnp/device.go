@@ -34,12 +34,12 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/ianr0bkny/go-sonos/ssdp"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"regexp"
-	"sonos/ssdp"
 	"time"
 )
 

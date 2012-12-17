@@ -31,7 +31,7 @@
 package sonos
 
 import (
-	"sonos/upnp"
+	"github.com/ianr0bkny/go-sonos/upnp"
 )
 
 type AlarmClock struct {

@@ -31,8 +31,8 @@
 package sonos
 
 import (
-	"sonos/ssdp"
-	"sonos/upnp"
+	"github.com/ianr0bkny/go-sonos/ssdp"
+	"github.com/ianr0bkny/go-sonos/upnp"
 )
 
 const MUSIC_SERVICES = "schemas-upnp-org-MusicServices"

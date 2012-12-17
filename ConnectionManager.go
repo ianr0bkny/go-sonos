@@ -32,8 +32,8 @@ package sonos
 
 import (
 	"encoding/xml"
+	"github.com/ianr0bkny/go-sonos/upnp"
 	_ "log"
-	"sonos/upnp"
 )
 
 type ConnectionManager struct {
