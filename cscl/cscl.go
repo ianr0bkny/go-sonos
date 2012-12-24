@@ -73,7 +73,7 @@ type Args struct {
 }
 
 func Usage() {
-	fmt.Fprintf(os.Stderr, "Usage of %s [args] command:\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "Usage: %s [args] command\n", os.Args[0])
 	flag.PrintDefaults()
 }
 
