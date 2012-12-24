@@ -53,4 +53,5 @@ func TestConfig(t *testing.T) {
 	if bookmark.URI != "http://192.168.1.47:13456" {
 		panic("failed")
 	}
+	os.RemoveAll("dot_go-sonos")
 }
