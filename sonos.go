@@ -51,12 +51,10 @@ type Sonos struct {
 	ZoneGroupTopology
 }
 
-var reactor upnp.Reactor
-
 func sonosHandleUpdate(svc *upnp.Service, value string) {
 }
 
-func MakeSonos(svc_map upnp.ServiceMap) (sonos *Sonos) {
+func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor) (sonos *Sonos) {
 	sonos = &Sonos{}
 	for svc_type, svc_list := range svc_map {
 		switch svc_type {
@@ -135,7 +133,7 @@ func MakeSonos(svc_map upnp.ServiceMap) (sonos *Sonos) {
 	return
 }
 
-func sonosQuerySSDPResults(mgr ssdp.Manager) (sonos []*Sonos) {
+func ConnectAny(mgr ssdp.Manager, reactor upnp.Reactor) (sonos []*Sonos) {
 	qry := ssdp.ServiceQueryTerms{
 		ssdp.ServiceKey(MUSIC_SERVICES): -1,
 	}
@@ -146,7 +144,7 @@ func sonosQuerySSDPResults(mgr ssdp.Manager) (sonos []*Sonos) {
 				if svc_map, err := upnp.Describe(dev.Location); nil != err {
 					panic(err)
 				} else {
-					sonos = append(sonos, MakeSonos(svc_map))
+					sonos = append(sonos, MakeSonos(svc_map, reactor))
 				}
 				break
 			}
@@ -155,11 +153,14 @@ func sonosQuerySSDPResults(mgr ssdp.Manager) (sonos []*Sonos) {
 	return
 }
 
-func Discover(ifiname, port string) (sonos []*Sonos, err error) {
-	reactor = upnp.MakeReactor()
-	reactor.Init(ifiname, "13105")
-	mgr := ssdp.MakeManager()
+func MakeReactor(ifiname, port string) upnp.Reactor {
+	reactor := upnp.MakeReactor()
+	reactor.Init(ifiname, port)
+	return reactor
+}
+
+func Discover(ifiname, port string) (mgr ssdp.Manager, err error) {
+	mgr = ssdp.MakeManager()
 	mgr.Discover(ifiname, port, false)
-	sonos = sonosQuerySSDPResults(mgr)
 	return
 }

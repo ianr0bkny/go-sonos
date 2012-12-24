@@ -57,12 +57,10 @@ func cleanup() {
 }
 
 func discover(args *Args) {
-	if found, err := sonos.Discover(*args.discoveryDevice, fmt.Sprintf("%d", *args.discoveryPort)); nil != err {
+	if mgr, err := sonos.Discover(*args.discoveryDevice, fmt.Sprintf("%d", *args.discoveryPort)); nil != err {
 		panic(err)
 	} else {
-		for _, s := range found {
-			log.Printf("%#v", s)
-		}
+		log.Printf("%#v", mgr)
 	}
 }
 

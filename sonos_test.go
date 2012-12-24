@@ -38,9 +38,11 @@ import (
 
 func TestDiscover(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
-	if found, err := sonos.Discover("eth0", "13104"); nil != err {
+	if mgr, err := sonos.Discover("eth0", "13104"); nil != err {
 		panic(err)
 	} else {
+		reactor := sonos.MakeReactor("eth0", "13105")
+		found := sonos.ConnectAny(mgr, reactor)
 		for _, s := range found {
 			id := s.GetHouseholdID()
 			name, _ := s.GetZoneAttributes()
