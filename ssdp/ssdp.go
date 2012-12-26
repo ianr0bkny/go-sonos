@@ -28,6 +28,22 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
+//
+// A client implementation of the SSDP protocol:
+//
+//	mgr := ssdp.MakeManager()
+//	mgr.Discover("eth0", "13104", false)
+//	qry := ssdp.ServiceQueryTerms{
+//		ssdp.ServiceKey("schemas-upnp-org-MusicServices"): -1,
+//	}
+//	result := mgr.QueryServices(qry)
+//	if device_list, has := result["schemas-upnp-org-MusicServices"]; has {
+//		for _, device := range device_list {
+//			...
+//		}
+//	}
+//	mgr.Close()
+//
 package ssdp
 
 import (
@@ -82,44 +98,88 @@ const (
 	ssdpBroadcastVersion = "udp4"
 )
 
+// Type protection for a device URI
 type Location string
 
+// Type protection for a SSDP service key
 type ServiceKey string
 
+// Type protection for a Universally Unique ID
 type UUID string
 
 type ssdpServerDescription struct {
 	os             string
 	os_version     string
 	upnp_version   string
-	Product        string
+	product        string
 	productVersion string
 }
 
 type ssdpResourceBase struct {
 	ssdpServerDescription
-	Location Location
+	location Location
 	uuid     UUID
+}
+
+// An abstraction of an SSDP service
+type Service interface {
+	// The version of the service
+	Version() int64
 }
 
 type ssdpService struct {
 	ssdpResourceBase
-	Name    string
+	name    string
 	version int64
 	uri     string
 }
 
-type ssdpServiceSet map[ServiceKey]*ssdpService
+func (this *ssdpService) Version() int64 {
+	return this.version
+}
+
+type ssdpServiceSet map[ServiceKey]Service
+
+// An abstraction of an SSDP leaf device
+type Device interface {
+	// The product name (e.g. "Sonos")
+	Product() string
+	// A URI that can be queried for device capabilities
+	Location() Location
+	// The device's Universally Unique ID
+	UUID() UUID
+	// Search for a service in the device's capabilities; same
+	// return semantics as querying a map
+	Service(key ServiceKey) (service Service, has bool)
+}
 
 type ssdpDevice struct {
 	ssdpResourceBase
 	name     string
 	version  int64
 	uri      string
-	Services ssdpServiceSet
+	services ssdpServiceSet
 }
 
-type DeviceMap map[UUID]*ssdpDevice
+func (this *ssdpDevice) Product() string {
+	return this.product
+}
+
+func (this *ssdpDevice) Location() Location {
+	return this.location
+}
+
+func (this *ssdpDevice) UUID() UUID {
+	return this.uuid
+}
+
+func (this *ssdpDevice) Service(key ServiceKey) (service Service, has bool) {
+	service, has = this.services[key]
+	return
+}
+
+// Indexes leaf devices by UUID
+type DeviceMap map[UUID]Device
 
 type ssdpRootDevice struct {
 	ssdpResourceBase
@@ -128,6 +188,7 @@ type ssdpRootDevice struct {
 
 type ssdpRootDeviceMap map[Location]*ssdpRootDevice
 
+// Discovered devices sorted by supported service
 type ServiceMap map[ServiceKey]DeviceMap
 
 type ssdpResourceType int
@@ -207,13 +268,22 @@ type ssdpConnection struct {
 	addr *net.UDPAddr
 }
 
+// A map of service key to minimum required version
 type ServiceQueryTerms map[ServiceKey]int64
 
+// Encapsulates SSDP discovery, handles updates, and stores results
 type Manager interface {
+	// Initiates SSDP discovery, where ifiname names a network device
+	// to query, port gives a free port on that network device to listen
+	// for responses, and the subscribe flag (currrently unimplemented)
+	// determines whether to listen to asynchronous updates after the
+	// initial query is complete.
 	Discover(ifiname, port string, subscribe bool) error
-	QueryServices(qry ServiceQueryTerms) ServiceMap
+	// After discovery is complete searches for devices implementing
+	// the services specified in query.
+	QueryServices(query ServiceQueryTerms) ServiceMap
+	// Shuts down asynchronous subscriptions to device state
 	Close() error
-	RootDevices() []*ssdpRootDevice
 }
 
 type ssdpDefaultManager struct {
@@ -228,6 +298,7 @@ type ssdpDefaultManager struct {
 	closeChan     chan int
 }
 
+// Returns an empty manager ready for SSDP discovery
 func MakeManager() Manager {
 	mgr := &ssdpDefaultManager{}
 	mgr.responseQueue = make(ssdpResponseQueue)
@@ -247,16 +318,16 @@ func (this *ssdpDefaultManager) Discover(ifiname, port string, subscribe bool) (
 	return
 }
 
-func (this *ssdpDefaultManager) QueryServices(qry ServiceQueryTerms) (results ServiceMap) {
+func (this *ssdpDefaultManager) QueryServices(query ServiceQueryTerms) (results ServiceMap) {
 	results = make(ServiceMap)
-	for name, minver := range qry {
+	for name, minver := range query {
 		results[name] = make(DeviceMap)
 		if dlist, has := this.serviceMap[name]; has {
 			for uuid, _ := range dlist {
 				de := this.deviceMap[uuid]
-				if svc, has := de.Services[name]; has {
-					if minver <= svc.version {
-						results[name][de.uuid] = de
+				if svc, has := de.Service(name); has {
+					if minver <= svc.Version() {
+						results[name][de.UUID()] = de
 					}
 				}
 			}
@@ -277,22 +348,15 @@ func (this *ssdpDefaultManager) Close() (err error) {
 	return
 }
 
-func (this *ssdpDefaultManager) RootDevices() (rootDevices []*ssdpRootDevice) {
-	for _, rootDevice := range this.rootDeviceMap {
-		rootDevices = append(rootDevices, rootDevice)
-	}
-	return
-}
-
 func ssdpNewDevice(res *ssdpResource) (de *ssdpDevice) {
 	de = new(ssdpDevice)
 	de.ssdpServerDescription = res.ssdpServerDescription
 	de.uuid = res.uuid
-	de.Location = res.location
+	de.location = res.location
 	de.name = res.name
 	de.version = res.version
 	de.uri = res.uri
-	de.Services = make(ssdpServiceSet)
+	de.services = make(ssdpServiceSet)
 	return
 }
 
@@ -300,14 +364,14 @@ func ssdpNewssdpRootDevice(res *ssdpResource) (rd *ssdpRootDevice) {
 	rd = new(ssdpRootDevice)
 	rd.ssdpServerDescription = res.ssdpServerDescription
 	rd.uuid = res.uuid
-	rd.Location = res.location
+	rd.location = res.location
 	rd.Devices = make(DeviceMap)
 	return
 }
 
 func (rd *ssdpRootDevice) ssdpRequireEmbeddedDevice(de *ssdpDevice) {
-	if _, has := rd.Devices[de.uuid]; !has {
-		rd.Devices[de.uuid] = de
+	if _, has := rd.Devices[de.UUID()]; !has {
+		rd.Devices[de.UUID()] = de
 	}
 }
 
@@ -326,8 +390,8 @@ func ssdpNewService(res *ssdpResource) (sv *ssdpService) {
 	sv = new(ssdpService)
 	sv.ssdpServerDescription = res.ssdpServerDescription
 	sv.uuid = res.uuid
-	sv.Location = res.location
-	sv.Name = res.name
+	sv.location = res.location
+	sv.name = res.name
 	sv.version = res.version
 	sv.uri = res.uri
 	return
@@ -451,7 +515,7 @@ func (this *ssdpDefaultManager) ssdpHandleResponse(raw *ssdpRawMessage) *ssdpRes
 				msg.os = m[1]
 				msg.os_version = m[3]
 				msg.upnp_version = m[5]
-				msg.Product = m[6]
+				msg.product = m[6]
 				msg.productVersion = m[8]
 			} else {
 				log.Printf("Invalid server description `%s'", value)
@@ -568,16 +632,17 @@ func (this *ssdpDefaultManager) ssdpRequiressdpRootDevice(res *ssdpResource) (rd
 	var has bool
 	if rd, has = this.rootDeviceMap[res.location]; !has {
 		rd = ssdpNewssdpRootDevice(res)
-		this.rootDeviceMap[rd.Location] = rd
+		this.rootDeviceMap[rd.location] = rd
 	}
 	return
 }
 
 func (this *ssdpDefaultManager) ssdpRequireDevice(res *ssdpResource) (de *ssdpDevice) {
-	var has bool
-	if de, has = this.deviceMap[res.uuid]; !has {
+	if raw, has := this.deviceMap[res.uuid]; !has {
 		de = ssdpNewDevice(res)
 		this.deviceMap[res.uuid] = de
+	} else {
+		de = raw.(*ssdpDevice)
 	}
 	return
 }
@@ -598,18 +663,18 @@ func (this *ssdpDefaultManager) ssdpGetServiceKey(sv *ssdpService) (key ServiceK
 	if 0 >= len(uri) {
 		uri = "schemas-upnp-org"
 	}
-	key = ServiceKey(fmt.Sprintf("%s-%s", uri, sv.Name))
+	key = ServiceKey(fmt.Sprintf("%s-%s", uri, sv.name))
 	return
 }
 
 func (this *ssdpDefaultManager) ssdpRequireService(de *ssdpDevice, sv *ssdpService) {
 	key := this.ssdpGetServiceKey(sv)
-	if _, has := de.Services[key]; !has {
-		de.Services[key] = sv
+	if _, has := de.services[key]; !has {
+		de.services[key] = sv
 		if _, has := this.serviceMap[key]; !has {
 			this.serviceMap[key] = make(DeviceMap)
 		}
-		this.serviceMap[key][de.uuid] = de
+		this.serviceMap[key][de.UUID()] = de
 	}
 }
 

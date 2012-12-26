@@ -140,8 +140,8 @@ func ConnectAny(mgr ssdp.Manager, reactor upnp.Reactor) (sonos []*Sonos) {
 	res := mgr.QueryServices(qry)
 	if dev_list, has := res[MUSIC_SERVICES]; has {
 		for _, dev := range dev_list {
-			if SONOS == dev.Product {
-				if svc_map, err := upnp.Describe(dev.Location); nil != err {
+			if SONOS == dev.Product() {
+				if svc_map, err := upnp.Describe(dev.Location()); nil != err {
 					panic(err)
 				} else {
 					sonos = append(sonos, MakeSonos(svc_map, reactor))
