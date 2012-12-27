@@ -33,10 +33,12 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/ianr0bkny/go-sonos"
 	"github.com/ianr0bkny/go-sonos/config"
+	"github.com/ianr0bkny/go-sonos/ssdp"
 	"log"
 	"os"
 	"path"
@@ -56,12 +58,63 @@ func cleanup() {
 	CONFIG.Save()
 }
 
+func alias(flags *Args, args []string) (err error) {
+	switch len(args) {
+	case 0:
+		for key, rec := range CONFIG.Bookmarks {
+			if 0 < len(rec.Alias) {
+				fmt.Printf("%s is an alias for %s\n", key, rec.UUID)
+			}
+		}
+	case 1:
+		key := args[0]
+		if rec, has := CONFIG.Bookmarks[key]; has {
+			if 0 < len(rec.Alias) {
+				fmt.Printf("%s is an alias for %s\n", key, rec.UUID)
+			} else {
+				fmt.Printf("%s is not an alias\n", key)
+			}
+		} else {
+			fmt.Printf("%s is not an alias\n", key)
+		}
+	case 2:
+		CONFIG.AddAlias(ssdp.UUID(args[0]), args[1])
+	default:
+		err = errors.New("usage: alias [alias | {uuid alias}]")
+	}
+	return
+}
+
 func discover(args *Args) {
-	if mgr, err := sonos.Discover(*args.discoveryDevice, fmt.Sprintf("%d", *args.discoveryPort)); nil != err {
+	port := fmt.Sprintf("%d", *args.discoveryPort)
+	if mgr, err := sonos.Discover(*args.discoveryDevice, port); nil != err {
 		panic(err)
 	} else {
-		log.Printf("%#v", mgr)
+		query := ssdp.ServiceQueryTerms{
+			ssdp.ServiceKey(sonos.MUSIC_SERVICES): -1,
+		}
+		res := mgr.QueryServices(query)
+		if dev_list, has := res[sonos.MUSIC_SERVICES]; has {
+			for _, dev := range dev_list {
+				if sonos.SONOS == dev.Product() {
+					fmt.Printf("%s %s\n", string(dev.UUID()), dev.Location())
+					CONFIG.AddBookmark(string(dev.UUID()), dev.Location(), dev.UUID())
+				}
+			}
+		}
 	}
+}
+
+func unalias(flat *Args, args []string) (err error) {
+	switch len(args) {
+	case 0:
+		CONFIG.ClearAliases()
+	case 1:
+		CONFIG.ClearAlias(args[0])
+	default:
+		err = errors.New("usage: unalias [alias]")
+	}
+	return
 }
 
 type Args struct {
@@ -73,8 +126,15 @@ type Args struct {
 }
 
 func Usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s [args] command\n", os.Args[0])
-	flag.PrintDefaults()
+	fmt.Fprintf(os.Stderr, "usage: cscl [-S <uuid/alias>] [-C <configdir=~/.go-sonos/>] [-D <discovery device=eth0>]\n")
+	fmt.Fprintf(os.Stderr, "            [-P <discovery port=13104>]\n")
+	fmt.Fprintf(os.Stderr, "            [--help|--usage]\n")
+	fmt.Fprintf(os.Stderr, "            <command> [args ...]\n\n")
+	fmt.Fprintf(os.Stderr, "The available commands are:\n")
+	fmt.Fprintf(os.Stderr, "   alias      Add an alias binding\n")
+	fmt.Fprintf(os.Stderr, "   discover   Start SSDP device discovery\n")
+	fmt.Fprintf(os.Stderr, "   unalias    Remove an alias binding\n")
+	fmt.Fprintf(os.Stderr, "\n")
 }
 
 func main() {
@@ -99,8 +159,12 @@ func main() {
 
 	for _, cmd := range flag.Args() {
 		switch cmd {
+		case "alias":
+			alias(&args, flag.Args()[1:])
 		case "discover":
 			discover(&args)
+		case "unalias":
+			unalias(&args, flag.Args()[1:])
 		default:
 			flag.Usage()
 		}

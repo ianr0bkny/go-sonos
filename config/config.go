@@ -32,6 +32,7 @@ package config
 
 import (
 	"encoding/json"
+	"github.com/ianr0bkny/go-sonos/ssdp"
 	"io"
 	"log"
 	"os"
@@ -45,8 +46,9 @@ type Config struct {
 }
 
 type Bookmark struct {
-	Alias string `json:"alias"`
-	URI   string `json:"uri"`
+	Alias    string        `json:"alias,omitempty"`
+	Location ssdp.Location `json:"location,omitempty"`
+	UUID     ssdp.UUID     `json:"uuid"`
 }
 
 type Bookmarks map[string]Bookmark
@@ -95,8 +97,33 @@ func (this *Config) saveBookmarks() {
 	}
 }
 
-func (this *Config) AddBookmark(alias, uri string) {
-	this.Bookmarks[alias] = Bookmark{alias, uri}
+func (this *Config) AddBookmark(alias string, location ssdp.Location, uuid ssdp.UUID) {
+	if alias != string(uuid) {
+		this.Bookmarks[alias] = Bookmark{alias, location, uuid}
+	} else {
+		this.Bookmarks[alias] = Bookmark{"", location, uuid}
+	}
+}
+
+func (this *Config) AddAlias(uuid ssdp.UUID, alias string) {
+	old := this.Bookmarks[string(uuid)]
+	this.AddBookmark(alias, ssdp.Location(""), old.UUID)
+}
+
+func (this *Config) ClearAliases() {
+	for key, rec := range this.Bookmarks {
+		if 0 < len(rec.Alias) {
+			delete(this.Bookmarks, key)
+		}
+	}
+}
+
+func (this *Config) ClearAlias(alias string) {
+	if rec, has := this.Bookmarks[alias]; has {
+		if 0 < len(rec.Alias) {
+			delete(this.Bookmarks, alias)
+		}
+	}
 }
 
 func (this *Config) loadFromDisk() {
