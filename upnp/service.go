@@ -239,6 +239,13 @@ type Service struct {
 	actionList     []*upnpAction
 }
 
+func (this *Service) Actions() (actions []string) {
+	for _, action := range this.actionList {
+		actions = append(actions, action.name)
+	}
+	return
+}
+
 func upnpMakeService() (svc *Service) {
 	return &Service{}
 }

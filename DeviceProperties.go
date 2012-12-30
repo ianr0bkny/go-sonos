@@ -37,11 +37,11 @@ import (
 )
 
 type DeviceProperties struct {
-	svc *upnp.Service
+	Svc *upnp.Service
 }
 
 func (this *DeviceProperties) SetLEDState(state string) {
-	response := upnp.CallVa(this.svc, "SetLEDState", "DesiredLEDState", state)
+	response := upnp.CallVa(this.Svc, "SetLEDState", "DesiredLEDState", state)
 	log.Printf("%#v", response)
 }
 
@@ -50,7 +50,7 @@ func (this *DeviceProperties) GetLEDState() string {
 		XMLName         xml.Name
 		CurrentLEDState string
 	}
-	response := upnp.CallVa(this.svc, "GetLEDState")
+	response := upnp.CallVa(this.Svc, "GetLEDState")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.CurrentLEDState
@@ -61,7 +61,7 @@ func (this *DeviceProperties) GetHouseholdID() string {
 		XMLName            xml.Name
 		CurrentHouseholdID string
 	}
-	response := upnp.CallVa(this.svc, "GetHouseholdID")
+	response := upnp.CallVa(this.Svc, "GetHouseholdID")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.CurrentHouseholdID
@@ -73,7 +73,7 @@ func (this *DeviceProperties) GetZoneAttributes() (name, icon string) {
 		CurrentZoneName string
 		Icon            string
 	}
-	response := upnp.CallVa(this.svc, "GetZoneAttributes")
+	response := upnp.CallVa(this.Svc, "GetZoneAttributes")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.CurrentZoneName, doc.Icon

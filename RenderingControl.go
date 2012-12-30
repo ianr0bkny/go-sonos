@@ -35,5 +35,5 @@ import (
 )
 
 type RenderingControl struct {
-	svc *upnp.Service
+	Svc *upnp.Service
 }

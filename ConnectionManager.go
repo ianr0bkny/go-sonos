@@ -33,11 +33,10 @@ package sonos
 import (
 	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/upnp"
-	_ "log"
 )
 
 type ConnectionManager struct {
-	svc *upnp.Service
+	Svc *upnp.Service
 }
 
 func (this *ConnectionManager) GetProtocolInfo() (source, sink string) {
@@ -46,7 +45,7 @@ func (this *ConnectionManager) GetProtocolInfo() (source, sink string) {
 		Source  string
 		Sink    string
 	}
-	response := upnp.CallVa(this.svc, "GetProtocolInfo")
+	response := upnp.CallVa(this.Svc, "GetProtocolInfo")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.Source, doc.Sink
@@ -57,7 +56,7 @@ func (this *ConnectionManager) GetCurrentConnectionIDs() string {
 		XMLName       xml.Name
 		ConnectionIDs string
 	}
-	response := upnp.CallVa(this.svc, "GetCurrentConnectionIDs")
+	response := upnp.CallVa(this.Svc, "GetCurrentConnectionIDs")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.ConnectionIDs
@@ -78,7 +77,7 @@ func (this *ConnectionManager) GetCurrentConnectionInfo(connection int) *Connect
 		XMLName xml.Name
 		ConnectionInfo
 	}
-	response := upnp.CallVa(this.svc, "GetCurrentConnectionInfo", "ConnectionID", connection)
+	response := upnp.CallVa(this.Svc, "GetCurrentConnectionInfo", "ConnectionID", connection)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return &doc.ConnectionInfo

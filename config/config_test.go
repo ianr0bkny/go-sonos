@@ -31,27 +31,45 @@
 package config_test
 
 import (
+	"github.com/ianr0bkny/go-sonos"
 	"github.com/ianr0bkny/go-sonos/config"
 	"log"
 	"os"
 	"testing"
 )
 
+const (
+	alias     = "kitchen"
+	configdir = "dot_go-sonos"
+	location  = "http://192.168.1.44:1400/xml/device_description.xml"
+	uuid      = "RINCON_000E58741A8401400"
+)
+
 func TestConfig(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
-	if err := os.RemoveAll("dot_go-sonos"); nil != err {
+
+	if err := os.RemoveAll(configdir); nil != err {
 		panic(err)
 	}
-	c := config.MakeConfig("dot_go-sonos")
+
+	c := config.MakeConfig(configdir)
 	c.Init()
-	c.AddBookmark("kitchen", "http://192.168.1.47:13456")
+	c.AddBookmark(uuid, sonos.SONOS, location, uuid)
+	c.AddAlias(uuid, alias)
 	c.Save()
 	c = nil
-	d := config.MakeConfig("dot_go-sonos")
+
+	d := config.MakeConfig(configdir)
 	d.Init()
-	bookmark := d.Bookmarks["kitchen"]
-	if bookmark.URI != "http://192.168.1.47:13456" {
+
+	bookmark := d.Bookmarks[uuid]
+	if location != bookmark.Location {
 		panic("failed")
 	}
-	os.RemoveAll("dot_go-sonos")
+
+	if dev := d.Lookup(alias); nil == dev {
+		panic("failed")
+	}
+
+	os.RemoveAll(configdir)
 }

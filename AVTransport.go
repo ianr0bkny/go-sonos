@@ -33,11 +33,10 @@ package sonos
 import (
 	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/upnp"
-	_ "log"
 )
 
 type AVTransport struct {
-	svc *upnp.Service
+	Svc *upnp.Service
 }
 
 const (
@@ -55,7 +54,7 @@ func (this *AVTransport) SetPlayMode(instance int, mode string) {
 		{"InstanceID", instance},
 		{"NewPlayMode", mode},
 	}
-	response := upnp.Call(this.svc, "SetPlayMode", args)
+	response := upnp.Call(this.Svc, "SetPlayMode", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -68,7 +67,7 @@ func (this *AVTransport) PreviousSection(instance int) {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "PreviousSection", args)
+	response := upnp.Call(this.Svc, "PreviousSection", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -81,7 +80,7 @@ func (this *AVTransport) NextSection(instance int) {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "NextSection", args)
+	response := upnp.Call(this.Svc, "NextSection", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -94,7 +93,7 @@ func (this *AVTransport) Previous(instance int) {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "Previous", args)
+	response := upnp.Call(this.Svc, "Previous", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -107,7 +106,7 @@ func (this *AVTransport) NextProgrammedRadioTracks(instance int) {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "NextProgrammedRadioTracks", args)
+	response := upnp.Call(this.Svc, "NextProgrammedRadioTracks", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -120,7 +119,7 @@ func (this *AVTransport) Next(instance int) {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "Next", args)
+	response := upnp.Call(this.Svc, "Next", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -141,7 +140,7 @@ func (this *AVTransport) Seek(instance int, unit, target string) {
 		{"Unit", unit},
 		{"Target", target},
 	}
-	response := upnp.Call(this.svc, "Seek", args)
+	response := upnp.Call(this.Svc, "Seek", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -154,7 +153,7 @@ func (this *AVTransport) Pause(instance int) {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "Pause", args)
+	response := upnp.Call(this.Svc, "Pause", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -168,7 +167,7 @@ func (this *AVTransport) Play(instance int, speed string) {
 		{"InstanceID", instance},
 		{"Speed", speed},
 	}
-	response := upnp.Call(this.svc, "Play", args)
+	response := upnp.Call(this.Svc, "Play", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -181,7 +180,7 @@ func (this *AVTransport) Stop(instance int) {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "Stop", args)
+	response := upnp.Call(this.Svc, "Stop", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -195,7 +194,7 @@ func (this *AVTransport) GetCrossfadeMode(instance int) bool {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "GetCrossfadeMode", args)
+	response := upnp.Call(this.Svc, "GetCrossfadeMode", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.CrossfadeMode
@@ -214,7 +213,7 @@ func (this *AVTransport) GetTransportSettings(instance int) *TransportSettings {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "GetTransportSettings", args)
+	response := upnp.Call(this.Svc, "GetTransportSettings", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return &doc.TransportSettings
@@ -234,7 +233,7 @@ func (this *AVTransport) GetDeviceCapabilities(instance int) *DeviceCapabilities
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "GetDeviceCapabilities", args)
+	response := upnp.Call(this.Svc, "GetDeviceCapabilities", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return &doc.DeviceCapabilities
@@ -259,7 +258,7 @@ func (this *AVTransport) GetPositionInfo(instance int) *PositionInfo {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "GetPositionInfo", args)
+	response := upnp.Call(this.Svc, "GetPositionInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return &doc.PositionInfo
@@ -279,7 +278,7 @@ func (this *AVTransport) GetTransportInfo(instance int) *TransportInfo {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "GetTransportInfo", args)
+	response := upnp.Call(this.Svc, "GetTransportInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return &doc.TransportInfo
@@ -305,7 +304,7 @@ func (this *AVTransport) GetMediaInfo(instance int) *MediaInfo {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "GetMediaInfo", args)
+	response := upnp.Call(this.Svc, "GetMediaInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return &doc.MediaInfo
@@ -318,7 +317,7 @@ func (this *AVTransport) BackupQueue(instance int) {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "BackupQueue", args)
+	response := upnp.Call(this.Svc, "BackupQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -333,7 +332,7 @@ func (this *AVTransport) SaveQueue(instance int, title, object string) {
 		{"Title", title},
 		{"ObjectID", object},
 	}
-	response := upnp.Call(this.svc, "SaveQueue", args)
+	response := upnp.Call(this.Svc, "SaveQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -346,7 +345,7 @@ func (this *AVTransport) RemoveAllTracksFromQueue(instance int) {
 	args := []upnp.Arg{
 		{"InstanceID", instance},
 	}
-	response := upnp.Call(this.svc, "RemoveAllTracksFromQueue", args)
+	response := upnp.Call(this.Svc, "RemoveAllTracksFromQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	// TODO
@@ -363,7 +362,7 @@ func (this *AVTransport) RemoveTrackRangeFromQueue(instance, update, start, numb
 		{"StartingIndex", start},
 		{"NumberOfTracks", number},
 	}
-	response := upnp.Call(this.svc, "RemoveTrackRangeFromQueue", args)
+	response := upnp.Call(this.Svc, "RemoveTrackRangeFromQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.NewUpdateID
@@ -378,7 +377,7 @@ func (this *AVTransport) RemoveTrackFromQueue(instance int, object string) int {
 		{"InstanceID", instance},
 		{"ObjectID", object},
 	}
-	response := upnp.Call(this.svc, "RemoveTrackFromQueue", args)
+	response := upnp.Call(this.Svc, "RemoveTrackFromQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.UpdateID
@@ -395,7 +394,7 @@ func (this *AVTransport) ReorderTracksInQueue(instance, start, num, before int) 
 		{"NumberOfTracks", num},
 		{"InsertBefore", before},
 	}
-	response := upnp.Call(this.svc, "ReorderTracksInQueue", args)
+	response := upnp.Call(this.Svc, "ReorderTracksInQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.UpdateID

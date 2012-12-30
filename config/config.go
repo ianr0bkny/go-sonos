@@ -47,11 +47,34 @@ type Config struct {
 
 type Bookmark struct {
 	Alias    string        `json:"alias,omitempty"`
+	Product  string        `json:"product,omitempty"`
 	Location ssdp.Location `json:"location,omitempty"`
 	UUID     ssdp.UUID     `json:"uuid"`
 }
 
 type Bookmarks map[string]Bookmark
+
+type configDevice struct {
+	product  string
+	location ssdp.Location
+	uuid     ssdp.UUID
+}
+
+func (this *configDevice) Product() string {
+	return this.product
+}
+
+func (this *configDevice) Location() ssdp.Location {
+	return this.location
+}
+
+func (this *configDevice) UUID() ssdp.UUID {
+	return this.uuid
+}
+
+func (this *configDevice) Service(key ssdp.ServiceKey) (service ssdp.Service, has bool) {
+	return
+}
 
 func MakeConfig(dir string) *Config {
 	return &Config{dir, nil, Bookmarks{}}
@@ -97,17 +120,17 @@ func (this *Config) saveBookmarks() {
 	}
 }
 
-func (this *Config) AddBookmark(alias string, location ssdp.Location, uuid ssdp.UUID) {
-	if alias != string(uuid) {
-		this.Bookmarks[alias] = Bookmark{alias, location, uuid}
+func (this *Config) AddBookmark(ident, product string, location ssdp.Location, uuid ssdp.UUID) {
+	if ident != string(uuid) {
+		this.Bookmarks[ident] = Bookmark{ident, product, location, uuid}
 	} else {
-		this.Bookmarks[alias] = Bookmark{"", location, uuid}
+		this.Bookmarks[ident] = Bookmark{"", product, location, uuid}
 	}
 }
 
 func (this *Config) AddAlias(uuid ssdp.UUID, alias string) {
 	old := this.Bookmarks[string(uuid)]
-	this.AddBookmark(alias, ssdp.Location(""), old.UUID)
+	this.AddBookmark(alias, "", ssdp.Location(""), old.UUID)
 }
 
 func (this *Config) ClearAliases() {
@@ -163,4 +186,22 @@ func (this *Config) maybeLoadBookmarks(f os.FileInfo) {
 			fd.Close()
 		}
 	}
+}
+
+func (this *Config) lookupImpl(ident string, history map[string]bool) (dev ssdp.Device) {
+	if _, has := history[ident]; !has {
+		history[ident] = true
+		if bookmark, has := this.Bookmarks[ident]; has {
+			if 0 < len(bookmark.Alias) {
+				return this.lookupImpl(string(bookmark.UUID), history)
+			} else {
+				dev = &configDevice{bookmark.Product, bookmark.Location, bookmark.UUID}
+			}
+		}
+	}
+	return
+}
+
+func (this *Config) Lookup(ident string) ssdp.Device {
+	return this.lookupImpl(ident, map[string]bool{})
 }

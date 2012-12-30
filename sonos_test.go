@@ -32,11 +32,23 @@ package sonos_test
 
 import (
 	"github.com/ianr0bkny/go-sonos"
+	"github.com/ianr0bkny/go-sonos/config"
 	"log"
 	"testing"
 )
 
-func TestDiscover(t *testing.T) {
+func TestCoverage(t *testing.T) {
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	c := config.MakeConfig("/home/ianr/.go-sonos")
+	c.Init()
+	if dev := c.Lookup("kitchen"); nil != dev {
+		reactor := sonos.MakeReactor("eth0", "13105")
+		s := sonos.Connect(dev, reactor)
+		sonos.Coverage(s)
+	}
+}
+
+func _TestDiscover(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	if mgr, err := sonos.Discover("eth0", "13104"); nil != err {
 		panic(err)

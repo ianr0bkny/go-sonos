@@ -34,11 +34,10 @@ import (
 	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/didl"
 	"github.com/ianr0bkny/go-sonos/upnp"
-	_ "log"
 )
 
 type ContentDirectory struct {
-	svc *upnp.Service
+	Svc *upnp.Service
 }
 
 func (this *ContentDirectory) GetSearchCapabilities() string {
@@ -46,7 +45,7 @@ func (this *ContentDirectory) GetSearchCapabilities() string {
 		XMLName    xml.Name
 		SearchCaps string
 	}
-	response := upnp.CallVa(this.svc, "GetSearchCapabilities")
+	response := upnp.CallVa(this.Svc, "GetSearchCapabilities")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.SearchCaps
@@ -57,7 +56,7 @@ func (this *ContentDirectory) GetSortCapabilities() string {
 		XMLName  xml.Name
 		SortCaps string
 	}
-	response := upnp.CallVa(this.svc, "GetSortCapabilities")
+	response := upnp.CallVa(this.Svc, "GetSortCapabilities")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.SortCaps
@@ -68,7 +67,7 @@ func (this *ContentDirectory) GetLastIndexChange() string {
 		XMLName         xml.Name
 		LastIndexChange string
 	}
-	response := upnp.CallVa(this.svc, "GetLastIndexChange")
+	response := upnp.CallVa(this.Svc, "GetLastIndexChange")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.LastIndexChange
@@ -90,7 +89,7 @@ func (this *ContentDirectory) Browse(object, flag, filter string, start, count i
 		{"RequestedCount", count},
 		{"SortCriteria", sort},
 	}
-	response := upnp.Call(this.svc, "Browse", args)
+	response := upnp.Call(this.Svc, "Browse", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	//log.Printf("%s", doc.Result)

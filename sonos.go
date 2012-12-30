@@ -60,70 +60,70 @@ func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor) (sonos *Sonos) {
 		switch svc_type {
 		case "AlarmClock":
 			for _, svc := range svc_list {
-				sonos.AlarmClock.svc = svc
+				sonos.AlarmClock.Svc = svc
 				upnp.DescribeService(svc)
 				reactor.Subscribe(svc, sonosHandleUpdate)
 				break
 			}
 		case "AVTransport":
 			for _, svc := range svc_list {
-				sonos.AVTransport.svc = svc
+				sonos.AVTransport.Svc = svc
 				upnp.DescribeService(svc)
 				reactor.Subscribe(svc, sonosHandleUpdate)
 				break
 			}
 		case "ConnectionManager":
 			for _, svc := range svc_list {
-				sonos.ConnectionManager.svc = svc
+				sonos.ConnectionManager.Svc = svc
 				upnp.DescribeService(svc)
 				reactor.Subscribe(svc, sonosHandleUpdate)
 				break
 			}
 		case "ContentDirectory":
 			for _, svc := range svc_list {
-				sonos.ContentDirectory.svc = svc
+				sonos.ContentDirectory.Svc = svc
 				upnp.DescribeService(svc)
 				reactor.Subscribe(svc, sonosHandleUpdate)
 				break
 			}
 		case "DeviceProperties":
 			for _, svc := range svc_list {
-				sonos.DeviceProperties.svc = svc
+				sonos.DeviceProperties.Svc = svc
 				upnp.DescribeService(svc)
 				reactor.Subscribe(svc, sonosHandleUpdate)
 				break
 			}
 		case "GroupManagement":
 			for _, svc := range svc_list {
-				sonos.GroupManagement.svc = svc
+				sonos.GroupManagement.Svc = svc
 				upnp.DescribeService(svc)
 				reactor.Subscribe(svc, sonosHandleUpdate)
 				break
 			}
 		case "MusicServices":
 			for _, svc := range svc_list {
-				sonos.MusicServices.svc = svc
+				sonos.MusicServices.Svc = svc
 				upnp.DescribeService(svc)
 				reactor.Subscribe(svc, sonosHandleUpdate)
 				break
 			}
 		case "RenderingControl":
 			for _, svc := range svc_list {
-				sonos.RenderingControl.svc = svc
+				sonos.RenderingControl.Svc = svc
 				upnp.DescribeService(svc)
 				reactor.Subscribe(svc, sonosHandleUpdate)
 				break
 			}
 		case "SystemProperties":
 			for _, svc := range svc_list {
-				sonos.SystemProperties.svc = svc
+				sonos.SystemProperties.Svc = svc
 				upnp.DescribeService(svc)
 				reactor.Subscribe(svc, sonosHandleUpdate)
 				break
 			}
 		case "ZoneGroupTopology":
 			for _, svc := range svc_list {
-				sonos.ZoneGroupTopology.svc = svc
+				sonos.ZoneGroupTopology.Svc = svc
 				upnp.DescribeService(svc)
 				reactor.Subscribe(svc, sonosHandleUpdate)
 				break
@@ -149,6 +149,15 @@ func ConnectAny(mgr ssdp.Manager, reactor upnp.Reactor) (sonos []*Sonos) {
 				break
 			}
 		}
+	}
+	return
+}
+
+func Connect(dev ssdp.Device, reactor upnp.Reactor) (sonos *Sonos) {
+	if svc_map, err := upnp.Describe(dev.Location()); nil != err {
+		panic(err)
+	} else {
+		sonos = MakeSonos(svc_map, reactor)
 	}
 	return
 }

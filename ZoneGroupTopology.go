@@ -35,5 +35,5 @@ import (
 )
 
 type ZoneGroupTopology struct {
-	svc *upnp.Service
+	Svc *upnp.Service
 }

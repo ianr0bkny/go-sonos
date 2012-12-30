@@ -32,8 +32,54 @@ package sonos
 
 import (
 	"github.com/ianr0bkny/go-sonos/upnp"
+	"log"
+	"reflect"
 )
 
-type MusicServices struct {
-	Svc *upnp.Service
+type coverageData struct {
+	total       int
+	missing     []string
+	implemented int
+}
+
+func (this *coverageData) pct() float32 {
+	return 100. * float32(this.implemented) / float32(this.total)
+}
+
+func (this *coverageData) add(other *coverageData) {
+	this.total += other.total
+	this.missing = append(this.missing, other.missing...)
+	this.implemented += other.implemented
+}
+
+func (this *coverageData) log(name string, missing bool) {
+	log.Printf("%20s %8.2f%% %3d/%-3d", name, this.pct(), this.implemented, this.total)
+	if missing {
+		for _, action := range this.missing {
+			log.Printf("%20s * %s", "", action)
+		}
+	}
+}
+
+func Coverage(s *Sonos) {
+	sv := reflect.ValueOf(*s)
+	st := sv.Type()
+	total_cd := coverageData{}
+	for i := 0; i < st.NumField(); i++ {
+		superclass := sv.Field(i)
+		svc := superclass.FieldByName("Svc").Interface().(*upnp.Service)
+		actions := svc.Actions()
+		superclass_type := reflect.PtrTo(superclass.Type())
+		cd := coverageData{total: len(actions)}
+		for _, action := range actions {
+			if _, has := superclass_type.MethodByName(action); has {
+				cd.implemented++
+			} else {
+				cd.missing = append(cd.missing, action)
+			}
+		}
+		cd.log(superclass.Type().Name(), true)
+		total_cd.add(&cd)
+	}
+	total_cd.log("TOTAL", false)
 }

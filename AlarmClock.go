@@ -35,5 +35,5 @@ import (
 )
 
 type AlarmClock struct {
-	svc *upnp.Service
+	Svc *upnp.Service
 }

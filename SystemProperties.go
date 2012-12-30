@@ -35,5 +35,5 @@ import (
 )
 
 type SystemProperties struct {
-	svc *upnp.Service
+	Svc *upnp.Service
 }
