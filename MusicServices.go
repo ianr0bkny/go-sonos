@@ -31,9 +31,94 @@
 package sonos
 
 import (
+	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/upnp"
 )
 
 type MusicServices struct {
 	Svc *upnp.Service
+}
+
+type msPolicy_XML struct {
+	XMLName      xml.Name
+	Auth         string `xml:"Auth,attr"`
+	PollInterval string `xml:"PollInterval,attr"`
+}
+
+type msStrings_XML struct {
+	XMLName xml.Name
+	Version string `xml:"Version,attr"`
+	Uri     string `xml:"Uri,attr"`
+}
+
+type msPresentationMap_XML struct {
+	XMLName xml.Name
+	Version string `xml:"Version,attr"`
+	Uri     string `xml:"Uri,attr"`
+}
+
+type msPresentation_XML struct {
+	XMLName         xml.Name
+	Strings         []msStrings_XML         `xml:"Strings"`
+	PresentationMap []msPresentationMap_XML `xml:"PresentationMap"`
+}
+
+type msService_XML struct {
+	XMLName           xml.Name
+	Id                string               `xml:"Id,attr"`
+	Name              string               `xml:"Name,attr"`
+	Version           string               `xml:"Version,attr"`
+	Uri               string               `xml:"Uri,attr"`
+	SecureUri         string               `xml:"SecureUri,attr"`
+	ContainerType     string               `xml:"ContainerType,attr"`
+	Capabilities      string               `xml:"Capabilities,attr"`
+	MaxMessagingChars string               `xml:"MaxMessagingChars,attr"`
+	Policy            []msPolicy_XML       `xml:"Policy"`
+	Presentation      []msPresentation_XML `xml:"Presentation"`
+}
+
+type msServices_XML struct {
+	XMLName xml.Name
+	Service []msService_XML `xml:"Service"`
+}
+
+func (this *MusicServices) GetSessionId(serviceId int32, username string) (sessionId string) {
+	type Response struct {
+		XMLName   xml.Name
+		SessionId string
+	}
+	args := []upnp.Arg{
+		{"ServiceId", serviceId},
+		{"Username", username},
+	}
+	response := upnp.Call(this.Svc, "GetSessionId", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	// TODO: Error handling
+	return doc.SessionId
+}
+
+func (this *MusicServices) ListAvailableServices() {
+	type Response struct {
+		XMLName                        xml.Name
+		AvailableServiceDescriptorList string
+		AvailableServiceTypeList       string
+		AvailableServiceListVersion    string
+	}
+	response := upnp.CallVa(this.Svc, "ListAvailableServices")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	services := msServices_XML{}
+	xml.Unmarshal([]byte(doc.AvailableServiceDescriptorList), &services)
+	// TODO: Return value
+}
+
+func (this *MusicServices) UpdateAvailableServices() {
+	type Response struct {
+		XMLName xml.Name
+	}
+	response := upnp.CallVa(this.Svc, "UpdateAvailableServices")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	// TODO: Error handling
 }

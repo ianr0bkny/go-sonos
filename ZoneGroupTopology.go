@@ -31,9 +31,52 @@
 package sonos
 
 import (
+	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/upnp"
+	_ "log"
 )
 
 type ZoneGroupTopology struct {
 	Svc *upnp.Service
+}
+
+const (
+	ALL      = "All"
+	SOFTWARE = "Software"
+)
+
+type UpdateItem struct {
+	Type         string `xml:"Type,attr"`
+	Version      string `xml:"Version,attr"`
+	UpdateURL    string `xml:"UpdateURL,attr"`
+	DownloadSize string `xml:"DownloadSize,attr"`
+	ManifestURL  string `xml:"ManifestURL,attr"`
+}
+
+type UpdateType string
+
+func (this *ZoneGroupTopology) CheckForUpdate(updateType UpdateType, cachedOnly bool, version string) *UpdateItem {
+	type UpdateItemHolder struct {
+		XMLName xml.Name
+		UpdateItem
+	}
+	type UpdateItemText struct {
+		XMLName xml.Name
+		Text    string `xml:",chardata"`
+	}
+	type Response struct {
+		XMLName    xml.Name
+		UpdateItem UpdateItemText
+	}
+	args := []upnp.Arg{
+		{"UpdateType", updateType},
+		{"CachedOnly", cachedOnly},
+		{"Version", version},
+	}
+	response := upnp.Call(this.Svc, "CheckForUpdate", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	rec := UpdateItemHolder{}
+	xml.Unmarshal([]byte(doc.UpdateItem.Text), &rec)
+	return &rec.UpdateItem
 }

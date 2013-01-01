@@ -37,7 +37,32 @@ import (
 	"testing"
 )
 
-func TestCoverage(t *testing.T) {
+func _TestMusicServices(t *testing.T) {
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	c := config.MakeConfig("/home/ianr/.go-sonos")
+	c.Init()
+	if dev := c.Lookup("kitchen"); nil != dev {
+		reactor := sonos.MakeReactor("eth0", "13105")
+		s := sonos.Connect(dev, reactor)
+		s.GetSessionId(6 /*iheartradio*/, "")
+		s.ListAvailableServices()
+		s.UpdateAvailableServices()
+	}
+}
+
+func _TestZoneGroupTopology(t *testing.T) {
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	c := config.MakeConfig("/home/ianr/.go-sonos")
+	c.Init()
+	if dev := c.Lookup("kitchen"); nil != dev {
+		reactor := sonos.MakeReactor("eth0", "13105")
+		s := sonos.Connect(dev, reactor)
+		ui := s.CheckForUpdate(sonos.ALL, false, "")
+		log.Printf("%#v", ui)
+	}
+}
+
+func _TestCoverage(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	c := config.MakeConfig("/home/ianr/.go-sonos")
 	c.Init()
