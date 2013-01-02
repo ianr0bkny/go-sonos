@@ -33,7 +33,6 @@ package sonos
 import (
 	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/upnp"
-	_ "log"
 )
 
 type ZoneGroupTopology struct {
@@ -44,6 +43,21 @@ const (
 	ALL      = "All"
 	SOFTWARE = "Software"
 )
+
+func (this *ZoneGroupTopology) BeginSoftwareUpdate(updateURL string, flags int32) {
+	type Response struct {
+		XMLName xml.Name
+	}
+	args := []upnp.Arg{
+		{"UpdateURL", updateURL},
+		{"Flags", flags},
+	}
+	response := upnp.Call(this.Svc, "BeginSoftwareUpdate", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	// log.Printf("%s", response)
+	// TODO: Return code, error handling
+}
 
 type UpdateItem struct {
 	Type         string `xml:"Type,attr"`
@@ -78,5 +92,66 @@ func (this *ZoneGroupTopology) CheckForUpdate(updateType UpdateType, cachedOnly 
 	xml.Unmarshal([]byte(response), &doc)
 	rec := UpdateItemHolder{}
 	xml.Unmarshal([]byte(doc.UpdateItem.Text), &rec)
+	// TODO: Would rather not return XML ..., error handling
 	return &rec.UpdateItem
+}
+
+const (
+	REMOVE                        = "Remove"
+	VERIFY_THEN_REMOVE_SYSTEMWIDE = "VerifyThenRemoveSystemwide"
+)
+
+func (this *ZoneGroupTopology) ReportUnresponsiveDevice(deviceUUID string, desiredAction string) {
+	type Response struct {
+		XMLName xml.Name
+	}
+	args := []upnp.Arg{
+		{"DeviceUUID", deviceUUID},
+		{"DesiredAction", desiredAction},
+	}
+	response := upnp.Call(this.Svc, "ReportUnresponsiveDevice", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	// log.Printf("%s", response)
+	// TODO: Return code, error handling
+}
+
+func (this *ZoneGroupTopology) ReportAlarmStartedRunning() {
+	type Response struct {
+		XMLName xml.Name
+	}
+	response := upnp.CallVa(this.Svc, "ReportAlarmStartedRunning")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	// log.Printf("%s", response)
+	// TODO: Return code, error handling
+}
+
+func (this *ZoneGroupTopology) SubmitDiagnostics() string {
+	type Response struct {
+		XMLName      xml.Name
+		DiagnosticID string
+	}
+	response := upnp.CallVa(this.Svc, "SubmitDiagnostics")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	// log.Printf("%s", response)
+	// TODO: Error handling
+	return doc.DiagnosticID
+}
+
+func (this *ZoneGroupTopology) RegisterMobileDevice(deviceName, deviceUDN, deviceAddress string) {
+	type Response struct {
+		XMLName xml.Name
+	}
+	args := []upnp.Arg{
+		{"MobileDeviceName", deviceName},
+		{"MobileDeviceUDN", deviceUDN},
+		{"MobileIPAndPort", deviceAddress},
+	}
+	response := upnp.Call(this.Svc, "RegisterMobileDevice", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	// log.Printf("%s", response)
+	// TODO: Error handling
 }

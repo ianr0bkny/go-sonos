@@ -32,8 +32,10 @@ package upnp
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	_ "log"
 	"net/http"
 	_ "os"
 	"strings"
@@ -52,6 +54,25 @@ type Arg struct {
 }
 
 type Args []Arg
+
+type ErrorResponse struct {
+	FaultCode   string `xml:"faultcode"`
+	FaultString string `xml:"faultstring"`
+	Detail      struct {
+		XMLName   xml.Name
+		UPnPError struct {
+			XMLName   xml.Name
+			ErrorCode string `xml:"errorCode"`
+		} `xml:"urn:schemas-upnp-org:control-1-0 UPnPError"`
+	} `xml:"detail"`
+}
+
+func CheckResponse(e *ErrorResponse) (err error) {
+	if 0 < len(e.FaultCode) {
+		err = errors.New(e.Detail.UPnPError.ErrorCode)
+	}
+	return
+}
 
 type soapRequestAction struct {
 	XMLName  xml.Name

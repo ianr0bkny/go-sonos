@@ -18,7 +18,7 @@
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENTING SHALL THE COPYRIGHT
 // HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
 // SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
 // TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -37,12 +37,80 @@ import (
 	"testing"
 )
 
-func _TestMusicServices(t *testing.T) {
+const (
+	TEST_CONFIG        = "/home/ianr/.go-sonos"
+	TEST_DEVICE        = "kitchen"
+	TEST_DISCOVER_PORT = "13104"
+	TEST_EVENTING_PORT = "13105"
+	TEST_NETWORK       = "eth0"
+)
+
+func TestRenderingControl(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
-	c := config.MakeConfig("/home/ianr/.go-sonos")
+	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
-	if dev := c.Lookup("kitchen"); nil != dev {
-		reactor := sonos.MakeReactor("eth0", "13105")
+	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
+		s := sonos.Connect(dev, reactor)
+		//
+		mute, err := s.GetMute(0, sonos.Channel_Master)
+		err = s.SetMute(0, sonos.Channel_Master, !mute)
+		if nil != err {
+			panic(err)
+		}
+		if basicEQ, err := s.ResetBasicEQ(0); nil == err {
+			log.Printf("%#v", basicEQ)
+		}
+		if volume, err := s.GetVolume(0, sonos.Channel_Master); nil == err {
+			log.Printf("%#v", volume)
+		}
+		if err := s.SetVolume(0, sonos.Channel_Master, 50); nil != err {
+			panic(err)
+		}
+		if newVolume, err := s.SetRelativeVolume(0, sonos.Channel_Master, 5); nil == err {
+			log.Printf("%#v", newVolume)
+		}
+		if volume, err := s.GetVolumeDB(0, sonos.Channel_Master); nil == err {
+			log.Printf("%#v", volume)
+		}
+		if err := s.SetVolumeDB(0, sonos.Channel_Master, 50); nil != err {
+			log.Printf("%#v", err)
+		}
+		if min, max, err := s.GetVolumeDBRange(0, sonos.Channel_Master); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("%v %v", min, max)
+		}
+		if bass, err := s.GetBass(0); nil != err {
+			log.Printf("%v", err)
+		} else {
+			log.Printf("%v", bass)
+		}
+		if err := s.SetBass(0, 51); nil != err {
+			log.Printf("%v", err)
+		}
+		if treble, err := s.GetTreble(0); nil != err {
+			log.Printf("%v", err)
+		} else {
+			log.Printf("%v", treble)
+		}
+		if err := s.SetTreble(0, 51); nil != err {
+			log.Printf("%v", err)
+		}
+		if loudness, err := s.GetLoudness(0, sonos.Channel_Master); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("%v", loudness)
+		}
+	}
+}
+
+func TestMusicServices(t *testing.T) {
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	c := config.MakeConfig(TEST_CONFIG)
+	c.Init()
+	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		s := sonos.Connect(dev, reactor)
 		s.GetSessionId(6 /*iheartradio*/, "")
 		s.ListAvailableServices()
@@ -50,35 +118,35 @@ func _TestMusicServices(t *testing.T) {
 	}
 }
 
-func _TestZoneGroupTopology(t *testing.T) {
+func TestZoneGroupTopology(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
-	c := config.MakeConfig("/home/ianr/.go-sonos")
+	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
-	if dev := c.Lookup("kitchen"); nil != dev {
-		reactor := sonos.MakeReactor("eth0", "13105")
+	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		s := sonos.Connect(dev, reactor)
 		ui := s.CheckForUpdate(sonos.ALL, false, "")
 		log.Printf("%#v", ui)
 	}
 }
 
-func _TestCoverage(t *testing.T) {
+func TestCoverage(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
-	c := config.MakeConfig("/home/ianr/.go-sonos")
+	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
-	if dev := c.Lookup("kitchen"); nil != dev {
-		reactor := sonos.MakeReactor("eth0", "13105")
+	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		s := sonos.Connect(dev, reactor)
 		sonos.Coverage(s)
 	}
 }
 
-func _TestDiscover(t *testing.T) {
+func TestDiscover(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
-	if mgr, err := sonos.Discover("eth0", "13104"); nil != err {
+	if mgr, err := sonos.Discover(TEST_NETWORK, TEST_DISCOVER_PORT); nil != err {
 		panic(err)
 	} else {
-		reactor := sonos.MakeReactor("eth0", "13105")
+		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		found := sonos.ConnectAny(mgr, reactor)
 		for _, s := range found {
 			id := s.GetHouseholdID()
