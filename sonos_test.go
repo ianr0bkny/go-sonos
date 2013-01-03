@@ -102,6 +102,28 @@ func TestRenderingControl(t *testing.T) {
 		} else {
 			log.Printf("%v", loudness)
 		}
+
+		if currentSupportsFixed, err := s.GetSupportsOutputFixed(0); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("%#v", currentSupportsFixed)
+		}
+
+		if fixed, err := s.GetOutputFixed(0); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("%#v", fixed)
+		}
+
+		if err := s.SetOutputFixed(0, false); nil != err {
+			log.Printf("%#v", err)
+		}
+
+		if connected, err := s.GetHeadphoneConnected(0); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("%#v", connected)
+		}
 	}
 }
 
@@ -125,8 +147,11 @@ func TestZoneGroupTopology(t *testing.T) {
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		s := sonos.Connect(dev, reactor)
-		ui := s.CheckForUpdate(sonos.ALL, false, "")
-		log.Printf("%#v", ui)
+		if ui, err := s.CheckForUpdate(sonos.ALL, false, ""); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("%#v", ui)
+		}
 	}
 }
 

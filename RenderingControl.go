@@ -46,7 +46,7 @@ const (
 	Channel_LF     = "LF"
 )
 
-func (this *RenderingControl) GetMute(instanceId int32, channel string) (currentMute bool, err error) {
+func (this *RenderingControl) GetMute(instanceId uint32, channel string) (currentMute bool, err error) {
 	type Response struct {
 		XMLName     xml.Name
 		CurrentMute bool
@@ -59,13 +59,12 @@ func (this *RenderingControl) GetMute(instanceId int32, channel string) (current
 	response := upnp.Call(this.Svc, "GetMute", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	if err = upnp.CheckResponse(&doc.ErrorResponse); nil == err {
-		currentMute = doc.CurrentMute
-	}
+	err = upnp.CheckResponse(&doc.ErrorResponse)
+	currentMute = doc.CurrentMute
 	return
 }
 
-func (this *RenderingControl) SetMute(instanceId int32, channel string, desiredMute bool) (err error) {
+func (this *RenderingControl) SetMute(instanceId uint32, channel string, desiredMute bool) (err error) {
 	type Response struct {
 		XMLName xml.Name
 		upnp.ErrorResponse
@@ -83,14 +82,14 @@ func (this *RenderingControl) SetMute(instanceId int32, channel string, desiredM
 }
 
 type BasicEQ struct {
-	Bass        int32
-	Treble      int32
+	Bass        int16
+	Treble      int16
 	Loudness    bool
-	LeftVolume  int32
-	RightVolume int32
+	LeftVolume  uint16
+	RightVolume uint16
 }
 
-func (this *RenderingControl) ResetBasicEQ(instanceId int32) (basicEQ *BasicEQ, err error) {
+func (this *RenderingControl) ResetBasicEQ(instanceId uint32) (basicEQ *BasicEQ, err error) {
 	type Response struct {
 		XMLName xml.Name
 		BasicEQ
@@ -107,7 +106,7 @@ func (this *RenderingControl) ResetBasicEQ(instanceId int32) (basicEQ *BasicEQ, 
 	return
 }
 
-func (this *RenderingControl) ResetExtEQ(instanceId int32, eqType string) (err error) {
+func (this *RenderingControl) ResetExtEQ(instanceId uint32, eqType string) (err error) {
 	type Response struct {
 		XMLName xml.Name
 		upnp.ErrorResponse
@@ -123,10 +122,10 @@ func (this *RenderingControl) ResetExtEQ(instanceId int32, eqType string) (err e
 	return
 }
 
-func (this *RenderingControl) GetVolume(instanceId int32, channel string) (currentVolume int32, err error) {
+func (this *RenderingControl) GetVolume(instanceId uint32, channel string) (currentVolume uint16, err error) {
 	type Response struct {
 		XMLName       xml.Name
-		CurrentVolume int32
+		CurrentVolume uint16
 		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
@@ -141,7 +140,7 @@ func (this *RenderingControl) GetVolume(instanceId int32, channel string) (curre
 	return
 }
 
-func (this *RenderingControl) SetVolume(instanceId int32, channel string, volume int32) (err error) {
+func (this *RenderingControl) SetVolume(instanceId uint32, channel string, volume uint16) (err error) {
 	type Response struct {
 		XMLName xml.Name
 		upnp.ErrorResponse
@@ -158,10 +157,10 @@ func (this *RenderingControl) SetVolume(instanceId int32, channel string, volume
 	return
 }
 
-func (this *RenderingControl) SetRelativeVolume(instanceId int32, channel string, adjustment int32) (newVolume int32, err error) {
+func (this *RenderingControl) SetRelativeVolume(instanceId uint32, channel string, adjustment int32) (newVolume uint16, err error) {
 	type Response struct {
 		XMLName   xml.Name
-		NewVolume int32
+		NewVolume uint16
 		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
@@ -177,10 +176,10 @@ func (this *RenderingControl) SetRelativeVolume(instanceId int32, channel string
 	return
 }
 
-func (this *RenderingControl) GetVolumeDB(instanceId int32, channel string) (currentVolume int32, err error) {
+func (this *RenderingControl) GetVolumeDB(instanceId uint32, channel string) (currentVolume int16, err error) {
 	type Response struct {
 		XMLName       xml.Name
-		CurrentVolume int32
+		CurrentVolume int16
 		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
@@ -195,7 +194,7 @@ func (this *RenderingControl) GetVolumeDB(instanceId int32, channel string) (cur
 	return
 }
 
-func (this *RenderingControl) SetVolumeDB(instanceId int32, channel string, volume int32) (err error) {
+func (this *RenderingControl) SetVolumeDB(instanceId uint32, channel string, volume int16) (err error) {
 	type Response struct {
 		XMLName xml.Name
 		upnp.ErrorResponse
@@ -212,11 +211,11 @@ func (this *RenderingControl) SetVolumeDB(instanceId int32, channel string, volu
 	return
 }
 
-func (this *RenderingControl) GetVolumeDBRange(instanceId int32, channel string) (min, max int32, err error) {
+func (this *RenderingControl) GetVolumeDBRange(instanceId uint32, channel string) (min, max int16, err error) {
 	type Response struct {
 		XMLName  xml.Name
-		MinValue int32
-		MaxValue int32
+		MinValue int16
+		MaxValue int16
 		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
@@ -232,10 +231,10 @@ func (this *RenderingControl) GetVolumeDBRange(instanceId int32, channel string)
 	return
 }
 
-func (this *RenderingControl) GetBass(instanceId int32) (currentBass int32, err error) {
+func (this *RenderingControl) GetBass(instanceId uint32) (currentBass int16, err error) {
 	type Response struct {
 		XMLName     xml.Name
-		CurrentBass int32
+		CurrentBass int16
 		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
@@ -249,7 +248,7 @@ func (this *RenderingControl) GetBass(instanceId int32) (currentBass int32, err 
 	return
 }
 
-func (this *RenderingControl) SetBass(instanceId, desiredBass int32) (err error) {
+func (this *RenderingControl) SetBass(instanceId, desiredBass int16) (err error) {
 	type Response struct {
 		XMLName xml.Name
 		upnp.ErrorResponse
@@ -265,10 +264,10 @@ func (this *RenderingControl) SetBass(instanceId, desiredBass int32) (err error)
 	return
 }
 
-func (this *RenderingControl) GetTreble(instanceId int32) (currentTreble int32, err error) {
+func (this *RenderingControl) GetTreble(instanceId uint32) (currentTreble int16, err error) {
 	type Response struct {
 		XMLName       xml.Name
-		CurrentTreble int32
+		CurrentTreble int16
 		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
@@ -282,7 +281,7 @@ func (this *RenderingControl) GetTreble(instanceId int32) (currentTreble int32, 
 	return
 }
 
-func (this *RenderingControl) SetTreble(instanceId, desiredTreble int32) (err error) {
+func (this *RenderingControl) SetTreble(instanceId, desiredTreble int16) (err error) {
 	type Response struct {
 		XMLName xml.Name
 		upnp.ErrorResponse
@@ -298,10 +297,10 @@ func (this *RenderingControl) SetTreble(instanceId, desiredTreble int32) (err er
 	return
 }
 
-func (this *RenderingControl) GetEQ(instanceId int32, eqType string) (currentValue int32, err error) {
+func (this *RenderingControl) GetEQ(instanceId uint32, eqType string) (currentValue int16, err error) {
 	type Response struct {
 		XMLName      xml.Name
-		CurrentValue int32
+		CurrentValue int16
 		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
@@ -316,7 +315,7 @@ func (this *RenderingControl) GetEQ(instanceId int32, eqType string) (currentVal
 	return
 }
 
-func (this *RenderingControl) SetEQ(instanceId int32, eqType string, desiredValue int32) (err error) {
+func (this *RenderingControl) SetEQ(instanceId uint32, eqType string, desiredValue int16) (err error) {
 	type Response struct {
 		XMLName xml.Name
 		upnp.ErrorResponse
@@ -333,7 +332,7 @@ func (this *RenderingControl) SetEQ(instanceId int32, eqType string, desiredValu
 	return
 }
 
-func (this *RenderingControl) GetLoudness(instanceId int32, channel string) (loudness bool, err error) {
+func (this *RenderingControl) GetLoudness(instanceId uint32, channel string) (loudness bool, err error) {
 	type Response struct {
 		XMLName         xml.Name
 		CurrentLoudness bool
@@ -351,7 +350,7 @@ func (this *RenderingControl) GetLoudness(instanceId int32, channel string) (lou
 	return
 }
 
-func (this *RenderingControl) SetLoudness(instanceId int32, channel string, loudness bool) (err error) {
+func (this *RenderingControl) SetLoudness(instanceId uint32, channel string, loudness bool) (err error) {
 	type Response struct {
 		XMLName xml.Name
 		upnp.ErrorResponse
@@ -362,6 +361,140 @@ func (this *RenderingControl) SetLoudness(instanceId int32, channel string, loud
 		{"DesiredLoudness", loudness},
 	}
 	response := upnp.Call(this.Svc, "SetLoudness", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = upnp.CheckResponse(&doc.ErrorResponse)
+	return
+}
+
+func (this *RenderingControl) GetSupportsOutputFixed(instanceId uint32) (currentSupportsFixed bool, err error) {
+	type Response struct {
+		XMLName              xml.Name
+		CurrentSupportsFixed bool
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "GetSupportsOutputFixed", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	currentSupportsFixed = doc.CurrentSupportsFixed
+	err = upnp.CheckResponse(&doc.ErrorResponse)
+	return
+}
+
+func (this *RenderingControl) GetOutputFixed(instanceId uint32) (currentFixed bool, err error) {
+	type Response struct {
+		XMLName      xml.Name
+		CurrentFixed bool
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "GetOutputFixed", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = upnp.CheckResponse(&doc.ErrorResponse)
+	currentFixed = doc.CurrentFixed
+	return
+}
+
+func (this *RenderingControl) SetOutputFixed(instanceId uint32, desiredFixed bool) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"DesiredFixed", desiredFixed},
+	}
+	response := upnp.Call(this.Svc, "SetOutputFixed", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = upnp.CheckResponse(&doc.ErrorResponse)
+	return
+}
+
+func (this *RenderingControl) GetHeadphoneConnected(instanceId uint32) (currentHeadphoneConnected bool, err error) {
+	type Response struct {
+		XMLName                   xml.Name
+		CurrentHeadphoneConnected bool
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "GetHeadphoneConnected", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	currentHeadphoneConnected = doc.CurrentHeadphoneConnected
+	err = upnp.CheckResponse(&doc.ErrorResponse)
+	return
+}
+
+const (
+	RampType_SleepTimer = "SLEEP_TIMER_RAMP_TYPE"
+	RampType_Alarm      = "ALARM_RAMP_TYPE"
+	RampType_Autoplay   = "AUTOPLAY_RAMP_TYPE"
+)
+
+type RampRequest struct {
+	RampType         string
+	DesiredVolume    uint16
+	ResetVolumeAfter bool
+	ProgramURI       string
+}
+
+func (this *RenderingControl) RampToVolume(instanceId uint32, channel, req RampRequest) (rampTime uint32, err error) {
+	type Response struct {
+		XMLName  xml.Name
+		RampTime uint32
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"Channel", channel},
+		{"RampType", req.RampType},
+		{"DesiredVolume", req.DesiredVolume},
+		{"ResetVolumeAfter", req.ResetVolumeAfter},
+		{"ProgramURI", req.ProgramURI},
+	}
+	response := upnp.Call(this.Svc, "RampToVolume", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	rampTime = doc.RampTime
+	err = upnp.CheckResponse(&doc.ErrorResponse)
+	return
+}
+
+func (this *RenderingControl) RestoreVolumePriorToRamp(instanceId uint32, channel string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"Channel", channel},
+	}
+	response := upnp.Call(this.Svc, "RestoreVolumePriorToRamp", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = upnp.CheckResponse(&doc.ErrorResponse)
+	return
+}
+
+func (this *RenderingControl) SetChannelMap(instanceId uint32, channelMap string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"ChannelMap", channelMap},
+	}
+	response := upnp.Call(this.Svc, "SetChannelMap", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = upnp.CheckResponse(&doc.ErrorResponse)

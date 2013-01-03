@@ -39,3 +39,6 @@ clean ::
 	$(GO) clean -i -x
 	$(GO) clean -i -x $(PACKAGE)/cscl
 
+wc ::
+	wc -l *.go */*.go
+

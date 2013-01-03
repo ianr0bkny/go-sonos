@@ -33,6 +33,7 @@ package sonos
 import (
 	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/upnp"
+	_ "log"
 )
 
 type MusicServices struct {
@@ -82,10 +83,11 @@ type msServices_XML struct {
 	Service []msService_XML `xml:"Service"`
 }
 
-func (this *MusicServices) GetSessionId(serviceId int32, username string) (sessionId string) {
+func (this *MusicServices) GetSessionId(serviceId int16, username string) (sessionId string, err error) {
 	type Response struct {
 		XMLName   xml.Name
 		SessionId string
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
 		{"ServiceId", serviceId},
@@ -94,31 +96,37 @@ func (this *MusicServices) GetSessionId(serviceId int32, username string) (sessi
 	response := upnp.Call(this.Svc, "GetSessionId", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO: Error handling
-	return doc.SessionId
+	sessionId = doc.SessionId
+	err = upnp.CheckResponse(&doc.ErrorResponse)
+	return
 }
 
-func (this *MusicServices) ListAvailableServices() {
+func (this *MusicServices) ListAvailableServices() (err error) {
 	type Response struct {
 		XMLName                        xml.Name
 		AvailableServiceDescriptorList string
 		AvailableServiceTypeList       string
 		AvailableServiceListVersion    string
+		upnp.ErrorResponse
 	}
 	response := upnp.CallVa(this.Svc, "ListAvailableServices")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	services := msServices_XML{}
 	xml.Unmarshal([]byte(doc.AvailableServiceDescriptorList), &services)
+	err = upnp.CheckResponse(&doc.ErrorResponse)
 	// TODO: Return value
+	return
 }
 
-func (this *MusicServices) UpdateAvailableServices() {
+func (this *MusicServices) UpdateAvailableServices() (err error) {
 	type Response struct {
 		XMLName xml.Name
+		upnp.ErrorResponse
 	}
 	response := upnp.CallVa(this.Svc, "UpdateAvailableServices")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO: Error handling
+	err = upnp.CheckResponse(&doc.ErrorResponse)
+	return
 }
