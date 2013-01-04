@@ -57,7 +57,7 @@ func (this *ZoneGroupTopology) BeginSoftwareUpdate(updateURL string, flags uint3
 	response := upnp.Call(this.Svc, "BeginSoftwareUpdate", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -96,7 +96,7 @@ func (this *ZoneGroupTopology) CheckForUpdate(updateType UpdateType, cachedOnly 
 	rec := UpdateItemHolder{}
 	xml.Unmarshal([]byte(doc.UpdateItem.Text), &rec)
 	updateItem = &rec.UpdateItem
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -117,7 +117,7 @@ func (this *ZoneGroupTopology) ReportUnresponsiveDevice(deviceUUID string, desir
 	response := upnp.Call(this.Svc, "ReportUnresponsiveDevice", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -129,7 +129,7 @@ func (this *ZoneGroupTopology) ReportAlarmStartedRunning() (err error) {
 	response := upnp.CallVa(this.Svc, "ReportAlarmStartedRunning")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -143,7 +143,7 @@ func (this *ZoneGroupTopology) SubmitDiagnostics() (diagnosticId string, err err
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	diagnosticId = doc.DiagnosticID
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -160,6 +160,6 @@ func (this *ZoneGroupTopology) RegisterMobileDevice(deviceName, deviceUDN, devic
 	response := upnp.Call(this.Svc, "RegisterMobileDevice", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }

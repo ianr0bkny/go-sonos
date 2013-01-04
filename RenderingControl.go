@@ -59,8 +59,8 @@ func (this *RenderingControl) GetMute(instanceId uint32, channel string) (curren
 	response := upnp.Call(this.Svc, "GetMute", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
 	currentMute = doc.CurrentMute
+	err = doc.Error()
 	return
 }
 
@@ -77,7 +77,7 @@ func (this *RenderingControl) SetMute(instanceId uint32, channel string, desired
 	response := upnp.Call(this.Svc, "SetMute", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -102,7 +102,7 @@ func (this *RenderingControl) ResetBasicEQ(instanceId uint32) (basicEQ *BasicEQ,
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	basicEQ = &doc.BasicEQ
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -118,7 +118,7 @@ func (this *RenderingControl) ResetExtEQ(instanceId uint32, eqType string) (err 
 	response := upnp.Call(this.Svc, "ResetExtEQ", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -135,8 +135,8 @@ func (this *RenderingControl) GetVolume(instanceId uint32, channel string) (curr
 	response := upnp.Call(this.Svc, "GetVolume", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
 	currentVolume = doc.CurrentVolume
+	err = doc.Error()
 	return
 }
 
@@ -153,7 +153,7 @@ func (this *RenderingControl) SetVolume(instanceId uint32, channel string, volum
 	response := upnp.Call(this.Svc, "SetVolume", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -172,7 +172,7 @@ func (this *RenderingControl) SetRelativeVolume(instanceId uint32, channel strin
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	newVolume = doc.NewVolume
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -189,8 +189,8 @@ func (this *RenderingControl) GetVolumeDB(instanceId uint32, channel string) (cu
 	response := upnp.Call(this.Svc, "GetVolumeDB", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
 	currentVolume = doc.CurrentVolume
+	err = doc.Error()
 	return
 }
 
@@ -207,7 +207,7 @@ func (this *RenderingControl) SetVolumeDB(instanceId uint32, channel string, vol
 	response := upnp.Call(this.Svc, "SetVolumeDB", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -225,9 +225,9 @@ func (this *RenderingControl) GetVolumeDBRange(instanceId uint32, channel string
 	response := upnp.Call(this.Svc, "GetVolumeDBRange", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
 	min = doc.MinValue
 	max = doc.MaxValue
+	err = doc.Error()
 	return
 }
 
@@ -243,8 +243,8 @@ func (this *RenderingControl) GetBass(instanceId uint32) (currentBass int16, err
 	response := upnp.Call(this.Svc, "GetBass", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
 	currentBass = doc.CurrentBass
+	err = doc.Error()
 	return
 }
 
@@ -260,7 +260,7 @@ func (this *RenderingControl) SetBass(instanceId, desiredBass int16) (err error)
 	response := upnp.Call(this.Svc, "SetBass", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -276,8 +276,8 @@ func (this *RenderingControl) GetTreble(instanceId uint32) (currentTreble int16,
 	response := upnp.Call(this.Svc, "GetTreble", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
 	currentTreble = doc.CurrentTreble
+	err = doc.Error()
 	return
 }
 
@@ -293,7 +293,7 @@ func (this *RenderingControl) SetTreble(instanceId, desiredTreble int16) (err er
 	response := upnp.Call(this.Svc, "SetTreble", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -310,8 +310,8 @@ func (this *RenderingControl) GetEQ(instanceId uint32, eqType string) (currentVa
 	response := upnp.Call(this.Svc, "GetEQ", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
 	currentValue = doc.CurrentValue
+	err = doc.Error()
 	return
 }
 
@@ -328,7 +328,7 @@ func (this *RenderingControl) SetEQ(instanceId uint32, eqType string, desiredVal
 	response := upnp.Call(this.Svc, "SetEQ", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -345,8 +345,8 @@ func (this *RenderingControl) GetLoudness(instanceId uint32, channel string) (lo
 	response := upnp.Call(this.Svc, "GetLoudness", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
 	loudness = doc.CurrentLoudness
+	err = doc.Error()
 	return
 }
 
@@ -363,7 +363,7 @@ func (this *RenderingControl) SetLoudness(instanceId uint32, channel string, lou
 	response := upnp.Call(this.Svc, "SetLoudness", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -380,7 +380,7 @@ func (this *RenderingControl) GetSupportsOutputFixed(instanceId uint32) (current
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentSupportsFixed = doc.CurrentSupportsFixed
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -396,8 +396,8 @@ func (this *RenderingControl) GetOutputFixed(instanceId uint32) (currentFixed bo
 	response := upnp.Call(this.Svc, "GetOutputFixed", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
 	currentFixed = doc.CurrentFixed
+	err = doc.Error()
 	return
 }
 
@@ -413,7 +413,7 @@ func (this *RenderingControl) SetOutputFixed(instanceId uint32, desiredFixed boo
 	response := upnp.Call(this.Svc, "SetOutputFixed", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -430,7 +430,7 @@ func (this *RenderingControl) GetHeadphoneConnected(instanceId uint32) (currentH
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentHeadphoneConnected = doc.CurrentHeadphoneConnected
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -465,7 +465,7 @@ func (this *RenderingControl) RampToVolume(instanceId uint32, channel, req RampR
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	rampTime = doc.RampTime
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -481,7 +481,7 @@ func (this *RenderingControl) RestoreVolumePriorToRamp(instanceId uint32, channe
 	response := upnp.Call(this.Svc, "RestoreVolumePriorToRamp", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -497,6 +497,6 @@ func (this *RenderingControl) SetChannelMap(instanceId uint32, channelMap string
 	response := upnp.Call(this.Svc, "SetChannelMap", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }

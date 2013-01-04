@@ -67,9 +67,9 @@ type ErrorResponse struct {
 	} `xml:"detail"`
 }
 
-func CheckResponse(e *ErrorResponse) (err error) {
-	if 0 < len(e.FaultCode) {
-		err = errors.New(e.Detail.UPnPError.ErrorCode)
+func (this *ErrorResponse) Error() (err error) {
+	if 0 < len(this.FaultCode) {
+		err = errors.New(this.Detail.UPnPError.ErrorCode)
 	}
 	return
 }

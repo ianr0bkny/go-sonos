@@ -97,7 +97,7 @@ func (this *MusicServices) GetSessionId(serviceId int16, username string) (sessi
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	sessionId = doc.SessionId
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }
 
@@ -114,7 +114,7 @@ func (this *MusicServices) ListAvailableServices() (err error) {
 	xml.Unmarshal([]byte(response), &doc)
 	services := msServices_XML{}
 	xml.Unmarshal([]byte(doc.AvailableServiceDescriptorList), &services)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	// TODO: Return value
 	return
 }
@@ -127,6 +127,6 @@ func (this *MusicServices) UpdateAvailableServices() (err error) {
 	response := upnp.CallVa(this.Svc, "UpdateAvailableServices")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = upnp.CheckResponse(&doc.ErrorResponse)
+	err = doc.Error()
 	return
 }

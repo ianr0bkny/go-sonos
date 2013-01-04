@@ -45,6 +45,81 @@ const (
 	TEST_NETWORK       = "eth0"
 )
 
+func TestDeviceProperites(t *testing.T) {
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	c := config.MakeConfig(TEST_CONFIG)
+	c.Init()
+	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
+		s := sonos.Connect(dev, reactor)
+
+		if err := s.SetLEDState(sonos.LEDState_On); nil != err {
+			log.Printf("%#v", err)
+		}
+		if currentLEDState, err := s.GetLEDState(); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("CurrentLEDState = %v", currentLEDState)
+		}
+
+		if err := s.SetInvisible(false); nil != err {
+			log.Printf("%#v", err)
+		}
+		if currentInvisible, err := s.GetInvisible(); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("CurrentInvisible = %v", currentInvisible)
+		}
+
+		if name, icon, err := s.GetZoneAttributes(); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("CurrentZoneName = %v", name)
+			log.Printf("CurrentIcon = %v", icon)
+		}
+
+		if id, err := s.GetHouseholdID(); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("CurrentHouseholdID = %s", id)
+		}
+
+		if info, err := s.GetZoneInfo(); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("%#v", info)
+		}
+
+		if err := s.SetAutoplayLinkedZones(false); nil != err {
+			log.Printf("%#v", err)
+		}
+
+		if inc, err := s.GetAutoplayLinkedZones(); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("IncludeLinkedZones = %v", inc)
+		}
+
+		if uuid, err := s.GetAutoplayRoomUUID(); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("AutoplayRoomUUID = %s", uuid)
+		}
+
+		if volume, err := s.GetAutoplayVolume(); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("AutoplayVolume = %v", volume)
+		}
+
+		if use, err := s.GetUseAutoplayVolume(); nil != err {
+			log.Printf("%#v", err)
+		} else {
+			log.Printf("UseAutoplayVolume = %v", use)
+		}
+	}
+}
+
 func TestRenderingControl(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	c := config.MakeConfig(TEST_CONFIG)
@@ -174,8 +249,8 @@ func TestDiscover(t *testing.T) {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		found := sonos.ConnectAny(mgr, reactor)
 		for _, s := range found {
-			id := s.GetHouseholdID()
-			name, _ := s.GetZoneAttributes()
+			id, _ := s.GetHouseholdID()
+			name, _, _ := s.GetZoneAttributes()
 			caps := s.GetSearchCapabilities()
 
 			s.SetPlayMode(0, sonos.REPEAT_ALL)
