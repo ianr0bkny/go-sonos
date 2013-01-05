@@ -34,52 +34,96 @@ import (
 	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/didl"
 	"github.com/ianr0bkny/go-sonos/upnp"
+	_ "log"
 )
 
 type ContentDirectory struct {
 	Svc *upnp.Service
 }
 
-func (this *ContentDirectory) GetSearchCapabilities() string {
+func (this *ContentDirectory) GetSearchCapabilities() (searchCaps string, err error) {
 	type Response struct {
 		XMLName    xml.Name
 		SearchCaps string
+		upnp.ErrorResponse
 	}
 	response := upnp.CallVa(this.Svc, "GetSearchCapabilities")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	return doc.SearchCaps
+	searchCaps = doc.SearchCaps
+	err = doc.Error()
+	return
 }
 
-func (this *ContentDirectory) GetSortCapabilities() string {
+func (this *ContentDirectory) GetSortCapabilities() (sortCaps string, err error) {
 	type Response struct {
 		XMLName  xml.Name
 		SortCaps string
+		upnp.ErrorResponse
 	}
 	response := upnp.CallVa(this.Svc, "GetSortCapabilities")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	return doc.SortCaps
+	sortCaps = doc.SortCaps
+	err = doc.Error()
+	return
 }
 
-func (this *ContentDirectory) GetLastIndexChange() string {
+func (this *ContentDirectory) GetSystemUpdateID() (id string, err error) {
+	type Response struct {
+		XMLName xml.Name
+		Id      string
+		upnp.ErrorResponse
+	}
+	response := upnp.CallVa(this.Svc, "GetSystemUpdateID")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	id = doc.Id
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) GetAlbumArtistDisplayOption() (albumArtistDisplayOption string, err error) {
+	type Response struct {
+		XMLName                  xml.Name
+		AlbumArtistDisplayOption string
+		upnp.ErrorResponse
+	}
+	response := upnp.CallVa(this.Svc, "GetAlbumArtistDisplayOption")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	albumArtistDisplayOption = doc.AlbumArtistDisplayOption
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) GetLastIndexChange() (lastIndexChange string, err error) {
 	type Response struct {
 		XMLName         xml.Name
 		LastIndexChange string
+		upnp.ErrorResponse
 	}
 	response := upnp.CallVa(this.Svc, "GetLastIndexChange")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	return doc.LastIndexChange
+	lastIndexChange = doc.LastIndexChange
+	err = doc.Error()
+	return
 }
 
-func (this *ContentDirectory) Browse(object, flag, filter string, start, count int, sort string) (result *didl.Lite) {
+type BrowseResult struct {
+	Result         string
+	NumberReturned int32
+	TotalMatches   int32
+	UpdateID       int32
+	Doc            *didl.Lite
+}
+
+func (this *ContentDirectory) Browse(object, flag, filter string, start, count uint32, sort string) (browseResult *BrowseResult, err error) {
 	type Response struct {
-		XMLName        xml.Name
-		Result         string
-		NumberReturned int
-		TotalMatches   int
-		UpdateID       int
+		XMLName xml.Name
+		BrowseResult
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
 		{"ObjectID", object},
@@ -92,9 +136,189 @@ func (this *ContentDirectory) Browse(object, flag, filter string, start, count i
 	response := upnp.Call(this.Svc, "Browse", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	//log.Printf("%s", doc.Result)
-	result = &didl.Lite{}
-	xml.Unmarshal([]byte(doc.Result), &result)
-	//log.Printf("%#v", result)
+	doc.Doc = &didl.Lite{}
+	xml.Unmarshal([]byte(doc.Result), doc.Doc)
+	browseResult = &doc.BrowseResult
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) FindPrefix(objectId, prefix string) (startingIndex, updateId uint32, err error) {
+	type Response struct {
+		XMLName       xml.Name
+		StartingIndex uint32
+		UpdateID      uint32
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"StartingIndex", startingIndex},
+		{"UpdateID", updateId},
+	}
+	response := upnp.Call(this.Svc, "FindPrefix", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	startingIndex = doc.StartingIndex
+	updateId = doc.UpdateID
+	err = doc.Error()
+	return
+}
+
+type PrefixLocations struct {
+	TotalPrefixes     uint32
+	PrefixAndIndexCSV string
+	UpdateID          uint32
+}
+
+func (this *ContentDirectory) GetAllPrefixLocations(objectId string) (prefixLocations *PrefixLocations, err error) {
+	type Response struct {
+		XMLName xml.Name
+		PrefixLocations
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"ObjectID", objectId},
+	}
+	response := upnp.Call(this.Svc, "GetAllPrefixLocations", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	prefixLocations = &doc.PrefixLocations
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) CreateObject(container, elements string) (objectId, result string, err error) {
+	type Response struct {
+		XMLName  xml.Name
+		ObjectID string
+		Result   string
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"Container", container},
+		{"Elements", elements},
+	}
+	response := upnp.Call(this.Svc, "CreateObject", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	objectId = doc.ObjectID
+	result = doc.Result
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) UpdateObject(objectId, currentTagValue, newTagValue string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"ObjectID", objectId},
+		{"CurrentTagValue", currentTagValue},
+		{"NewTagValue", newTagValue},
+	}
+	response := upnp.Call(this.Svc, "UpdateObject", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) DestroyObject(objectId string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"ObjectID", objectId},
+	}
+	response := upnp.Call(this.Svc, "DestroyObject", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) RefreshShareList() (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	response := upnp.CallVa(this.Svc, "RefreshShareList")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) RefreshShareIndex(albumArtistDisplayOption string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"AlbumArtistDisplayOption", albumArtistDisplayOption},
+	}
+	response := upnp.Call(this.Svc, "RefreshShareIndex", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) RequestResort(sortOrder string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"SortOrder", sortOrder},
+	}
+	response := upnp.Call(this.Svc, "RequestResort", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) GetShareIndexInProgress(isIndexing bool, err error) {
+	type Response struct {
+		XMLName    xml.Name
+		IsIndexing bool
+		upnp.ErrorResponse
+	}
+	response := upnp.CallVa(this.Svc, "GetShareIndexInProgress")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	isIndexing = doc.IsIndexing
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) GetBrowseable() (isBrowseable bool, err error) {
+	type Response struct {
+		XMLName      xml.Name
+		IsBrowseable bool
+		upnp.ErrorResponse
+	}
+	response := upnp.CallVa(this.Svc, "GetBrowseable")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	isBrowseable = doc.IsBrowseable
+	err = doc.Error()
+	return
+}
+
+func (this *ContentDirectory) SetBrowseable(browseable bool) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"Browseable", browseable},
+	}
+	response := upnp.Call(this.Svc, "SetBrowseable", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
 	return
 }

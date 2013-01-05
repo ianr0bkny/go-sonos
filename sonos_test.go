@@ -251,7 +251,7 @@ func TestDiscover(t *testing.T) {
 		for _, s := range found {
 			id, _ := s.GetHouseholdID()
 			name, _, _ := s.GetZoneAttributes()
-			caps := s.GetSearchCapabilities()
+			caps, _ := s.GetSearchCapabilities()
 
 			s.SetPlayMode(0, sonos.REPEAT_ALL)
 			s.GetCrossfadeMode(0)
@@ -285,7 +285,8 @@ func TestDiscover(t *testing.T) {
 				s.Browse("S://perseus/sonos/iTunes/Music/The Who", "BrowseDirectChildren", "*", 0, 0, "")
 			*/
 			// browse the //perseus/sonos/iTunes/Music/The Who/Tommy share
-			s.Browse("S://perseus/sonos/iTunes/Music/The Who/Tommy", "BrowseDirectChildren", "*", 0, 0, "")
+			x, _ := s.Browse("S://perseus/sonos/iTunes/Music/The Who/Tommy", "BrowseDirectChildren", "*", 0, 0, "")
+			log.Printf("%#v", x)
 
 			/*
 				// browse music attributes

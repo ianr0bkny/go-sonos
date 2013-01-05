@@ -31,9 +31,66 @@
 package sonos
 
 import (
+	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/upnp"
+	_ "log"
 )
 
 type GroupManagement struct {
 	Svc *upnp.Service
+}
+
+type MemberInfo struct {
+	CurrentTransportSettings string
+	GroupUUIDJoined          string
+	ResetVolumeAfter         bool
+	VolumeAVTransportURI     string
+}
+
+func (this *GroupManagement) AddMember(memberId string) (memberInfo *MemberInfo, err error) {
+	type Response struct {
+		XMLName xml.Name
+		MemberInfo
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"MemberID", memberId},
+	}
+	response := upnp.Call(this.Svc, "AddMember", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	memberInfo = &doc.MemberInfo
+	err = doc.Error()
+	return
+}
+
+func (this *GroupManagement) RemoveMember(memberId string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"MemberID", memberId},
+	}
+	response := upnp.Call(this.Svc, "RemoveMember", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *GroupManagement) ReportTrackBufferingResult(memberId string, resultCode int32) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"MemberID", memberId},
+		{"ResultCode", resultCode},
+	}
+	response := upnp.Call(this.Svc, "ReportTrackBufferingResult", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
 }

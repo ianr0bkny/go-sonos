@@ -33,52 +33,79 @@ package sonos
 import (
 	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/upnp"
+	_ "log"
 )
 
 type ConnectionManager struct {
 	Svc *upnp.Service
 }
 
-func (this *ConnectionManager) GetProtocolInfo() (source, sink string) {
+func (this *ConnectionManager) GetProtocolInfo() (source, sink string, err error) {
 	type Response struct {
 		XMLName xml.Name
 		Source  string
 		Sink    string
+		upnp.ErrorResponse
 	}
 	response := upnp.CallVa(this.Svc, "GetProtocolInfo")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	return doc.Source, doc.Sink
+	source = doc.Source
+	sink = doc.Sink
+	err = doc.Error()
+	return
 }
 
-func (this *ConnectionManager) GetCurrentConnectionIDs() string {
+func (this *ConnectionManager) GetCurrentConnectionIDs() (connectionIds string, err error) {
 	type Response struct {
 		XMLName       xml.Name
 		ConnectionIDs string
+		upnp.ErrorResponse
 	}
 	response := upnp.CallVa(this.Svc, "GetCurrentConnectionIDs")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	return doc.ConnectionIDs
+	connectionIds = doc.ConnectionIDs
+	err = doc.Error()
+	return
 }
 
+const (
+	Direction_Input  = "Input"
+	Direction_Output = "Output"
+)
+
+const (
+	Status_OK                    = "OK"
+	Status_ContentFormatMismatch = "ContentFormatMismatch"
+	Status_InsufficientBandwidth = "InsufficientBandwidth"
+	Status_UnreliableChannel     = "UnreliableChannel"
+	Status_Unknown               = "Unknown"
+)
+
 type ConnectionInfo struct {
-	RcsID                 int
-	AVTransportID         int
+	RcsID                 int32
+	AVTransportID         int32
 	ProtocolInfo          string
 	PeerConnectionManager string
-	PeerConnectionID      int
+	PeerConnectionID      int32
 	Direction             string
 	Status                string
 }
 
-func (this *ConnectionManager) GetCurrentConnectionInfo(connection int) *ConnectionInfo {
+func (this *ConnectionManager) GetCurrentConnectionInfo(connectionId int32) (connectionInfo *ConnectionInfo, err error) {
 	type Response struct {
 		XMLName xml.Name
 		ConnectionInfo
+		upnp.ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "GetCurrentConnectionInfo", "ConnectionID", connection)
+	args := []upnp.Arg{
+		{"ConnectionID", connectionId},
+	}
+	response := upnp.Call(this.Svc, "GetCurrentConnectionInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	return &doc.ConnectionInfo
+	connectionInfo = &doc.ConnectionInfo
+	err = doc.Error()
+	return
 }
