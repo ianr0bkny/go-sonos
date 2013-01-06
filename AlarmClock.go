@@ -31,9 +31,139 @@
 package sonos
 
 import (
+	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/upnp"
+	_ "log"
 )
 
 type AlarmClock struct {
 	Svc *upnp.Service
+}
+
+func (this *AlarmClock) SetFormat(desiredTimeFormat, desiredDateFormat string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"DesiredTimeFormat", desiredTimeFormat},
+		{"DesiredDateFormat", desiredDateFormat},
+	}
+	response := upnp.Call(this.Svc, "SetFormat", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AlarmClock) GetFormat() (currentTimeFormat, currentDateFormat string, err error) {
+	type Response struct {
+		XMLName           xml.Name
+		CurrentTimeFormat string
+		CurrentDateFormat string
+		upnp.ErrorResponse
+	}
+	response := upnp.CallVa(this.Svc, "GetFormat")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	currentTimeFormat = doc.CurrentTimeFormat
+	currentDateFormat = doc.CurrentDateFormat
+	err = doc.Error()
+	return
+}
+
+func (this *AlarmClock) SetTimeZone(index int32, autoAdjustDst bool) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"Index", index},
+		{"AutoAdjustDst", autoAdjustDst},
+	}
+	response := upnp.Call(this.Svc, "SetTimeZone", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AlarmClock) GetTimeZone() (index int32, autoAdjustDst bool, err error) {
+	type Response struct {
+		XMLName       xml.Name
+		Index         int32
+		AutoAdjustDst bool
+		upnp.ErrorResponse
+	}
+	response := upnp.CallVa(this.Svc, "GetTimeZone")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	index = doc.Index
+	autoAdjustDst = doc.AutoAdjustDst
+	err = doc.Error()
+	return
+}
+
+func (this *AlarmClock) GetTimeZoneAndRule() (index int32, autoAdjustDst bool, timeZone string, err error) {
+	type Response struct {
+		XMLName       xml.Name
+		Index         int32
+		AutoAdjustDst bool
+		TimeZone      string
+		upnp.ErrorResponse
+	}
+	response := upnp.CallVa(this.Svc, "GetTimeZoneAndRule")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	index = doc.Index
+	autoAdjustDst = doc.AutoAdjustDst
+	timeZone = doc.TimeZone
+	err = doc.Error()
+	return
+}
+
+func (this *AlarmClock) GetTimeZoneRule(index int32) (timeZone string, err error) {
+	type Response struct {
+		XMLName       xml.Name
+		TimeZone      string
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg {
+		{"Index", index},
+	}
+	response := upnp.Call(this.Svc, "GetTimeZoneRule", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	timeZone = doc.TimeZone
+	err = doc.Error()
+	return
+}
+
+func (this *AlarmClock) SetTimeServer(desiredTimeServer string) (err error) {
+	type Response struct {
+		XMLName       xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg {
+		{"DesiredTimeServer", desiredTimeServer},
+	}
+	response := upnp.Call(this.Svc, "SetTimeServer", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AlarmClock) GetTimeServer() (currentTimeServer string, err error) {
+	type Response struct {
+		XMLName       xml.Name
+		CurrentTimeServer string
+		upnp.ErrorResponse
+	}
+	response := upnp.CallVa(this.Svc, "GetTimeServer")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	currentTimeServer = doc.CurrentTimeServer
+	err = doc.Error()
+	return
 }
