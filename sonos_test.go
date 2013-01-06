@@ -253,7 +253,7 @@ func TestDiscover(t *testing.T) {
 			name, _, _ := s.GetZoneAttributes()
 			caps, _ := s.GetSearchCapabilities()
 
-			s.SetPlayMode(0, sonos.REPEAT_ALL)
+			s.SetPlayMode(0, sonos.PlayMode_REPEAT_ALL)
 			s.GetCrossfadeMode(0)
 			s.GetTransportSettings(0)
 			s.GetDeviceCapabilities(0)

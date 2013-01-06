@@ -2,4 +2,4 @@ go-sonos
 ========
 
   1.  Service descriptions should be used to validate SOAP method calls
-
+  2.  Should have a version of upnp.Call that uses reflection to extract arguments from a struct

@@ -39,253 +39,207 @@ type AVTransport struct {
 	Svc *upnp.Service
 }
 
-const (
-	NORMAL           = "NORMAL"
-	REPEAT_ALL       = "REPEAT_ALL"
-	SHUFFLE_NOREPEAT = "SHUFFLE_NOREPEAT"
-	SHUFFLE          = "SHUFFLE"
-)
-
-func (this *AVTransport) SetPlayMode(instance int, mode string) {
+func (this *AVTransport) SetAVTransportURI(instanceId uint32, currentURI, currentURIMetaData string) (err error) {
 	type Response struct {
 		XMLName xml.Name
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
-		{"NewPlayMode", mode},
+		{"InstanceID", instanceId},
+		{"CurrentURI", currentURI},
+		{"CurrentURIMetaData", currentURIMetaData},
 	}
-	response := upnp.Call(this.Svc, "SetPlayMode", args)
+	response := upnp.Call(this.Svc, "SetAVTransportURI", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO
+	err = doc.Error()
+	return
 }
 
-func (this *AVTransport) PreviousSection(instance int) {
+type AddRequest struct {
+	EnqueuedURI                     string
+	EnqueuedURIMetaData             string
+	DesiredFirstTrackNumberEnqueued uint32
+	EnqueueAsNext                   bool
+}
+
+type AddResponse struct {
+	FirstTrackNumberEnqueued uint32
+	NumTracksAdded           uint32
+	NewQueueLength           uint32
+}
+
+func (this *AVTransport) AddURIToQueue(instanceId uint32, req *AddRequest) (resp *AddResponse, err error) {
 	type Response struct {
 		XMLName xml.Name
+		AddResponse
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
+		{"InstanceID", instanceId},
+		{"EnqueuedURI", req.EnqueuedURI},
+		{"EnqueuedURIMetaData", req.EnqueuedURIMetaData},
+		{"DesiredFirstTrackNumberEnqueued", req.DesiredFirstTrackNumberEnqueued},
+		{"EnqueueAsNext", req.EnqueueAsNext},
 	}
-	response := upnp.Call(this.Svc, "PreviousSection", args)
+	response := upnp.Call(this.Svc, "AddURIToQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO
+	resp = &doc.AddResponse
+	err = doc.Error()
+	return
 }
 
-func (this *AVTransport) NextSection(instance int) {
+type MultiAddRequest struct {
+	UpdateID                        uint32
+	NumberOfURIs                    uint32
+	EnqueuedURIs                    string
+	EnqueuedURIsMetaData            string
+	ContainerURI                    string
+	ContainerMetaData               string
+	DesiredFirstTrackNumberEnqueued uint32
+	EnqueueAsNext                   bool
+}
+
+type MultiAddResponse struct {
+	FirstTrackNumberEnqueued uint32
+	NumTracksAdded           uint32
+	NewQueueLength           uint32
+	NewUpdateID              uint32
+}
+
+func (this *AVTransport) AddMultipleURIsToQueue(instanceId uint32, req *MultiAddRequest) (resp *MultiAddResponse, err error) {
 	type Response struct {
 		XMLName xml.Name
+		MultiAddResponse
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
+		{"InstanceID", instanceId},
+		{"UdpateID", req.UpdateID},
+		{"NumberOfURIs", req.NumberOfURIs},
+		{"EnqueuedURIs", req.EnqueuedURIs},
+		{"EnqueuedURIsMetaData", req.EnqueuedURIsMetaData},
+		{"ContainerURI", req.ContainerURI},
+		{"ContainerMetaData", req.ContainerMetaData},
+		{"DesiredFirstTrackNumberEnqueued", req.DesiredFirstTrackNumberEnqueued},
+		{"EnqueueAsNext", req.EnqueueAsNext},
 	}
-	response := upnp.Call(this.Svc, "NextSection", args)
+	response := upnp.Call(this.Svc, "AddMultipleURIsToQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO
+	resp = &doc.MultiAddResponse
+	err = doc.Error()
+	return
 }
 
-func (this *AVTransport) Previous(instance int) {
+func (this *AVTransport) ReorderTracksInQueue(instanceId, startingIndex, numberOfTracks, insertBefore, updateId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
+		{"InstanceID", instanceId},
+		{"StartingIndex", startingIndex},
+		{"NumberOfTracks", numberOfTracks},
+		{"InsertBefore", insertBefore},
+		{"UpdateID", updateId},
 	}
-	response := upnp.Call(this.Svc, "Previous", args)
+	response := upnp.Call(this.Svc, "ReorderTracksInQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO
+	err = doc.Error()
+	return
 }
 
-func (this *AVTransport) NextProgrammedRadioTracks(instance int) {
+func (this *AVTransport) RemoveTrackFromQueue(instanceId uint32, objectId string, updateId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
+		{"InstanceID", instanceId},
+		{"ObjectID", objectId},
+		{"UpdateID", updateId},
 	}
-	response := upnp.Call(this.Svc, "NextProgrammedRadioTracks", args)
+	response := upnp.Call(this.Svc, "RemoveTrackFromQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO
+	err = doc.Error()
+	return
 }
 
-func (this *AVTransport) Next(instance int) {
+func (this *AVTransport) RemoveTrackRangeFromQueue(instanceId, updateId, startingIndex, numberOfTracks uint32) (newUpdateId uint32, err error) {
+	type Response struct {
+		XMLName     xml.Name
+		NewUpdateID uint32
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"UpdateID", updateId},
+		{"StartingIndex", startingIndex},
+		{"NumberOfTracks", numberOfTracks},
+	}
+	response := upnp.Call(this.Svc, "RemoveTrackRangeFromQueue", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	newUpdateId = doc.NewUpdateID
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) RemoveAllTracksFromQueue(instanceId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
+		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "Next", args)
+	response := upnp.Call(this.Svc, "RemoveAllTracksFromQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO
+	err = doc.Error()
+	return
 }
 
-const (
-	TRACK_NR = "TRACK_NR"
-	REL_TIME = "REL_TIME"
-	SECTION  = "SECTION"
-)
+func (this *AVTransport) SaveQueue(instanceId uint32, title, objectId string) (assignedObjectId string, err error) {
+	type Response struct {
+		XMLName          xml.Name
+		AssignedObjectID string
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"Title", title},
+		{"ObjectID", objectId},
+	}
+	response := upnp.Call(this.Svc, "SaveQueue", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	assignedObjectId = doc.AssignedObjectID
+	err = doc.Error()
+	return
+}
 
-func (this *AVTransport) Seek(instance int, unit, target string) {
+func (this *AVTransport) BackupQueue(instanceId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
-		{"Unit", unit},
-		{"Target", target},
+		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "Seek", args)
+	response := upnp.Call(this.Svc, "BackupQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO
-}
-
-func (this *AVTransport) Pause(instance int) {
-	type Response struct {
-		XMLName xml.Name
-	}
-	args := []upnp.Arg{
-		{"InstanceID", instance},
-	}
-	response := upnp.Call(this.Svc, "Pause", args)
-	doc := Response{}
-	xml.Unmarshal([]byte(response), &doc)
-	// TODO
-}
-
-func (this *AVTransport) Play(instance int, speed string) {
-	type Response struct {
-		XMLName xml.Name
-	}
-	args := []upnp.Arg{
-		{"InstanceID", instance},
-		{"Speed", speed},
-	}
-	response := upnp.Call(this.Svc, "Play", args)
-	doc := Response{}
-	xml.Unmarshal([]byte(response), &doc)
-	// TODO
-}
-
-func (this *AVTransport) Stop(instance int) {
-	type Response struct {
-		XMLName xml.Name
-	}
-	args := []upnp.Arg{
-		{"InstanceID", instance},
-	}
-	response := upnp.Call(this.Svc, "Stop", args)
-	doc := Response{}
-	xml.Unmarshal([]byte(response), &doc)
-	// TODO
-}
-
-func (this *AVTransport) GetCrossfadeMode(instance int) bool {
-	type Response struct {
-		XMLName       xml.Name
-		CrossfadeMode bool
-	}
-	args := []upnp.Arg{
-		{"InstanceID", instance},
-	}
-	response := upnp.Call(this.Svc, "GetCrossfadeMode", args)
-	doc := Response{}
-	xml.Unmarshal([]byte(response), &doc)
-	return doc.CrossfadeMode
-}
-
-type TransportSettings struct {
-	PlayMode       string
-	RecQualityMode string
-}
-
-func (this *AVTransport) GetTransportSettings(instance int) *TransportSettings {
-	type Response struct {
-		XMLName xml.Name
-		TransportSettings
-	}
-	args := []upnp.Arg{
-		{"InstanceID", instance},
-	}
-	response := upnp.Call(this.Svc, "GetTransportSettings", args)
-	doc := Response{}
-	xml.Unmarshal([]byte(response), &doc)
-	return &doc.TransportSettings
-}
-
-type DeviceCapabilities struct {
-	PlayMedia       string
-	RecMedia        string
-	RecQualityModes string
-}
-
-func (this *AVTransport) GetDeviceCapabilities(instance int) *DeviceCapabilities {
-	type Response struct {
-		XMLName xml.Name
-		DeviceCapabilities
-	}
-	args := []upnp.Arg{
-		{"InstanceID", instance},
-	}
-	response := upnp.Call(this.Svc, "GetDeviceCapabilities", args)
-	doc := Response{}
-	xml.Unmarshal([]byte(response), &doc)
-	return &doc.DeviceCapabilities
-}
-
-type PositionInfo struct {
-	Track         int
-	TrackDuration string
-	TrackMetaData string
-	TrackURI      string
-	RelTime       string
-	AbsTime       string
-	RelCount      int
-	AbsCount      int
-}
-
-func (this *AVTransport) GetPositionInfo(instance int) *PositionInfo {
-	type Response struct {
-		XMLName xml.Name
-		PositionInfo
-	}
-	args := []upnp.Arg{
-		{"InstanceID", instance},
-	}
-	response := upnp.Call(this.Svc, "GetPositionInfo", args)
-	doc := Response{}
-	xml.Unmarshal([]byte(response), &doc)
-	return &doc.PositionInfo
-}
-
-type TransportInfo struct {
-	CurrentTransportState  string
-	CurrentTransportStatus string
-	CurrentSpeed           string
-}
-
-func (this *AVTransport) GetTransportInfo(instance int) *TransportInfo {
-	type Response struct {
-		XMLName xml.Name
-		TransportInfo
-	}
-	args := []upnp.Arg{
-		{"InstanceID", instance},
-	}
-	response := upnp.Call(this.Svc, "GetTransportInfo", args)
-	doc := Response{}
-	xml.Unmarshal([]byte(response), &doc)
-	return &doc.TransportInfo
+	err = doc.Error()
+	return
 }
 
 type MediaInfo struct {
-	NrTracks           int
+	NrTracks           uint32
 	MediaDuration      string
 	CurrentURI         string
 	CurrentURIMetaData string
@@ -296,106 +250,621 @@ type MediaInfo struct {
 	WriteStatus        string
 }
 
-func (this *AVTransport) GetMediaInfo(instance int) *MediaInfo {
+func (this *AVTransport) GetMediaInfo(instanceId uint32) (mediaInfo *MediaInfo, err error) {
 	type Response struct {
 		XMLName xml.Name
 		MediaInfo
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
+		{"InstanceID", instanceId},
 	}
 	response := upnp.Call(this.Svc, "GetMediaInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	return &doc.MediaInfo
+	mediaInfo = &doc.MediaInfo
+	err = doc.Error()
+	return
 }
 
-func (this *AVTransport) BackupQueue(instance int) {
+type TransportInfo struct {
+	CurrentTransportState  string
+	CurrentTransportStatus string
+	CurrentSpeed           string
+}
+
+func (this *AVTransport) GetTransportInfo(instanceId uint32) (transportInfo *TransportInfo, err error) {
 	type Response struct {
 		XMLName xml.Name
+		TransportInfo
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
+		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "BackupQueue", args)
+	response := upnp.Call(this.Svc, "GetTransportInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO
+	transportInfo = &doc.TransportInfo
+	err = doc.Error()
+	return
 }
 
-func (this *AVTransport) SaveQueue(instance int, title, object string) {
+type PositionInfo struct {
+	Track         uint32
+	TrackDuration string
+	TrackMetaData string
+	TrackURI      string
+	RelTime       string
+	AbsTime       string
+	RelCount      uint32
+	AbsCount      uint32
+}
+
+func (this *AVTransport) GetPositionInfo(instanceId uint32) (positionInfo *PositionInfo, err error) {
 	type Response struct {
 		XMLName xml.Name
+		PositionInfo
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
-		{"Title", title},
-		{"ObjectID", object},
+		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "SaveQueue", args)
+	response := upnp.Call(this.Svc, "GetPositionInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO
+	positionInfo = &doc.PositionInfo
+	err = doc.Error()
+	return
 }
 
-func (this *AVTransport) RemoveAllTracksFromQueue(instance int) {
+type DeviceCapabilities struct {
+	PlayMedia       string
+	RecMedia        string
+	RecQualityModes string
+}
+
+func (this *AVTransport) GetDeviceCapabilities(instanceId uint32) (deviceCapabilities *DeviceCapabilities, err error) {
 	type Response struct {
 		XMLName xml.Name
+		DeviceCapabilities
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
+		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "RemoveAllTracksFromQueue", args)
+	response := upnp.Call(this.Svc, "GetDeviceCapabilities", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	// TODO
+	deviceCapabilities = &doc.DeviceCapabilities
+	err = doc.Error()
+	return
 }
 
-func (this *AVTransport) RemoveTrackRangeFromQueue(instance, update, start, number int) int {
-	type Response struct {
-		XMLName     xml.Name
-		NewUpdateID int
-	}
-	args := []upnp.Arg{
-		{"InstanceID", instance},
-		{"UpdateID", update},
-		{"StartingIndex", start},
-		{"NumberOfTracks", number},
-	}
-	response := upnp.Call(this.Svc, "RemoveTrackRangeFromQueue", args)
-	doc := Response{}
-	xml.Unmarshal([]byte(response), &doc)
-	return doc.NewUpdateID
+type TransportSettings struct {
+	PlayMode       string
+	RecQualityMode string
 }
 
-func (this *AVTransport) RemoveTrackFromQueue(instance int, object string) int {
+func (this *AVTransport) GetTransportSettings(instanceId uint32) (transportSettings *TransportSettings, err error) {
 	type Response struct {
-		XMLName  xml.Name
-		UpdateID int
+		XMLName xml.Name
+		TransportSettings
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
-		{"ObjectID", object},
+		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "RemoveTrackFromQueue", args)
+	response := upnp.Call(this.Svc, "GetTransportSettings", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	return doc.UpdateID
+	transportSettings = &doc.TransportSettings
+	err = doc.Error()
+	return
 }
 
-func (this *AVTransport) ReorderTracksInQueue(instance, start, num, before int) int {
+func (this *AVTransport) GetCrossfadeMode(instanceId uint32) (crossfadeMode bool, err error) {
 	type Response struct {
-		XMLName  xml.Name
-		UpdateID int
+		XMLName       xml.Name
+		CrossfadeMode bool
+		upnp.ErrorResponse
 	}
 	args := []upnp.Arg{
-		{"InstanceID", instance},
-		{"StartingIndex", start},
-		{"NumberOfTracks", num},
-		{"InsertBefore", before},
+		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "ReorderTracksInQueue", args)
+	response := upnp.Call(this.Svc, "GetCrossfadeMode", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	return doc.UpdateID
+	crossfadeMode = doc.CrossfadeMode
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) Stop(instanceId uint32) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "Stop", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+const PlaySpeed_1 = "1"
+
+func (this *AVTransport) Play(instanceId uint32, speed string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"Speed", speed},
+	}
+	response := upnp.Call(this.Svc, "Play", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) Pause(instanceId uint32) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "Pause", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+const (
+	SeekMode_TRACK_NR = "TRACK_NR"
+	SeekMode_REL_TIME = "REL_TIME"
+	SeekMode_SECTION  = "SECTION"
+)
+
+func (this *AVTransport) Seek(instanceId uint32, unit, target string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"Unit", unit},
+		{"Target", target},
+	}
+	response := upnp.Call(this.Svc, "Seek", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) Next(instanceId uint32) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "Next", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) NextProgrammedRadioTracks(instanceId uint32) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "NextProgrammedRadioTracks", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) Previous(instanceId uint32) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "Previous", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) NextSection(instanceId uint32) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "NextSection", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) PreviousSection(instanceId int) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "PreviousSection", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+const (
+	PlayMode_NORMAL           = "NORMAL"
+	PlayMode_REPEAT_ALL       = "REPEAT_ALL"
+	PlayMode_SHUFFLE_NOREPEAT = "SHUFFLE_NOREPEAT"
+	PlayMode_SHUFFLE          = "SHUFFLE"
+)
+
+func (this *AVTransport) SetPlayMode(instanceId uint32, newPlayMode string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"NewPlayMode", newPlayMode},
+	}
+	response := upnp.Call(this.Svc, "SetPlayMode", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) SetCrossfadeMode(instanceId uint32, crossfadeMode bool) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"CrossfadeMode", crossfadeMode},
+	}
+	response := upnp.Call(this.Svc, "SetCrossfadeMode", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) NotifyDeletedURI(instanceId uint32, deletedURI string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"DeletedURI", deletedURI},
+	}
+	response := upnp.Call(this.Svc, "NotifyDeletedURI", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) GetCurrentTransportActions(instanceId uint32) (actions string, err error) {
+	type Response struct {
+		XMLName xml.Name
+		Actions string
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "GetCurrentTransportActions", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	actions = doc.Actions
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) BecomeCoordinatorOfStandaloneGroup(instanceId uint32) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "BecomeCoordinatorOfStandaloneGroup", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+type BecomeGroupCoordinatorRequest struct {
+	CurrentCoordinator    string
+	CurrentGroupID        string
+	OtherMembers          string
+	TransportSettings     string
+	CurrentURI            string
+	CurrentURIMetaData    string
+	SleepTimerState       string
+	AlarmState            string
+	StreamRestartState    string
+	CurrentQueueTrackList string
+}
+
+func (this *AVTransport) BecomeGroupCoordinator(instanceId uint32, req *BecomeGroupCoordinatorRequest) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"CurrentCoordinator", req.CurrentCoordinator},
+		{"CurrentGroupID", req.CurrentGroupID},
+		{"OtherMembers", req.OtherMembers},
+		{"TransportSettings", req.TransportSettings},
+		{"CurrentURI", req.CurrentURI},
+		{"CurrentURIMetaData", req.CurrentURIMetaData},
+		{"SleepTimerState", req.SleepTimerState},
+		{"AlarmState", req.AlarmState},
+		{"StreamRestartState", req.StreamRestartState},
+		{"CurrentQueueTrackList", req.CurrentQueueTrackList},
+	}
+	response := upnp.Call(this.Svc, "BecomeCoordinatorOfStandaloneGroup", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+type BecomeGroupCoordinatorAndSourceRequest struct {
+	CurrentCoordinator    string
+	CurrentGroupID        string
+	OtherMembers          string
+	CurrentURI            string
+	CurrentURIMetaData    string
+	SleepTimerState       string
+	AlarmState            string
+	StreamRestartState    string
+	CurrentAVTTrackList   string
+	CurrentQueueTrackList string
+	CurrentSourceState    string
+	ResumePlayback        bool
+}
+
+func (this *AVTransport) BecomeGroupCoordinatorAndSource(instanceId uint32, req *BecomeGroupCoordinatorAndSourceRequest) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"CurrentCoordinator", req.CurrentCoordinator},
+		{"CurrentGroupID", req.CurrentGroupID},
+		{"OtherMembers", req.OtherMembers},
+		{"CurrentURI", req.CurrentURI},
+		{"CurrentURIMetaData", req.CurrentURIMetaData},
+		{"SleepTimerState", req.SleepTimerState},
+		{"AlarmState", req.AlarmState},
+		{"StreamRestartState", req.StreamRestartState},
+		{"CurrentAVTTrackList", req.CurrentAVTTrackList},
+		{"CurrentQueueTrackList", req.CurrentQueueTrackList},
+		{"CurrentSourceState", req.CurrentSourceState},
+		{"ResumePlayback", req.ResumePlayback},
+	}
+	response := upnp.Call(this.Svc, "BecomeGroupCoordinatorAndSourceRequest", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+type ChangeCoordinatorRequest struct {
+	CurrentCoordinator   string
+	NewCoordinator       string
+	NewTransportSettings string
+}
+
+func (this *AVTransport) ChangeCoordinator(instanceId uint32, req *ChangeCoordinatorRequest) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"CurrentCoordinator", req.CurrentCoordinator},
+		{"NewCoordinator", req.NewCoordinator},
+		{"NewTransportSettings", req.NewTransportSettings},
+	}
+	response := upnp.Call(this.Svc, "ChangeCoordinator", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) ChangeTransportSettings(instanceId uint32, newTransportSettings, currentAVTransportURI string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"NewTransportSettings", newTransportSettings},
+		{"CurrentTransportURI", currentAVTransportURI},
+	}
+	response := upnp.Call(this.Svc, "ChangeTransportSettings", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) ConfigureSleepTimer(instanceId uint32, newSleepTimerDuration string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"NewSleepTimerDuration", newSleepTimerDuration},
+	}
+	response := upnp.Call(this.Svc, "ConfigureSleepTimer", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) GetRemainingSleepTimerDuration(instanceId uint32) (remainingSleepTimerDuration string,
+	currentSleepTimerGeneration uint32, err error) {
+	type Response struct {
+		XMLName                     xml.Name
+		RemainingSleepTimerDuration string
+		CurrentSleepTimerGeneration uint32
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "GetRemainingSleepTimerDuration", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	remainingSleepTimerDuration = doc.RemainingSleepTimerDuration
+	currentSleepTimerGeneration = doc.CurrentSleepTimerGeneration
+	err = doc.Error()
+	return
+}
+
+type RunAlarmRequest struct {
+	AlarmID            uint32
+	LoggedStartTime    string
+	Duration           string
+	ProgramURI         string
+	ProgramMetaData    string
+	PlayMode           string
+	Volume             uint32
+	IncludeLinkedZones bool
+}
+
+func (this *AVTransport) RunAlarm(instanceId uint32, req *RunAlarmRequest) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"AlarmID", req.AlarmID},
+		{"LoggedStartTime", req.LoggedStartTime},
+		{"Duration", req.Duration},
+		{"ProgramURI", req.ProgramURI},
+		{"ProgramMetaData", req.ProgramMetaData},
+		{"PlayMode", req.PlayMode},
+		{"Volume", req.Volume},
+		{"IncludeLinkedZones", req.IncludeLinkedZones},
+	}
+	response := upnp.Call(this.Svc, "RunAlarm", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+type StartAutoplayRequest struct {
+	ProgramURI         string
+	ProgramMetaData    string
+	Volume             uint32
+	IncludeLinkedZones bool
+	ResetVolumeAfter   bool
+}
+
+func (this *AVTransport) StartAutoplay(instanceId uint32, req *StartAutoplayRequest) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"ProgramURI", req.ProgramURI},
+		{"ProgramMetaData", req.ProgramMetaData},
+		{"Volume", req.Volume},
+		{"IncludeLinkedZones", req.IncludeLinkedZones},
+		{"ResetVolumeAfter", req.ResetVolumeAfter},
+	}
+	response := upnp.Call(this.Svc, "StartAutoplay", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) GetRunningAlarmProperties(instanceId uint32) (alarmId uint32, groupId, loggedStartTime string, err error) {
+	type Response struct {
+		XMLName         xml.Name
+		AlarmID         uint32
+		GroupID         string
+		LoggedStartTime string
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+	}
+	response := upnp.Call(this.Svc, "GetRunningAlarmProperties", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	alarmId = doc.AlarmID
+	groupId = doc.GroupID
+	loggedStartTime = doc.LoggedStartTime
+	err = doc.Error()
+	return
+}
+
+func (this *AVTransport) SnoozeAlarm(instanceId uint32, duration string) (err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"InstanceID", instanceId},
+		{"Duration", duration},
+	}
+	response := upnp.Call(this.Svc, "SnoozeAlarm", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	err = doc.Error()
+	return
 }
