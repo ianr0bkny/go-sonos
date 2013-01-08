@@ -28,16 +28,15 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
-package sonos
+package upnp
 
 import (
 	"encoding/xml"
-	"github.com/ianr0bkny/go-sonos/upnp"
 	_ "log"
 )
 
 type ZoneGroupTopology struct {
-	Svc *upnp.Service
+	Svc *Service
 }
 
 const (
@@ -48,13 +47,13 @@ const (
 func (this *ZoneGroupTopology) BeginSoftwareUpdate(updateURL string, flags uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"UpdateURL", updateURL},
 		{"Flags", flags},
 	}
-	response := upnp.Call(this.Svc, "BeginSoftwareUpdate", args)
+	response := Call(this.Svc, "BeginSoftwareUpdate", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -83,14 +82,14 @@ func (this *ZoneGroupTopology) CheckForUpdate(updateType UpdateType, cachedOnly 
 	type Response struct {
 		XMLName    xml.Name
 		UpdateItem UpdateItemText
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"UpdateType", updateType},
 		{"CachedOnly", cachedOnly},
 		{"Version", version},
 	}
-	response := upnp.Call(this.Svc, "CheckForUpdate", args)
+	response := Call(this.Svc, "CheckForUpdate", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	rec := UpdateItemHolder{}
@@ -108,13 +107,13 @@ const (
 func (this *ZoneGroupTopology) ReportUnresponsiveDevice(deviceUUID string, desiredAction string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"DeviceUUID", deviceUUID},
 		{"DesiredAction", desiredAction},
 	}
-	response := upnp.Call(this.Svc, "ReportUnresponsiveDevice", args)
+	response := Call(this.Svc, "ReportUnresponsiveDevice", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -124,9 +123,9 @@ func (this *ZoneGroupTopology) ReportUnresponsiveDevice(deviceUUID string, desir
 func (this *ZoneGroupTopology) ReportAlarmStartedRunning() (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "ReportAlarmStartedRunning")
+	response := CallVa(this.Svc, "ReportAlarmStartedRunning")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -137,9 +136,9 @@ func (this *ZoneGroupTopology) SubmitDiagnostics() (diagnosticId string, err err
 	type Response struct {
 		XMLName      xml.Name
 		DiagnosticID string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "SubmitDiagnostics")
+	response := CallVa(this.Svc, "SubmitDiagnostics")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	diagnosticId = doc.DiagnosticID
@@ -150,14 +149,14 @@ func (this *ZoneGroupTopology) SubmitDiagnostics() (diagnosticId string, err err
 func (this *ZoneGroupTopology) RegisterMobileDevice(deviceName, deviceUDN, deviceAddress string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"MobileDeviceName", deviceName},
 		{"MobileDeviceUDN", deviceUDN},
 		{"MobileIPAndPort", deviceAddress},
 	}
-	response := upnp.Call(this.Svc, "RegisterMobileDevice", args)
+	response := Call(this.Svc, "RegisterMobileDevice", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()

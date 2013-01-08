@@ -28,28 +28,28 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
-package sonos
+package upnp
 
 import (
 	"encoding/xml"
-	"github.com/ianr0bkny/go-sonos/upnp"
+	_ "log"
 )
 
 type AVTransport struct {
-	Svc *upnp.Service
+	Svc *Service
 }
 
 func (this *AVTransport) SetAVTransportURI(instanceId uint32, currentURI, currentURIMetaData string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"CurrentURI", currentURI},
 		{"CurrentURIMetaData", currentURIMetaData},
 	}
-	response := upnp.Call(this.Svc, "SetAVTransportURI", args)
+	response := Call(this.Svc, "SetAVTransportURI", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -73,16 +73,16 @@ func (this *AVTransport) AddURIToQueue(instanceId uint32, req *AddRequest) (resp
 	type Response struct {
 		XMLName xml.Name
 		AddResponse
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"EnqueuedURI", req.EnqueuedURI},
 		{"EnqueuedURIMetaData", req.EnqueuedURIMetaData},
 		{"DesiredFirstTrackNumberEnqueued", req.DesiredFirstTrackNumberEnqueued},
 		{"EnqueueAsNext", req.EnqueueAsNext},
 	}
-	response := upnp.Call(this.Svc, "AddURIToQueue", args)
+	response := Call(this.Svc, "AddURIToQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	resp = &doc.AddResponse
@@ -112,9 +112,9 @@ func (this *AVTransport) AddMultipleURIsToQueue(instanceId uint32, req *MultiAdd
 	type Response struct {
 		XMLName xml.Name
 		MultiAddResponse
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"UdpateID", req.UpdateID},
 		{"NumberOfURIs", req.NumberOfURIs},
@@ -125,7 +125,7 @@ func (this *AVTransport) AddMultipleURIsToQueue(instanceId uint32, req *MultiAdd
 		{"DesiredFirstTrackNumberEnqueued", req.DesiredFirstTrackNumberEnqueued},
 		{"EnqueueAsNext", req.EnqueueAsNext},
 	}
-	response := upnp.Call(this.Svc, "AddMultipleURIsToQueue", args)
+	response := Call(this.Svc, "AddMultipleURIsToQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	resp = &doc.MultiAddResponse
@@ -136,16 +136,16 @@ func (this *AVTransport) AddMultipleURIsToQueue(instanceId uint32, req *MultiAdd
 func (this *AVTransport) ReorderTracksInQueue(instanceId, startingIndex, numberOfTracks, insertBefore, updateId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"StartingIndex", startingIndex},
 		{"NumberOfTracks", numberOfTracks},
 		{"InsertBefore", insertBefore},
 		{"UpdateID", updateId},
 	}
-	response := upnp.Call(this.Svc, "ReorderTracksInQueue", args)
+	response := Call(this.Svc, "ReorderTracksInQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -155,14 +155,14 @@ func (this *AVTransport) ReorderTracksInQueue(instanceId, startingIndex, numberO
 func (this *AVTransport) RemoveTrackFromQueue(instanceId uint32, objectId string, updateId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"ObjectID", objectId},
 		{"UpdateID", updateId},
 	}
-	response := upnp.Call(this.Svc, "RemoveTrackFromQueue", args)
+	response := Call(this.Svc, "RemoveTrackFromQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -173,15 +173,15 @@ func (this *AVTransport) RemoveTrackRangeFromQueue(instanceId, updateId, startin
 	type Response struct {
 		XMLName     xml.Name
 		NewUpdateID uint32
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"UpdateID", updateId},
 		{"StartingIndex", startingIndex},
 		{"NumberOfTracks", numberOfTracks},
 	}
-	response := upnp.Call(this.Svc, "RemoveTrackRangeFromQueue", args)
+	response := Call(this.Svc, "RemoveTrackRangeFromQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	newUpdateId = doc.NewUpdateID
@@ -192,12 +192,12 @@ func (this *AVTransport) RemoveTrackRangeFromQueue(instanceId, updateId, startin
 func (this *AVTransport) RemoveAllTracksFromQueue(instanceId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "RemoveAllTracksFromQueue", args)
+	response := Call(this.Svc, "RemoveAllTracksFromQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -208,14 +208,14 @@ func (this *AVTransport) SaveQueue(instanceId uint32, title, objectId string) (a
 	type Response struct {
 		XMLName          xml.Name
 		AssignedObjectID string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"Title", title},
 		{"ObjectID", objectId},
 	}
-	response := upnp.Call(this.Svc, "SaveQueue", args)
+	response := Call(this.Svc, "SaveQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	assignedObjectId = doc.AssignedObjectID
@@ -226,12 +226,12 @@ func (this *AVTransport) SaveQueue(instanceId uint32, title, objectId string) (a
 func (this *AVTransport) BackupQueue(instanceId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "BackupQueue", args)
+	response := Call(this.Svc, "BackupQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -254,12 +254,12 @@ func (this *AVTransport) GetMediaInfo(instanceId uint32) (mediaInfo *MediaInfo, 
 	type Response struct {
 		XMLName xml.Name
 		MediaInfo
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "GetMediaInfo", args)
+	response := Call(this.Svc, "GetMediaInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	mediaInfo = &doc.MediaInfo
@@ -277,12 +277,12 @@ func (this *AVTransport) GetTransportInfo(instanceId uint32) (transportInfo *Tra
 	type Response struct {
 		XMLName xml.Name
 		TransportInfo
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "GetTransportInfo", args)
+	response := Call(this.Svc, "GetTransportInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	transportInfo = &doc.TransportInfo
@@ -305,12 +305,12 @@ func (this *AVTransport) GetPositionInfo(instanceId uint32) (positionInfo *Posit
 	type Response struct {
 		XMLName xml.Name
 		PositionInfo
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "GetPositionInfo", args)
+	response := Call(this.Svc, "GetPositionInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	positionInfo = &doc.PositionInfo
@@ -328,12 +328,12 @@ func (this *AVTransport) GetDeviceCapabilities(instanceId uint32) (deviceCapabil
 	type Response struct {
 		XMLName xml.Name
 		DeviceCapabilities
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "GetDeviceCapabilities", args)
+	response := Call(this.Svc, "GetDeviceCapabilities", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	deviceCapabilities = &doc.DeviceCapabilities
@@ -350,12 +350,12 @@ func (this *AVTransport) GetTransportSettings(instanceId uint32) (transportSetti
 	type Response struct {
 		XMLName xml.Name
 		TransportSettings
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "GetTransportSettings", args)
+	response := Call(this.Svc, "GetTransportSettings", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	transportSettings = &doc.TransportSettings
@@ -367,12 +367,12 @@ func (this *AVTransport) GetCrossfadeMode(instanceId uint32) (crossfadeMode bool
 	type Response struct {
 		XMLName       xml.Name
 		CrossfadeMode bool
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "GetCrossfadeMode", args)
+	response := Call(this.Svc, "GetCrossfadeMode", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	crossfadeMode = doc.CrossfadeMode
@@ -383,12 +383,12 @@ func (this *AVTransport) GetCrossfadeMode(instanceId uint32) (crossfadeMode bool
 func (this *AVTransport) Stop(instanceId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "Stop", args)
+	response := Call(this.Svc, "Stop", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -400,13 +400,13 @@ const PlaySpeed_1 = "1"
 func (this *AVTransport) Play(instanceId uint32, speed string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"Speed", speed},
 	}
-	response := upnp.Call(this.Svc, "Play", args)
+	response := Call(this.Svc, "Play", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -416,12 +416,12 @@ func (this *AVTransport) Play(instanceId uint32, speed string) (err error) {
 func (this *AVTransport) Pause(instanceId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "Pause", args)
+	response := Call(this.Svc, "Pause", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -437,14 +437,14 @@ const (
 func (this *AVTransport) Seek(instanceId uint32, unit, target string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"Unit", unit},
 		{"Target", target},
 	}
-	response := upnp.Call(this.Svc, "Seek", args)
+	response := Call(this.Svc, "Seek", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -454,12 +454,12 @@ func (this *AVTransport) Seek(instanceId uint32, unit, target string) (err error
 func (this *AVTransport) Next(instanceId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "Next", args)
+	response := Call(this.Svc, "Next", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -469,12 +469,12 @@ func (this *AVTransport) Next(instanceId uint32) (err error) {
 func (this *AVTransport) NextProgrammedRadioTracks(instanceId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "NextProgrammedRadioTracks", args)
+	response := Call(this.Svc, "NextProgrammedRadioTracks", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -484,12 +484,12 @@ func (this *AVTransport) NextProgrammedRadioTracks(instanceId uint32) (err error
 func (this *AVTransport) Previous(instanceId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "Previous", args)
+	response := Call(this.Svc, "Previous", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -499,12 +499,12 @@ func (this *AVTransport) Previous(instanceId uint32) (err error) {
 func (this *AVTransport) NextSection(instanceId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "NextSection", args)
+	response := Call(this.Svc, "NextSection", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -514,12 +514,12 @@ func (this *AVTransport) NextSection(instanceId uint32) (err error) {
 func (this *AVTransport) PreviousSection(instanceId int) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "PreviousSection", args)
+	response := Call(this.Svc, "PreviousSection", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -536,13 +536,13 @@ const (
 func (this *AVTransport) SetPlayMode(instanceId uint32, newPlayMode string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"NewPlayMode", newPlayMode},
 	}
-	response := upnp.Call(this.Svc, "SetPlayMode", args)
+	response := Call(this.Svc, "SetPlayMode", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -552,13 +552,13 @@ func (this *AVTransport) SetPlayMode(instanceId uint32, newPlayMode string) (err
 func (this *AVTransport) SetCrossfadeMode(instanceId uint32, crossfadeMode bool) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"CrossfadeMode", crossfadeMode},
 	}
-	response := upnp.Call(this.Svc, "SetCrossfadeMode", args)
+	response := Call(this.Svc, "SetCrossfadeMode", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -568,13 +568,13 @@ func (this *AVTransport) SetCrossfadeMode(instanceId uint32, crossfadeMode bool)
 func (this *AVTransport) NotifyDeletedURI(instanceId uint32, deletedURI string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"DeletedURI", deletedURI},
 	}
-	response := upnp.Call(this.Svc, "NotifyDeletedURI", args)
+	response := Call(this.Svc, "NotifyDeletedURI", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -585,12 +585,12 @@ func (this *AVTransport) GetCurrentTransportActions(instanceId uint32) (actions 
 	type Response struct {
 		XMLName xml.Name
 		Actions string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "GetCurrentTransportActions", args)
+	response := Call(this.Svc, "GetCurrentTransportActions", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	actions = doc.Actions
@@ -601,12 +601,12 @@ func (this *AVTransport) GetCurrentTransportActions(instanceId uint32) (actions 
 func (this *AVTransport) BecomeCoordinatorOfStandaloneGroup(instanceId uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "BecomeCoordinatorOfStandaloneGroup", args)
+	response := Call(this.Svc, "BecomeCoordinatorOfStandaloneGroup", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -629,9 +629,9 @@ type BecomeGroupCoordinatorRequest struct {
 func (this *AVTransport) BecomeGroupCoordinator(instanceId uint32, req *BecomeGroupCoordinatorRequest) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"CurrentCoordinator", req.CurrentCoordinator},
 		{"CurrentGroupID", req.CurrentGroupID},
@@ -644,7 +644,7 @@ func (this *AVTransport) BecomeGroupCoordinator(instanceId uint32, req *BecomeGr
 		{"StreamRestartState", req.StreamRestartState},
 		{"CurrentQueueTrackList", req.CurrentQueueTrackList},
 	}
-	response := upnp.Call(this.Svc, "BecomeCoordinatorOfStandaloneGroup", args)
+	response := Call(this.Svc, "BecomeCoordinatorOfStandaloneGroup", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -669,9 +669,9 @@ type BecomeGroupCoordinatorAndSourceRequest struct {
 func (this *AVTransport) BecomeGroupCoordinatorAndSource(instanceId uint32, req *BecomeGroupCoordinatorAndSourceRequest) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"CurrentCoordinator", req.CurrentCoordinator},
 		{"CurrentGroupID", req.CurrentGroupID},
@@ -686,7 +686,7 @@ func (this *AVTransport) BecomeGroupCoordinatorAndSource(instanceId uint32, req 
 		{"CurrentSourceState", req.CurrentSourceState},
 		{"ResumePlayback", req.ResumePlayback},
 	}
-	response := upnp.Call(this.Svc, "BecomeGroupCoordinatorAndSourceRequest", args)
+	response := Call(this.Svc, "BecomeGroupCoordinatorAndSourceRequest", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -702,15 +702,15 @@ type ChangeCoordinatorRequest struct {
 func (this *AVTransport) ChangeCoordinator(instanceId uint32, req *ChangeCoordinatorRequest) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"CurrentCoordinator", req.CurrentCoordinator},
 		{"NewCoordinator", req.NewCoordinator},
 		{"NewTransportSettings", req.NewTransportSettings},
 	}
-	response := upnp.Call(this.Svc, "ChangeCoordinator", args)
+	response := Call(this.Svc, "ChangeCoordinator", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -720,14 +720,14 @@ func (this *AVTransport) ChangeCoordinator(instanceId uint32, req *ChangeCoordin
 func (this *AVTransport) ChangeTransportSettings(instanceId uint32, newTransportSettings, currentAVTransportURI string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"NewTransportSettings", newTransportSettings},
 		{"CurrentTransportURI", currentAVTransportURI},
 	}
-	response := upnp.Call(this.Svc, "ChangeTransportSettings", args)
+	response := Call(this.Svc, "ChangeTransportSettings", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -737,13 +737,13 @@ func (this *AVTransport) ChangeTransportSettings(instanceId uint32, newTransport
 func (this *AVTransport) ConfigureSleepTimer(instanceId uint32, newSleepTimerDuration string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"NewSleepTimerDuration", newSleepTimerDuration},
 	}
-	response := upnp.Call(this.Svc, "ConfigureSleepTimer", args)
+	response := Call(this.Svc, "ConfigureSleepTimer", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -756,12 +756,12 @@ func (this *AVTransport) GetRemainingSleepTimerDuration(instanceId uint32) (rema
 		XMLName                     xml.Name
 		RemainingSleepTimerDuration string
 		CurrentSleepTimerGeneration uint32
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "GetRemainingSleepTimerDuration", args)
+	response := Call(this.Svc, "GetRemainingSleepTimerDuration", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	remainingSleepTimerDuration = doc.RemainingSleepTimerDuration
@@ -784,9 +784,9 @@ type RunAlarmRequest struct {
 func (this *AVTransport) RunAlarm(instanceId uint32, req *RunAlarmRequest) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"AlarmID", req.AlarmID},
 		{"LoggedStartTime", req.LoggedStartTime},
@@ -797,7 +797,7 @@ func (this *AVTransport) RunAlarm(instanceId uint32, req *RunAlarmRequest) (err 
 		{"Volume", req.Volume},
 		{"IncludeLinkedZones", req.IncludeLinkedZones},
 	}
-	response := upnp.Call(this.Svc, "RunAlarm", args)
+	response := Call(this.Svc, "RunAlarm", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -815,9 +815,9 @@ type StartAutoplayRequest struct {
 func (this *AVTransport) StartAutoplay(instanceId uint32, req *StartAutoplayRequest) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"ProgramURI", req.ProgramURI},
 		{"ProgramMetaData", req.ProgramMetaData},
@@ -825,7 +825,7 @@ func (this *AVTransport) StartAutoplay(instanceId uint32, req *StartAutoplayRequ
 		{"IncludeLinkedZones", req.IncludeLinkedZones},
 		{"ResetVolumeAfter", req.ResetVolumeAfter},
 	}
-	response := upnp.Call(this.Svc, "StartAutoplay", args)
+	response := Call(this.Svc, "StartAutoplay", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -838,12 +838,12 @@ func (this *AVTransport) GetRunningAlarmProperties(instanceId uint32) (alarmId u
 		AlarmID         uint32
 		GroupID         string
 		LoggedStartTime string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := upnp.Call(this.Svc, "GetRunningAlarmProperties", args)
+	response := Call(this.Svc, "GetRunningAlarmProperties", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	alarmId = doc.AlarmID
@@ -856,13 +856,13 @@ func (this *AVTransport) GetRunningAlarmProperties(instanceId uint32) (alarmId u
 func (this *AVTransport) SnoozeAlarm(instanceId uint32, duration string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"InstanceID", instanceId},
 		{"Duration", duration},
 	}
-	response := upnp.Call(this.Svc, "SnoozeAlarm", args)
+	response := Call(this.Svc, "SnoozeAlarm", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()

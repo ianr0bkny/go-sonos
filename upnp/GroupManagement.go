@@ -28,84 +28,68 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
-package sonos
+package upnp
 
 import (
 	"encoding/xml"
-	"github.com/ianr0bkny/go-sonos/upnp"
 	_ "log"
 )
 
-type ConnectionManager struct {
-	Svc *upnp.Service
+type GroupManagement struct {
+	Svc *Service
 }
 
-func (this *ConnectionManager) GetProtocolInfo() (source, sink string, err error) {
+type MemberInfo struct {
+	CurrentTransportSettings string
+	GroupUUIDJoined          string
+	ResetVolumeAfter         bool
+	VolumeAVTransportURI     string
+}
+
+func (this *GroupManagement) AddMember(memberId string) (memberInfo *MemberInfo, err error) {
 	type Response struct {
 		XMLName xml.Name
-		Source  string
-		Sink    string
-		upnp.ErrorResponse
+		MemberInfo
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "GetProtocolInfo")
+	args := []Arg{
+		{"MemberID", memberId},
+	}
+	response := Call(this.Svc, "AddMember", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	source = doc.Source
-	sink = doc.Sink
+	memberInfo = &doc.MemberInfo
 	err = doc.Error()
 	return
 }
 
-func (this *ConnectionManager) GetCurrentConnectionIDs() (connectionIds string, err error) {
+func (this *GroupManagement) RemoveMember(memberId string) (err error) {
 	type Response struct {
-		XMLName       xml.Name
-		ConnectionIDs string
-		upnp.ErrorResponse
+		XMLName xml.Name
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "GetCurrentConnectionIDs")
+	args := []Arg{
+		{"MemberID", memberId},
+	}
+	response := Call(this.Svc, "RemoveMember", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	connectionIds = doc.ConnectionIDs
 	err = doc.Error()
 	return
 }
 
-const (
-	Direction_Input  = "Input"
-	Direction_Output = "Output"
-)
-
-const (
-	Status_OK                    = "OK"
-	Status_ContentFormatMismatch = "ContentFormatMismatch"
-	Status_InsufficientBandwidth = "InsufficientBandwidth"
-	Status_UnreliableChannel     = "UnreliableChannel"
-	Status_Unknown               = "Unknown"
-)
-
-type ConnectionInfo struct {
-	RcsID                 int32
-	AVTransportID         int32
-	ProtocolInfo          string
-	PeerConnectionManager string
-	PeerConnectionID      int32
-	Direction             string
-	Status                string
-}
-
-func (this *ConnectionManager) GetCurrentConnectionInfo(connectionId int32) (connectionInfo *ConnectionInfo, err error) {
+func (this *GroupManagement) ReportTrackBufferingResult(memberId string, resultCode int32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ConnectionInfo
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
-		{"ConnectionID", connectionId},
+	args := []Arg{
+		{"MemberID", memberId},
+		{"ResultCode", resultCode},
 	}
-	response := upnp.Call(this.Svc, "GetCurrentConnectionInfo", args)
+	response := Call(this.Svc, "ReportTrackBufferingResult", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	connectionInfo = &doc.ConnectionInfo
 	err = doc.Error()
 	return
 }

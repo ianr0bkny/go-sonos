@@ -28,16 +28,15 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
-package sonos
+package upnp
 
 import (
 	"encoding/xml"
-	"github.com/ianr0bkny/go-sonos/upnp"
 	_ "log"
 )
 
 type MusicServices struct {
-	Svc *upnp.Service
+	Svc *Service
 }
 
 type msPolicy_XML struct {
@@ -87,13 +86,13 @@ func (this *MusicServices) GetSessionId(serviceId int16, username string) (sessi
 	type Response struct {
 		XMLName   xml.Name
 		SessionId string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"ServiceId", serviceId},
 		{"Username", username},
 	}
-	response := upnp.Call(this.Svc, "GetSessionId", args)
+	response := Call(this.Svc, "GetSessionId", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	sessionId = doc.SessionId
@@ -107,9 +106,9 @@ func (this *MusicServices) ListAvailableServices() (err error) {
 		AvailableServiceDescriptorList string
 		AvailableServiceTypeList       string
 		AvailableServiceListVersion    string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "ListAvailableServices")
+	response := CallVa(this.Svc, "ListAvailableServices")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	services := msServices_XML{}
@@ -122,9 +121,9 @@ func (this *MusicServices) ListAvailableServices() (err error) {
 func (this *MusicServices) UpdateAvailableServices() (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "UpdateAvailableServices")
+	response := CallVa(this.Svc, "UpdateAvailableServices")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()

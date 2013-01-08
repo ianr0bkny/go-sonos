@@ -28,28 +28,27 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
-package sonos
+package upnp
 
 import (
 	"encoding/xml"
-	"github.com/ianr0bkny/go-sonos/upnp"
 	_ "log"
 )
 
 type AlarmClock struct {
-	Svc *upnp.Service
+	Svc *Service
 }
 
 func (this *AlarmClock) SetFormat(desiredTimeFormat, desiredDateFormat string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"DesiredTimeFormat", desiredTimeFormat},
 		{"DesiredDateFormat", desiredDateFormat},
 	}
-	response := upnp.Call(this.Svc, "SetFormat", args)
+	response := Call(this.Svc, "SetFormat", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -61,9 +60,9 @@ func (this *AlarmClock) GetFormat() (currentTimeFormat, currentDateFormat string
 		XMLName           xml.Name
 		CurrentTimeFormat string
 		CurrentDateFormat string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "GetFormat")
+	response := CallVa(this.Svc, "GetFormat")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentTimeFormat = doc.CurrentTimeFormat
@@ -75,13 +74,13 @@ func (this *AlarmClock) GetFormat() (currentTimeFormat, currentDateFormat string
 func (this *AlarmClock) SetTimeZone(index int32, autoAdjustDst bool) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"Index", index},
 		{"AutoAdjustDst", autoAdjustDst},
 	}
-	response := upnp.Call(this.Svc, "SetTimeZone", args)
+	response := Call(this.Svc, "SetTimeZone", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -93,9 +92,9 @@ func (this *AlarmClock) GetTimeZone() (index int32, autoAdjustDst bool, err erro
 		XMLName       xml.Name
 		Index         int32
 		AutoAdjustDst bool
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "GetTimeZone")
+	response := CallVa(this.Svc, "GetTimeZone")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	index = doc.Index
@@ -110,9 +109,9 @@ func (this *AlarmClock) GetTimeZoneAndRule() (index int32, autoAdjustDst bool, t
 		Index         int32
 		AutoAdjustDst bool
 		TimeZone      string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "GetTimeZoneAndRule")
+	response := CallVa(this.Svc, "GetTimeZoneAndRule")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	index = doc.Index
@@ -126,12 +125,12 @@ func (this *AlarmClock) GetTimeZoneRule(index int32) (timeZone string, err error
 	type Response struct {
 		XMLName  xml.Name
 		TimeZone string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"Index", index},
 	}
-	response := upnp.Call(this.Svc, "GetTimeZoneRule", args)
+	response := Call(this.Svc, "GetTimeZoneRule", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	timeZone = doc.TimeZone
@@ -142,12 +141,12 @@ func (this *AlarmClock) GetTimeZoneRule(index int32) (timeZone string, err error
 func (this *AlarmClock) SetTimeServer(desiredTimeServer string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"DesiredTimeServer", desiredTimeServer},
 	}
-	response := upnp.Call(this.Svc, "SetTimeServer", args)
+	response := Call(this.Svc, "SetTimeServer", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -158,9 +157,9 @@ func (this *AlarmClock) GetTimeServer() (currentTimeServer string, err error) {
 	type Response struct {
 		XMLName           xml.Name
 		CurrentTimeServer string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "GetTimeServer")
+	response := CallVa(this.Svc, "GetTimeServer")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentTimeServer = doc.CurrentTimeServer
@@ -171,13 +170,13 @@ func (this *AlarmClock) GetTimeServer() (currentTimeServer string, err error) {
 func (this *AlarmClock) SetTimeNow(desiredTime, timeZoneForDesiredTime string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"DesiredTime", desiredTime},
 		{"TimeZoneForDesiredTime", timeZoneForDesiredTime},
 	}
-	response := upnp.Call(this.Svc, "SetTimeNow", args)
+	response := Call(this.Svc, "SetTimeNow", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -188,12 +187,12 @@ func (this *AlarmClock) GetHouseholdTimeAtStamp(timeStamp string) (householdUTCT
 	type Response struct {
 		XMLName          xml.Name
 		HouseholdUTCTime string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"TimeStamp", timeStamp},
 	}
-	response := upnp.Call(this.Svc, "GetHouseholdTimeAtStamp", args)
+	response := Call(this.Svc, "GetHouseholdTimeAtStamp", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	householdUTCTime = doc.HouseholdUTCTime
@@ -212,9 +211,9 @@ func (this *AlarmClock) GetTimeNow() (getTimeNowResponse *GetTimeNowResponse, er
 	type Response struct {
 		XMLName xml.Name
 		GetTimeNowResponse
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "GetTimeNow")
+	response := CallVa(this.Svc, "GetTimeNow")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	getTimeNowResponse = &doc.GetTimeNowResponse
@@ -253,9 +252,9 @@ func (this *AlarmClock) CreateAlarm(req *CreateAlarmRequest) (assignedId uint32,
 	type Response struct {
 		XMLName    xml.Name
 		AssignedID uint32
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"StartLocalTime", req.StartLocalTime},
 		{"Duration", req.Duration},
 		{"Recurrence", req.Recurrence},
@@ -267,7 +266,7 @@ func (this *AlarmClock) CreateAlarm(req *CreateAlarmRequest) (assignedId uint32,
 		{"Volume", req.Volume},
 		{"IncludeLinkedZones", req.IncludeLinkedZones},
 	}
-	response := upnp.Call(this.Svc, "CreateAlarm", args)
+	response := Call(this.Svc, "CreateAlarm", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	assignedId = doc.AssignedID
@@ -280,9 +279,9 @@ type UpdateAlarmRequest CreateAlarmRequest
 func (this *AlarmClock) UpdateAlarm(id uint32, req *UpdateAlarmRequest) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"ID", id},
 		{"StartLocalTime", req.StartLocalTime},
 		{"Duration", req.Duration},
@@ -295,7 +294,7 @@ func (this *AlarmClock) UpdateAlarm(id uint32, req *UpdateAlarmRequest) (err err
 		{"Volume", req.Volume},
 		{"IncludeLinkedZones", req.IncludeLinkedZones},
 	}
-	response := upnp.Call(this.Svc, "UpdateAlarm", args)
+	response := Call(this.Svc, "UpdateAlarm", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -305,12 +304,12 @@ func (this *AlarmClock) UpdateAlarm(id uint32, req *UpdateAlarmRequest) (err err
 func (this *AlarmClock) DestroyAlarm(id uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"ID", id},
 	}
-	response := upnp.Call(this.Svc, "DestroyAlarm", args)
+	response := Call(this.Svc, "DestroyAlarm", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -322,9 +321,9 @@ func (this *AlarmClock) ListAlarms() (currentAlarmList, currentAlarmListVersion 
 		XMLName                 xml.Name
 		CurrentAlarmList        string
 		CurrentAlarmListVersion string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "ListAlarms")
+	response := CallVa(this.Svc, "ListAlarms")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentAlarmList = doc.CurrentAlarmList
@@ -336,12 +335,12 @@ func (this *AlarmClock) ListAlarms() (currentAlarmList, currentAlarmListVersion 
 func (this *AlarmClock) SetDailyIndexRefreshTime(desiredDailyIndexRefreshTime string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	args := []upnp.Arg{
+	args := []Arg{
 		{"DesiredDailyIndexRefreshTime", desiredDailyIndexRefreshTime},
 	}
-	response := upnp.Call(this.Svc, "SetDailyIndexRefreshTime", args)
+	response := Call(this.Svc, "SetDailyIndexRefreshTime", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -352,9 +351,9 @@ func (this *AlarmClock) GetDailyIndexRefreshTime() (currentDailyIndexRefreshTime
 	type Response struct {
 		XMLName                      xml.Name
 		CurrentDailyIndexRefreshTime string
-		upnp.ErrorResponse
+		ErrorResponse
 	}
-	response := upnp.CallVa(this.Svc, "GetDailyIndexRefreshTime")
+	response := CallVa(this.Svc, "GetDailyIndexRefreshTime")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentDailyIndexRefreshTime = doc.CurrentDailyIndexRefreshTime

@@ -33,6 +33,7 @@ package sonos_test
 import (
 	"github.com/ianr0bkny/go-sonos"
 	"github.com/ianr0bkny/go-sonos/config"
+	"github.com/ianr0bkny/go-sonos/upnp"
 	"log"
 	"testing"
 )
@@ -53,7 +54,7 @@ func TestDeviceProperites(t *testing.T) {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		s := sonos.Connect(dev, reactor)
 
-		if err := s.SetLEDState(sonos.LEDState_On); nil != err {
+		if err := s.SetLEDState(upnp.LEDState_On); nil != err {
 			log.Printf("%#v", err)
 		}
 		if currentLEDState, err := s.GetLEDState(); nil != err {
@@ -128,30 +129,30 @@ func TestRenderingControl(t *testing.T) {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		s := sonos.Connect(dev, reactor)
 		//
-		mute, err := s.GetMute(0, sonos.Channel_Master)
-		err = s.SetMute(0, sonos.Channel_Master, !mute)
+		mute, err := s.GetMute(0, upnp.Channel_Master)
+		err = s.SetMute(0, upnp.Channel_Master, !mute)
 		if nil != err {
 			panic(err)
 		}
 		if basicEQ, err := s.ResetBasicEQ(0); nil == err {
 			log.Printf("%#v", basicEQ)
 		}
-		if volume, err := s.GetVolume(0, sonos.Channel_Master); nil == err {
+		if volume, err := s.GetVolume(0, upnp.Channel_Master); nil == err {
 			log.Printf("%#v", volume)
 		}
-		if err := s.SetVolume(0, sonos.Channel_Master, 50); nil != err {
+		if err := s.SetVolume(0, upnp.Channel_Master, 50); nil != err {
 			panic(err)
 		}
-		if newVolume, err := s.SetRelativeVolume(0, sonos.Channel_Master, 5); nil == err {
+		if newVolume, err := s.SetRelativeVolume(0, upnp.Channel_Master, 5); nil == err {
 			log.Printf("%#v", newVolume)
 		}
-		if volume, err := s.GetVolumeDB(0, sonos.Channel_Master); nil == err {
+		if volume, err := s.GetVolumeDB(0, upnp.Channel_Master); nil == err {
 			log.Printf("%#v", volume)
 		}
-		if err := s.SetVolumeDB(0, sonos.Channel_Master, 50); nil != err {
+		if err := s.SetVolumeDB(0, upnp.Channel_Master, 50); nil != err {
 			log.Printf("%#v", err)
 		}
-		if min, max, err := s.GetVolumeDBRange(0, sonos.Channel_Master); nil != err {
+		if min, max, err := s.GetVolumeDBRange(0, upnp.Channel_Master); nil != err {
 			log.Printf("%#v", err)
 		} else {
 			log.Printf("%v %v", min, max)
@@ -172,7 +173,7 @@ func TestRenderingControl(t *testing.T) {
 		if err := s.SetTreble(0, 51); nil != err {
 			log.Printf("%v", err)
 		}
-		if loudness, err := s.GetLoudness(0, sonos.Channel_Master); nil != err {
+		if loudness, err := s.GetLoudness(0, upnp.Channel_Master); nil != err {
 			log.Printf("%#v", err)
 		} else {
 			log.Printf("%v", loudness)
@@ -222,7 +223,7 @@ func TestZoneGroupTopology(t *testing.T) {
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		s := sonos.Connect(dev, reactor)
-		if ui, err := s.CheckForUpdate(sonos.ALL, false, ""); nil != err {
+		if ui, err := s.CheckForUpdate(upnp.ALL, false, ""); nil != err {
 			log.Printf("%#v", err)
 		} else {
 			log.Printf("%#v", ui)
@@ -253,7 +254,7 @@ func TestDiscover(t *testing.T) {
 			name, _, _ := s.GetZoneAttributes()
 			caps, _ := s.GetSearchCapabilities()
 
-			s.SetPlayMode(0, sonos.PlayMode_REPEAT_ALL)
+			s.SetPlayMode(0, upnp.PlayMode_REPEAT_ALL)
 			s.GetCrossfadeMode(0)
 			s.GetTransportSettings(0)
 			s.GetDeviceCapabilities(0)

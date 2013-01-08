@@ -39,16 +39,16 @@ const MUSIC_SERVICES = "schemas-upnp-org-MusicServices"
 const SONOS = "Sonos"
 
 type Sonos struct {
-	AlarmClock
-	AVTransport
-	ConnectionManager
-	ContentDirectory
-	DeviceProperties
-	GroupManagement
-	MusicServices
-	RenderingControl
-	SystemProperties
-	ZoneGroupTopology
+	upnp.AlarmClock
+	upnp.AVTransport
+	upnp.ConnectionManager
+	upnp.ContentDirectory
+	upnp.DeviceProperties
+	upnp.GroupManagement
+	upnp.MusicServices
+	upnp.RenderingControl
+	upnp.SystemProperties
+	upnp.ZoneGroupTopology
 }
 
 func sonosHandleUpdate(svc *upnp.Service, value string) {
