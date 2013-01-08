@@ -46,6 +46,58 @@ const (
 	TEST_NETWORK       = "eth0"
 )
 
+func TestAlarmClock(t *testing.T) {
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	c := config.MakeConfig(TEST_CONFIG)
+	c.Init()
+	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
+		s := sonos.Connect(dev, reactor)
+		var err error
+		// GetFormat()
+		t.Log("GetFormat")
+		if _ /*currentTimeFormat*/, _ /*currentDateFormat*/, err = s.GetFormat(); nil != err {
+			t.Fatal(err)
+		}
+		// GetTimeZone()
+		t.Log("GetTimeZone")
+		if _ /*index*/, _ /*autoAdjustDst*/, err = s.GetTimeZone(); nil != err {
+			t.Fatal(err)
+		}
+		// GetTimeZoneAndRule()
+		t.Log("GetTimeZoneAndRule")
+		var index int32
+		if index, _ /*autoAdjustDst*/, _ /*timeZone*/, err = s.GetTimeZoneAndRule(); nil != err {
+			t.Fatal(err)
+		}
+		// GetTimeZoneRule()
+		t.Log("GetTimeZoneRule")
+		if _ /*timeZone*/, err := s.GetTimeZoneRule(index); nil != err {
+			t.Fatal(err)
+		}
+		// GetTimeServer()
+		t.Log("GetTimeServer")
+		if _ /*currentTimeServer*/, err = s.GetTimeServer(); nil != err {
+			t.Fatal(err)
+		}
+		// GetTimeNow()
+		t.Log("GetTimeNow")
+		if _ /*getTimeNowResponse*/, err = s.GetTimeNow(); nil != err {
+			t.Fatal(err)
+		}
+		// ListAlarms()
+		t.Log("ListAlarms")
+		if _ /*currentAlarmList*/, _ /*currentAlarmListVersion*/, err = s.ListAlarms(); nil != err {
+			t.Fatal(err)
+		}
+		// GetDailyIndexRefreshTime()
+		t.Log("GetDailyIndexRefreshTime")
+		if _ /*currentDailyIndexRefreshTime*/, err = s.GetDailyIndexRefreshTime(); nil != err {
+			t.Fatal(err)
+		}
+	}
+}
+
 func TestDeviceProperites(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	c := config.MakeConfig(TEST_CONFIG)
