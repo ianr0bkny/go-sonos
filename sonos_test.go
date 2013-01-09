@@ -46,56 +46,174 @@ const (
 	TEST_NETWORK       = "eth0"
 )
 
-func TestAlarmClock(t *testing.T) {
+var testSonos *sonos.Sonos
+
+func initTestSonos() {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		s := sonos.Connect(dev, reactor)
-		var err error
-		// GetFormat()
-		t.Log("GetFormat")
-		if _ /*currentTimeFormat*/, _ /*currentDateFormat*/, err = s.GetFormat(); nil != err {
+		testSonos = sonos.Connect(dev, reactor)
+	} else {
+		log.Fatal("Could not create test instance")
+	}
+}
+
+func getTestSonos() *sonos.Sonos {
+	if nil == testSonos {
+		initTestSonos()
+	}
+	return testSonos
+}
+
+//
+// AlarmClock
+//
+func TestAlarmClock(t *testing.T) {
+	s := getTestSonos()
+
+	if currentTimeFormat, currentDateFormat, err := s.GetFormat(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetFormat() -> \"%s\",\"%s\"", currentTimeFormat, currentDateFormat)
+	}
+
+	if index, autoAdjustDst, err := s.GetTimeZone(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetTimeZone() -> %d,%v", index, autoAdjustDst)
+	}
+
+	if index, autoAdjustDst, timeZone, err := s.GetTimeZoneAndRule(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetTimeZoneAndRule() -> %d,%v,\"%s\"", index, autoAdjustDst, timeZone)
+		if timeZone, err := s.GetTimeZoneRule(index); nil != err {
 			t.Fatal(err)
-		}
-		// GetTimeZone()
-		t.Log("GetTimeZone")
-		if _ /*index*/, _ /*autoAdjustDst*/, err = s.GetTimeZone(); nil != err {
-			t.Fatal(err)
-		}
-		// GetTimeZoneAndRule()
-		t.Log("GetTimeZoneAndRule")
-		var index int32
-		if index, _ /*autoAdjustDst*/, _ /*timeZone*/, err = s.GetTimeZoneAndRule(); nil != err {
-			t.Fatal(err)
-		}
-		// GetTimeZoneRule()
-		t.Log("GetTimeZoneRule")
-		if _ /*timeZone*/, err := s.GetTimeZoneRule(index); nil != err {
-			t.Fatal(err)
-		}
-		// GetTimeServer()
-		t.Log("GetTimeServer")
-		if _ /*currentTimeServer*/, err = s.GetTimeServer(); nil != err {
-			t.Fatal(err)
-		}
-		// GetTimeNow()
-		t.Log("GetTimeNow")
-		if _ /*getTimeNowResponse*/, err = s.GetTimeNow(); nil != err {
-			t.Fatal(err)
-		}
-		// ListAlarms()
-		t.Log("ListAlarms")
-		if _ /*currentAlarmList*/, _ /*currentAlarmListVersion*/, err = s.ListAlarms(); nil != err {
-			t.Fatal(err)
-		}
-		// GetDailyIndexRefreshTime()
-		t.Log("GetDailyIndexRefreshTime")
-		if _ /*currentDailyIndexRefreshTime*/, err = s.GetDailyIndexRefreshTime(); nil != err {
-			t.Fatal(err)
+		} else {
+			t.Logf("GetTimeZoneRule(index=%d) -> \"%v\"", index, timeZone)
 		}
 	}
+
+	if currentTimeServer, err := s.GetTimeServer(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetTimeServer() -> \"%s\"", currentTimeServer)
+	}
+
+	if getTimeNowResponse, err := s.GetTimeNow(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetTimeNow() ->")
+		t.Logf("\tCurrentUTCTime = \"%s\"", getTimeNowResponse.CurrentUTCTime)
+		t.Logf("\tCurrentLocalTime = \"%s\"", getTimeNowResponse.CurrentLocalTime)
+		t.Logf("\tCurrentTimeZone = \"%s\"", getTimeNowResponse.CurrentTimeZone)
+		t.Logf("\tCurrenTimeGeneration = %d", getTimeNowResponse.CurrentTimeGeneration)
+	}
+
+	if currentAlarmList, currentAlarmListVersion, err := s.ListAlarms(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("ListAlarms() -> \"%s\",\"%s\"", currentAlarmList, currentAlarmListVersion)
+	}
+
+	if currentDailyIndexRefreshTime, err := s.GetDailyIndexRefreshTime(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetDailyIndexRefreshTime() -> \"%s\"", currentDailyIndexRefreshTime)
+	}
+}
+
+//
+// AVTransport
+//
+func TestAVTransport(t *testing.T) {
+	s := getTestSonos()
+
+	if mediaInfo, err := s.GetMediaInfo(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetMediaInfo(0) ->")
+		t.Logf("\tNrTracks = %d", mediaInfo.NrTracks)
+		t.Logf("\tMediaDuration = \"%s\"", mediaInfo.MediaDuration)
+		t.Logf("\tCurrentURI = \"%s\"", mediaInfo.CurrentURI)
+		t.Logf("\tCurrentURIMetaData = \"%s\"", mediaInfo.CurrentURIMetaData)
+		t.Logf("\tNextURI = \"%s\"", mediaInfo.NextURI)
+		t.Logf("\tNextURIMetaData = \"%s\"", mediaInfo.NextURIMetaData)
+		t.Logf("\tPlayMedium = \"%s\"", mediaInfo.PlayMedium)
+		t.Logf("\tRecordMedium = \"%s\"", mediaInfo.RecordMedium)
+		t.Logf("\tWriteStatus = \"%s\"", mediaInfo.WriteStatus)
+	}
+
+	if transportInfo, err := s.GetTransportInfo(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetTransportInfo(0) ->")
+		t.Logf("\tCurrentTransportState = \"%s\"", transportInfo.CurrentTransportState)
+		t.Logf("\tCurrentTransportStatus = \"%s\"", transportInfo.CurrentTransportStatus)
+		t.Logf("\tCurrentSpeed = \"%s\"", transportInfo.CurrentSpeed)
+	}
+
+	if positionInfo, err := s.GetPositionInfo(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetPositionInfo(0) ->")
+		t.Logf("\tTrack = %d", positionInfo.Track)
+		t.Logf("\tTrackDuration = \"%s\"", positionInfo.TrackDuration)
+		t.Logf("\tTrackMetaData = \"%s\"", positionInfo.TrackMetaData)
+		t.Logf("\tTrackURI = \"%s\"", positionInfo.TrackURI)
+		t.Logf("\tRelTime = \"%s\"", positionInfo.RelTime)
+		t.Logf("\tAbsTime = \"%s\"", positionInfo.AbsTime)
+		t.Logf("\tRelCount = %d", positionInfo.RelCount)
+		t.Logf("\tAbsCount = %d", positionInfo.AbsCount)
+	}
+
+	if deviceCapabilities, err := s.GetDeviceCapabilities(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetDeviceCapabilities() ->")
+		t.Logf("\tPlayMedia = \"%s\"", deviceCapabilities.PlayMedia)
+		t.Logf("\tRecMedia = \"%s\"", deviceCapabilities.RecMedia)
+		t.Logf("\tRecQualityModes = \"%s\"", deviceCapabilities.RecQualityModes)
+	}
+
+	if transportSettings, err := s.GetTransportSettings(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetTransportSettings() ->")
+		t.Logf("\tPlayMode = \"%s\"", transportSettings.PlayMode)
+		t.Logf("\tRecQualityMode = \"%s\"", transportSettings.RecQualityMode)
+	}
+
+	if crossfadeMode, err := s.GetCrossfadeMode(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetCrossfadeMode() -> %v", crossfadeMode)
+	}
+
+	if actions, err := s.GetCurrentTransportActions(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetCurrentTransportActions() -> \"%s\"", actions)
+	}
+
+	if remainingSleepTimerDuration, currentSleepTimerGeneration, err := s.GetRemainingSleepTimerDuration(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetRemainingSleepTimerDuration() -> \"%s\",%d", remainingSleepTimerDuration, currentSleepTimerGeneration)
+	}
+
+	/*
+	if alarmId, groupId, loggedStartTime, err := s.GetRunningAlarmProperties(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetRunningAlarmProperties() ->")
+		t.Logf("\tAlarmID = %d", alarmId)
+		t.Logf("\tGroupID = \"%s\"", groupId)
+		t.Logf("\tLoggedStartTime = \"%s\"", loggedStartTime)
+	}
+	*/
 }
 
 func TestDeviceProperites(t *testing.T) {
