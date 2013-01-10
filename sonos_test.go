@@ -205,215 +205,303 @@ func TestAVTransport(t *testing.T) {
 	}
 
 	/*
-	if alarmId, groupId, loggedStartTime, err := s.GetRunningAlarmProperties(0); nil != err {
-		t.Fatal(err)
-	} else {
-		t.Logf("GetRunningAlarmProperties() ->")
-		t.Logf("\tAlarmID = %d", alarmId)
-		t.Logf("\tGroupID = \"%s\"", groupId)
-		t.Logf("\tLoggedStartTime = \"%s\"", loggedStartTime)
-	}
+		if alarmId, groupId, loggedStartTime, err := s.GetRunningAlarmProperties(0); nil != err {
+			t.Fatal(err)
+		} else {
+			t.Logf("GetRunningAlarmProperties() ->")
+			t.Logf("\tAlarmID = %d", alarmId)
+			t.Logf("\tGroupID = \"%s\"", groupId)
+			t.Logf("\tLoggedStartTime = \"%s\"", loggedStartTime)
+		}
 	*/
 }
 
-func TestDeviceProperites(t *testing.T) {
-	log.SetFlags(log.Ltime | log.Lshortfile)
-	c := config.MakeConfig(TEST_CONFIG)
-	c.Init()
-	if dev := c.Lookup(TEST_DEVICE); nil != dev {
-		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		s := sonos.Connect(dev, reactor)
+//
+// ConnectiionManager
+//
+func TestConnectionManager(t *testing.T) {
+	s := getTestSonos()
 
-		if err := s.SetLEDState(upnp.LEDState_On); nil != err {
-			log.Printf("%#v", err)
-		}
-		if currentLEDState, err := s.GetLEDState(); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("CurrentLEDState = %v", currentLEDState)
-		}
+	if source, sink, err := s.GetProtocolInfo(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetProtocolInfo() -> \"%s\",\"%s\"", source, sink)
+	}
 
-		if err := s.SetInvisible(false); nil != err {
-			log.Printf("%#v", err)
-		}
-		if currentInvisible, err := s.GetInvisible(); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("CurrentInvisible = %v", currentInvisible)
-		}
-
-		if name, icon, err := s.GetZoneAttributes(); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("CurrentZoneName = %v", name)
-			log.Printf("CurrentIcon = %v", icon)
-		}
-
-		if id, err := s.GetHouseholdID(); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("CurrentHouseholdID = %s", id)
-		}
-
-		if info, err := s.GetZoneInfo(); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("%#v", info)
-		}
-
-		if err := s.SetAutoplayLinkedZones(false); nil != err {
-			log.Printf("%#v", err)
-		}
-
-		if inc, err := s.GetAutoplayLinkedZones(); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("IncludeLinkedZones = %v", inc)
-		}
-
-		if uuid, err := s.GetAutoplayRoomUUID(); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("AutoplayRoomUUID = %s", uuid)
-		}
-
-		if volume, err := s.GetAutoplayVolume(); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("AutoplayVolume = %v", volume)
-		}
-
-		if use, err := s.GetUseAutoplayVolume(); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("UseAutoplayVolume = %v", use)
-		}
+	if connectionIds, err := s.GetCurrentConnectionIDs(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetCurrentConnectionIds() -> \"%s\"", connectionIds)
 	}
 }
 
-func TestRenderingControl(t *testing.T) {
-	log.SetFlags(log.Ltime | log.Lshortfile)
-	c := config.MakeConfig(TEST_CONFIG)
-	c.Init()
-	if dev := c.Lookup(TEST_DEVICE); nil != dev {
-		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		s := sonos.Connect(dev, reactor)
-		//
-		mute, err := s.GetMute(0, upnp.Channel_Master)
-		err = s.SetMute(0, upnp.Channel_Master, !mute)
-		if nil != err {
-			panic(err)
-		}
-		if basicEQ, err := s.ResetBasicEQ(0); nil == err {
-			log.Printf("%#v", basicEQ)
-		}
-		if volume, err := s.GetVolume(0, upnp.Channel_Master); nil == err {
-			log.Printf("%#v", volume)
-		}
-		if err := s.SetVolume(0, upnp.Channel_Master, 50); nil != err {
-			panic(err)
-		}
-		if newVolume, err := s.SetRelativeVolume(0, upnp.Channel_Master, 5); nil == err {
-			log.Printf("%#v", newVolume)
-		}
-		if volume, err := s.GetVolumeDB(0, upnp.Channel_Master); nil == err {
-			log.Printf("%#v", volume)
-		}
-		if err := s.SetVolumeDB(0, upnp.Channel_Master, 50); nil != err {
-			log.Printf("%#v", err)
-		}
-		if min, max, err := s.GetVolumeDBRange(0, upnp.Channel_Master); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("%v %v", min, max)
-		}
-		if bass, err := s.GetBass(0); nil != err {
-			log.Printf("%v", err)
-		} else {
-			log.Printf("%v", bass)
-		}
-		if err := s.SetBass(0, 51); nil != err {
-			log.Printf("%v", err)
-		}
-		if treble, err := s.GetTreble(0); nil != err {
-			log.Printf("%v", err)
-		} else {
-			log.Printf("%v", treble)
-		}
-		if err := s.SetTreble(0, 51); nil != err {
-			log.Printf("%v", err)
-		}
-		if loudness, err := s.GetLoudness(0, upnp.Channel_Master); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("%v", loudness)
-		}
+//
+// ContentDirectory
+//
+func TestContentDirectory(t *testing.T) {
+	s := getTestSonos()
 
-		if currentSupportsFixed, err := s.GetSupportsOutputFixed(0); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("%#v", currentSupportsFixed)
-		}
+	if searchCaps, err := s.GetSearchCapabilities(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetSearchCapabilities() -> \"%s\"", searchCaps)
+	}
 
-		if fixed, err := s.GetOutputFixed(0); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("%#v", fixed)
-		}
+	if sortCaps, err := s.GetSortCapabilities(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetSortCapabilities() -> \"%s\"", sortCaps)
+	}
 
-		if err := s.SetOutputFixed(0, false); nil != err {
-			log.Printf("%#v", err)
-		}
+	if id, err := s.GetSystemUpdateID(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetSystemUpdateID() -> \"%s\"", id)
+	}
 
-		if connected, err := s.GetHeadphoneConnected(0); nil != err {
-			log.Printf("%#v", err)
-		} else {
-			log.Printf("%#v", connected)
-		}
+	if albumArtistDisplayOption, err := s.GetAlbumArtistDisplayOption(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetAlbumArtistDisplayOption() -> \"%s\"", albumArtistDisplayOption)
+	}
+
+	if lastIndexChange, err := s.GetLastIndexChange(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetLastIndexChange() -> \"%s\"", lastIndexChange)
+	}
+
+	if isIndexing, err := s.GetShareIndexInProgress(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetShareIndexInProgress() -> %v", isIndexing)
+	}
+
+	if isBrowseable, err := s.GetBrowseable(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetBrowseable() -> %v", isBrowseable)
 	}
 }
 
+//
+// DeviceProperties
+//
+func TestDeviceProperties(t *testing.T) {
+	s := getTestSonos()
+
+	if currentLEDState, err := s.GetLEDState(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetLEDState() -> \"%s\"", currentLEDState)
+	}
+
+	if currentInvisible, err := s.GetInvisible(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetInvisible() -> %v", currentInvisible)
+	}
+
+	if currentZoneName, currentIcon, err := s.GetZoneAttributes(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetZoneAttributes() -> \"%s\",\"%s\"", currentZoneName, currentIcon)
+	}
+
+	if currentHouseholdId, err := s.GetHouseholdID(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetHouseholdID() -> \"%s\"", currentHouseholdId)
+	}
+
+	if zoneInfo, err := s.GetZoneInfo(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetZoneInfo() ->")
+		t.Logf("\tSerialNumber = \"%s\"", zoneInfo.SerialNumber)
+		t.Logf("\tSoftwareVersion = \"%s\"", zoneInfo.SoftwareVersion)
+		t.Logf("\tDisplaySoftwareVersion = \"%s\"", zoneInfo.DisplaySoftwareVersion)
+		t.Logf("\tHardwareVersion = \"%s\"", zoneInfo.HardwareVersion)
+		t.Logf("\tIPAddress = \"%s\"", zoneInfo.IPAddress)
+		t.Logf("\tMACAddress = \"%s\"", zoneInfo.MACAddress)
+		t.Logf("\tCopyrightInfo = \"%s\"", zoneInfo.CopyrightInfo)
+		t.Logf("\tExtraInfo = \"%s\"", zoneInfo.ExtraInfo)
+	}
+
+	if includeLinkedZones, err := s.GetAutoplayLinkedZones(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetAutoplayLinkedZones() -> %v", includeLinkedZones)
+	}
+
+	if roomUUID, err := s.GetAutoplayRoomUUID(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetAutoplayRoomUUID() -> \"%s\"", roomUUID)
+	}
+
+	if currentVolume, err := s.GetAutoplayVolume(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetAutoplayVolume() -> %d", currentVolume)
+	}
+
+	if useVolume, err := s.GetUseAutoplayVolume(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetUseAutoplayVolume() -> %v", useVolume)
+	}
+}
+
+//
+// GroupManagement
+//
+func TestGroupManagement(t *testing.T) {
+	// TODO
+}
+
+//
+// MusicServices
+//
 func TestMusicServices(t *testing.T) {
-	log.SetFlags(log.Ltime | log.Lshortfile)
-	c := config.MakeConfig(TEST_CONFIG)
-	c.Init()
-	if dev := c.Lookup(TEST_DEVICE); nil != dev {
-		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		s := sonos.Connect(dev, reactor)
-		s.GetSessionId(6 /*iheartradio*/, "")
-		s.ListAvailableServices()
-		s.UpdateAvailableServices()
+	s := getTestSonos()
+
+	if sessionId, err := s.GetSessionId(6 /*iheartradio*/, ""); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetSessionId() -> \"%s\"", sessionId)
+	}
+
+	if err := s.ListAvailableServices(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("ListAvailableServices() -> OK")
+	}
+
+	if err := s.UpdateAvailableServices(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("UpdateAvailableServices() -> OK")
 	}
 }
 
-func TestZoneGroupTopology(t *testing.T) {
-	log.SetFlags(log.Ltime | log.Lshortfile)
-	c := config.MakeConfig(TEST_CONFIG)
-	c.Init()
-	if dev := c.Lookup(TEST_DEVICE); nil != dev {
-		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		s := sonos.Connect(dev, reactor)
-		if ui, err := s.CheckForUpdate(upnp.ALL, false, ""); nil != err {
-			log.Printf("%#v", err)
+//
+// RenderingControl
+//
+func TestRenderingControl(t *testing.T) {
+	s := getTestSonos()
+
+	if currentMute, err := s.GetMute(0, upnp.Channel_Master); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetMute() -> %v", currentMute)
+	}
+
+	if basicEQ, err := s.ResetBasicEQ(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("ResetBasicEQ() ->")
+		t.Logf("\tBass = %d", basicEQ.Bass)
+		t.Logf("\tTreble = %d", basicEQ.Treble)
+		t.Logf("\tLoudness = %v", basicEQ.Loudness)
+		t.Logf("\tLeftVolume = %d", basicEQ.LeftVolume)
+		t.Logf("\tRightVolume = %d", basicEQ.RightVolume)
+	}
+
+	if currentVolume, err := s.GetVolume(0, upnp.Channel_Master); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetVolume() -> %d", currentVolume)
+	}
+
+	/*
+		if currentVolume, err := s.GetVolumeDB(0, upnp.Channel_Master); nil != err {
+			t.Fatal(err)
 		} else {
-			log.Printf("%#v", ui)
+			t.Logf("GetVolumeDB() -> %d", currentVolume)
 		}
+
+		if min, max, err := s.GetVolumeDBRange(0, upnp.Channel_Master); nil != err {
+			t.Fatal(err)
+		} else {
+			t.Logf("GetVolumeDBRange() -> %d,%d", min, max)
+		}
+	*/
+
+	if currentBass, err := s.GetBass(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetBass() -> %d", currentBass)
+	}
+
+	if currentTreble, err := s.GetTreble(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetTreble() -> %d", currentTreble)
+	}
+
+	if loudness, err := s.GetLoudness(0, upnp.Channel_Master); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetLoudness() -> %v", loudness)
+	}
+
+	if currentSupportsFixed, err := s.GetSupportsOutputFixed(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetSupportsOutputFixed() -> %v", currentSupportsFixed)
+	}
+
+	if currentFixed, err := s.GetOutputFixed(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetOutputFixed() -> %v", currentFixed)
+	}
+
+	if currentHeadphoneConnected, err := s.GetHeadphoneConnected(0); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("GetHeadphoneConnected() -> %v", currentHeadphoneConnected)
 	}
 }
 
+//
+// SystemProperties
+//
+func TestSystemProperties(t *testing.T) {
+	// TODO
+}
+
+//
+// ZoneGroupTopology
+//
+func TestZoneGroupTopology(t *testing.T) {
+	s := getTestSonos()
+
+	if updateItem, err := s.CheckForUpdate(upnp.ALL, false, ""); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("CheckForUpdate() ->")
+		t.Logf("\tType = \"%s\"", updateItem.Type)
+		t.Logf("\tVersion = \"%s\"", updateItem.Version)
+		t.Logf("\tUpdateURL = \"%s\"", updateItem.UpdateURL)
+		t.Logf("\tDownloadSize = \"%s\"", updateItem.DownloadSize)
+		t.Logf("\tManifestURL = \"%s\"", updateItem.ManifestURL)
+	}
+}
+
+//
+// Coverage
+//
 func TestCoverage(t *testing.T) {
-	log.SetFlags(log.Ltime | log.Lshortfile)
-	c := config.MakeConfig(TEST_CONFIG)
-	c.Init()
-	if dev := c.Lookup(TEST_DEVICE); nil != dev {
-		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		s := sonos.Connect(dev, reactor)
-		sonos.Coverage(s)
-	}
+	s := getTestSonos()
+	sonos.Coverage(s)
 }
 
-func TestDiscover(t *testing.T) {
-	log.SetFlags(log.Ltime | log.Lshortfile)
+//
+// Discovery
+//
+func _TestDiscovery(t *testing.T) {
 	if mgr, err := sonos.Discover(TEST_NETWORK, TEST_DISCOVER_PORT); nil != err {
 		panic(err)
 	} else {
@@ -422,49 +510,34 @@ func TestDiscover(t *testing.T) {
 		for _, s := range found {
 			id, _ := s.GetHouseholdID()
 			name, _, _ := s.GetZoneAttributes()
-			caps, _ := s.GetSearchCapabilities()
-
-			s.SetPlayMode(0, upnp.PlayMode_REPEAT_ALL)
-			s.GetCrossfadeMode(0)
-			s.GetTransportSettings(0)
-			s.GetDeviceCapabilities(0)
-			s.GetPositionInfo(0)
-			s.GetTransportInfo(0)
-			s.GetMediaInfo(0)
-			//s.Play(0, "1")
-			//s.Stop(0)
-			s.GetProtocolInfo()
-			s.GetCurrentConnectionIDs()
-			s.GetCurrentConnectionInfo(0)
-
-			log.Printf("Found device %s `%s' '%s'", id, name, caps)
-
-			/*
-				// browse root-level metadata
-				s.Browse("0", "BrowseMetadata", "*", 0, 0, "")
-				// browse children of the root
-				s.Browse("0", "BrowseDirectChildren", "*", 0, 0, "")
-				// browse music shares
-				s.Browse("S:", "BrowseDirectChildren", "*", 0, 0, "")
-				// browse the //perseus/sonos share
-				s.Browse("S://perseus/sonos", "BrowseDirectChildren", "*", 0, 0, "")
-				// browse the //perseus/sonos/iTunes share
-				s.Browse("S://perseus/sonos/iTunes", "BrowseDirectChildren", "*", 0, 0, "")
-				// browse the //perseus/sonos/iTunes/Music share
-				s.Browse("S://perseus/sonos/iTunes/Music", "BrowseDirectChildren", "*", 0, 0, "")
-				// browse the //perseus/sonos/iTunes/Music/The Who share
-				s.Browse("S://perseus/sonos/iTunes/Music/The Who", "BrowseDirectChildren", "*", 0, 0, "")
-			*/
-			// browse the //perseus/sonos/iTunes/Music/The Who/Tommy share
-			x, _ := s.Browse("S://perseus/sonos/iTunes/Music/The Who/Tommy", "BrowseDirectChildren", "*", 0, 0, "")
-			log.Printf("%#v", x)
-
-			/*
-				// browse music attributes
-				s.Browse("A:", "BrowseDirectChildren", "*", 0, 0, "")
-				// return list of composers
-				s.Browse("A:COMPOSER", "BrowseDirectChildren", "dc:title", 0, 0, "")
-			*/
+			log.Printf("Found device \"%s\",\"%s\"", id, name)
 		}
 	}
 }
+
+//			/*
+//				// browse root-level metadata
+//				s.Browse("0", "BrowseMetadata", "*", 0, 0, "")
+//				// browse children of the root
+//				s.Browse("0", "BrowseDirectChildren", "*", 0, 0, "")
+//				// browse music shares
+//				s.Browse("S:", "BrowseDirectChildren", "*", 0, 0, "")
+//				// browse the //perseus/sonos share
+//				s.Browse("S://perseus/sonos", "BrowseDirectChildren", "*", 0, 0, "")
+//				// browse the //perseus/sonos/iTunes share
+//				s.Browse("S://perseus/sonos/iTunes", "BrowseDirectChildren", "*", 0, 0, "")
+//				// browse the //perseus/sonos/iTunes/Music share
+//				s.Browse("S://perseus/sonos/iTunes/Music", "BrowseDirectChildren", "*", 0, 0, "")
+//				// browse the //perseus/sonos/iTunes/Music/The Who share
+//				s.Browse("S://perseus/sonos/iTunes/Music/The Who", "BrowseDirectChildren", "*", 0, 0, "")
+//			*/
+//			// browse the //perseus/sonos/iTunes/Music/The Who/Tommy share
+//			x, _ := s.Browse("S://perseus/sonos/iTunes/Music/The Who/Tommy", "BrowseDirectChildren", "*", 0, 0, "")
+//			log.Printf("%#v", x)
+//
+//			/*
+//				// browse music attributes
+//				s.Browse("A:", "BrowseDirectChildren", "*", 0, 0, "")
+//				// return list of composers
+//				s.Browse("A:COMPOSER", "BrowseDirectChildren", "dc:title", 0, 0, "")
+//			*/
