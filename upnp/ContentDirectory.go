@@ -279,7 +279,7 @@ func (this *ContentDirectory) RequestResort(sortOrder string) (err error) {
 	return
 }
 
-func (this *ContentDirectory) GetShareIndexInProgress(isIndexing bool, err error) {
+func (this *ContentDirectory) GetShareIndexInProgress() (isIndexing bool, err error) {
 	type Response struct {
 		XMLName    xml.Name
 		IsIndexing bool
