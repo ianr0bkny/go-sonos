@@ -110,27 +110,53 @@ func (this *ContentDirectory) GetLastIndexChange() (lastIndexChange string, err 
 	return
 }
 
+const (
+	BrowseObjectID_Root = "0"
+)
+
+const (
+	BrowseFlag_BrowseMetdata        = "BrowseMetadata"
+	BrowseFlag_BrowseDirectChildren = "BrowseDirectChildren"
+)
+
+const (
+	BrowseFilter_All = "*"
+)
+
+const (
+	BrowseSortCriteria_None = ""
+)
+
+type BrowseRequest struct {
+	ObjectID      string
+	BrowseFlag    string
+	Filter        string
+	StartingIndex uint32
+	RequestCount  uint32
+	SortCriteria  string
+}
+
 type BrowseResult struct {
-	Result         string
 	NumberReturned int32
 	TotalMatches   int32
 	UpdateID       int32
 	Doc            *didl.Lite
 }
 
-func (this *ContentDirectory) Browse(object, flag, filter string, start, count uint32, sort string) (browseResult *BrowseResult, err error) {
+func (this *ContentDirectory) Browse(req *BrowseRequest) (browseResult *BrowseResult, err error) {
 	type Response struct {
 		XMLName xml.Name
+		Result  string
 		BrowseResult
 		ErrorResponse
 	}
 	args := []Arg{
-		{"ObjectID", object},
-		{"BrowseFlag", flag},
-		{"Filter", filter},
-		{"StartingIndex", start},
-		{"RequestedCount", count},
-		{"SortCriteria", sort},
+		{"ObjectID", req.ObjectID},
+		{"BrowseFlag", req.BrowseFlag},
+		{"Filter", req.Filter},
+		{"StartingIndex", req.StartingIndex},
+		{"RequestedCount", req.RequestCount},
+		{"SortCriteria", req.SortCriteria},
 	}
 	response := Call(this.Svc, "Browse", args)
 	doc := Response{}
@@ -150,6 +176,7 @@ func (this *ContentDirectory) FindPrefix(objectId, prefix string) (startingIndex
 		ErrorResponse
 	}
 	args := []Arg{
+		{"ObjectID", objectId},
 		{"StartingIndex", startingIndex},
 		{"UpdateID", updateId},
 	}

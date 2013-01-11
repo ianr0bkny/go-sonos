@@ -237,6 +237,7 @@ func TestConnectionManager(t *testing.T) {
 
 //
 // ContentDirectory
+// @see also TestBrowse
 //
 func TestContentDirectory(t *testing.T) {
 	s := getTestSonos()
@@ -510,9 +511,26 @@ func _TestDiscovery(t *testing.T) {
 		for _, s := range found {
 			id, _ := s.GetHouseholdID()
 			name, _, _ := s.GetZoneAttributes()
-			log.Printf("Found device \"%s\",\"%s\"", id, name)
+			t.Logf("Found device \"%s\",\"%s\"", id, name)
 		}
 	}
+}
+
+//
+// Browse
+//
+func TestBrowse(t *testing.T) {
+	s := getTestSonos()
+
+	if result, err := s.GetRootLevelChildren(); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%3s %-15s %s", container.ID, container.Title, container.Class)
+		}
+	}
+
+	s.ListQueues()
 }
 
 //			/*

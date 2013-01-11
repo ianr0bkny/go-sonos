@@ -33,6 +33,7 @@ package sonos
 import (
 	"github.com/ianr0bkny/go-sonos/ssdp"
 	"github.com/ianr0bkny/go-sonos/upnp"
+	_ "log"
 )
 
 const MUSIC_SERVICES = "schemas-upnp-org-MusicServices"
@@ -52,6 +53,7 @@ type Sonos struct {
 }
 
 func sonosHandleUpdate(svc *upnp.Service, value string) {
+	//log.Printf("UPDATE: %s", value)
 }
 
 func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor) (sonos *Sonos) {

@@ -42,3 +42,6 @@ clean ::
 wc ::
 	wc -l *.go */*.go
 
+longlines ::
+	egrep '.{120,}' *.go */*.go
+
