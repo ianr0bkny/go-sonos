@@ -42,6 +42,8 @@ const (
 	ObjectID_SavedQueues   = "SQ:"
 	ObjectID_InternetRadio = "R:"
 	ObjectID_EntireNetwork = "EN:"
+	//
+	ObjectID_Queue_AVT_Instance_0 = "Q:0"
 )
 
 type Container struct {
@@ -74,7 +76,7 @@ func (this *Sonos) GetRootLevelChildren() (containers []Container, err error) {
 	return
 }
 
-func (this *Sonos) ListQueues() (err error) {
+func (this *Sonos) ListQueues() (containers []Container, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID_Queues,
@@ -87,6 +89,39 @@ func (this *Sonos) ListQueues() (err error) {
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
+		for _, container := range result.Doc.Container {
+			c := Container{}
+			c.ID = container.ID
+			c.Title = container.Title[0].Value
+			c.Class = container.Class[0].Value
+			containers = append(containers, c)
+		}
+	}
+	return
+}
+
+func (this *Sonos) GetQueueContents() (err error) {
+	var result *upnp.BrowseResult
+	req := &upnp.BrowseRequest{
+		ObjectID_Queue_AVT_Instance_0,
+		upnp.BrowseFlag_BrowseDirectChildren,
+		upnp.BrowseFilter_All,
+		0, /*StartingIndex*/
+		0, /*RequestCount*/
+		upnp.BrowseSortCriteria_None,
+	}
+	if result, err = this.Browse(req); nil != err {
+		return
+	} else {
+		/*
+			for _, container := range result.Doc.Container {
+				c := Container{}
+				c.ID = container.ID
+				c.Title = container.Title[0].Value
+				c.Class = container.Class[0].Value
+				containers = append(containers, c)
+			}
+		*/
 		log.Printf("%#v", result.Doc)
 	}
 	return

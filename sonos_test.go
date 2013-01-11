@@ -522,6 +522,8 @@ func _TestDiscovery(t *testing.T) {
 func TestBrowse(t *testing.T) {
 	s := getTestSonos()
 
+	t.Logf("Root Level Children")
+	t.Logf("===================")
 	if result, err := s.GetRootLevelChildren(); nil != err {
 		t.Fatal(err)
 	} else {
@@ -530,7 +532,17 @@ func TestBrowse(t *testing.T) {
 		}
 	}
 
-	s.ListQueues()
+	t.Logf("Queues")
+	t.Logf("===================")
+	if result, err := s.ListQueues(); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%3s %-15s %s", container.ID, container.Title, container.Class)
+		}
+	}
+
+	s.GetQueueContents()
 }
 
 //			/*
