@@ -589,6 +589,17 @@ func TestBrowse(t *testing.T) {
 		}
 	}
 
+	t.Logf("===================")
+	t.Logf("Genres")
+	t.Logf("-------------------")
+	if result, err := s.ListGenres(); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%32s %-20s %s", container.ID, container.Title, container.Class)
+		}
+	}
+
 	//s.GetQueueContents()
 }
 
