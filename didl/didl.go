@@ -48,7 +48,7 @@ type Container struct {
 	XMLName    xml.Name
 	ID         string  `xml:"id,attr"`
 	ParentID   string  `xml:"parentID,attr"`
-	Restricted string  `xml:"restricted,attr"`
+	Restricted bool    `xml:"restricted,attr"`
 	Title      []Title `xml:"title"`
 	Class      []Class `xml:"class"`
 }
