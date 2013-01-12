@@ -523,7 +523,7 @@ func TestBrowse(t *testing.T) {
 	s := getTestSonos()
 
 	t.Logf("Root Level Children")
-	t.Logf("===================")
+	t.Logf("-------------------")
 	if result, err := s.GetRootLevelChildren(); nil != err {
 		t.Fatal(err)
 	} else {
@@ -532,8 +532,9 @@ func TestBrowse(t *testing.T) {
 		}
 	}
 
-	t.Logf("Queues")
 	t.Logf("===================")
+	t.Logf("Queues")
+	t.Logf("-------------------")
 	if result, err := s.ListQueues(); nil != err {
 		t.Fatal(err)
 	} else {
@@ -542,7 +543,53 @@ func TestBrowse(t *testing.T) {
 		}
 	}
 
-	s.GetQueueContents()
+	t.Logf("===================")
+	t.Logf("Saved Queues")
+	t.Logf("-------------------")
+	if result, err := s.ListSavedQueues(); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%3s %-25s %s", container.ID, container.Title, container.Class)
+		}
+	}
+
+	/*
+	t.Logf("===================")
+	t.Logf("Internet Radio")
+	t.Logf("-------------------")
+	if result, err := s.ListInternetRadio(); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%3s %-25s %s", container.ID, container.Title, container.Class)
+		}
+	}
+	*/
+
+	t.Logf("===================")
+	t.Logf("Attributes")
+	t.Logf("-------------------")
+	if result, err := s.ListAttributes(); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%13s %-25s %s", container.ID, container.Title, container.Class)
+		}
+	}
+
+	t.Logf("===================")
+	t.Logf("Music Shares")
+	t.Logf("-------------------")
+	if result, err := s.ListMusicShares(); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%18s %-20s %s", container.ID, container.Title, container.Class)
+		}
+	}
+
+	//s.GetQueueContents()
 }
 
 //			/*

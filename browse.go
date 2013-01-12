@@ -31,6 +31,7 @@
 package sonos
 
 import (
+	"github.com/ianr0bkny/go-sonos/didl"
 	"github.com/ianr0bkny/go-sonos/upnp"
 	"log"
 )
@@ -47,12 +48,31 @@ const (
 )
 
 type Container struct {
-	ID    string
-	Title string
-	Class string
+	ID         string
+	ParentID   string
+	Restricted bool
+	Title      string
+	Class      string
 }
 
-func (this *Sonos) GetRootLevelChildren() (containers []Container, err error) {
+func makeContainer(in *didl.Container) *Container {
+	return &Container{
+		in.ID,
+		in.ParentID,
+		in.Restricted,
+		in.Title[0].Value,
+		in.Class[0].Value,
+	}
+}
+
+func makeContainers(in []didl.Container) (out []*Container) {
+	for _, container := range in {
+		out = append(out, makeContainer(&container))
+	}
+	return
+}
+
+func (this *Sonos) GetRootLevelChildren() (containers []*Container, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		upnp.BrowseObjectID_Root,
@@ -65,18 +85,12 @@ func (this *Sonos) GetRootLevelChildren() (containers []Container, err error) {
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		for _, container := range result.Doc.Container {
-			c := Container{}
-			c.ID = container.ID
-			c.Title = container.Title[0].Value
-			c.Class = container.Class[0].Value
-			containers = append(containers, c)
-		}
+		containers = makeContainers(result.Doc.Container)
 	}
 	return
 }
 
-func (this *Sonos) ListQueues() (containers []Container, err error) {
+func (this *Sonos) ListQueues() (containers []*Container, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID_Queues,
@@ -89,13 +103,79 @@ func (this *Sonos) ListQueues() (containers []Container, err error) {
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		for _, container := range result.Doc.Container {
-			c := Container{}
-			c.ID = container.ID
-			c.Title = container.Title[0].Value
-			c.Class = container.Class[0].Value
-			containers = append(containers, c)
-		}
+		containers = makeContainers(result.Doc.Container)
+	}
+	return
+}
+
+func (this *Sonos) ListSavedQueues() (containers []*Container, err error) {
+	var result *upnp.BrowseResult
+	req := &upnp.BrowseRequest{
+		ObjectID_SavedQueues,
+		upnp.BrowseFlag_BrowseDirectChildren,
+		upnp.BrowseFilter_All,
+		0, /*StartingIndex*/
+		0, /*RequestCount*/
+		upnp.BrowseSortCriteria_None,
+	}
+	if result, err = this.Browse(req); nil != err {
+		return
+	} else {
+		containers = makeContainers(result.Doc.Container)
+	}
+	return
+}
+
+func (this *Sonos) ListInternetRadio() (containers []*Container, err error) {
+	var result *upnp.BrowseResult
+	req := &upnp.BrowseRequest{
+		ObjectID_InternetRadio,
+		upnp.BrowseFlag_BrowseDirectChildren,
+		upnp.BrowseFilter_All,
+		0, /*StartingIndex*/
+		0, /*RequestCount*/
+		upnp.BrowseSortCriteria_None,
+	}
+	if result, err = this.Browse(req); nil != err {
+		return
+	} else {
+		containers = makeContainers(result.Doc.Container)
+	}
+	return
+}
+
+func (this *Sonos) ListAttributes() (containers []*Container, err error) {
+	var result *upnp.BrowseResult
+	req := &upnp.BrowseRequest{
+		ObjectID_Attributes,
+		upnp.BrowseFlag_BrowseDirectChildren,
+		upnp.BrowseFilter_All,
+		0, /*StartingIndex*/
+		0, /*RequestCount*/
+		upnp.BrowseSortCriteria_None,
+	}
+	if result, err = this.Browse(req); nil != err {
+		return
+	} else {
+		containers = makeContainers(result.Doc.Container)
+	}
+	return
+}
+
+func (this *Sonos) ListMusicShares() (containers []*Container, err error) {
+	var result *upnp.BrowseResult
+	req := &upnp.BrowseRequest{
+		ObjectID_MusicShares,
+		upnp.BrowseFlag_BrowseDirectChildren,
+		upnp.BrowseFilter_All,
+		0, /*StartingIndex*/
+		0, /*RequestCount*/
+		upnp.BrowseSortCriteria_None,
+	}
+	if result, err = this.Browse(req); nil != err {
+		return
+	} else {
+		containers = makeContainers(result.Doc.Container)
 	}
 	return
 }
