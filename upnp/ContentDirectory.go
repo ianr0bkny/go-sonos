@@ -115,7 +115,7 @@ const (
 )
 
 const (
-	BrowseFlag_BrowseMetdata        = "BrowseMetadata"
+	BrowseFlag_BrowseMetadata       = "BrowseMetadata"
 	BrowseFlag_BrowseDirectChildren = "BrowseDirectChildren"
 )
 
