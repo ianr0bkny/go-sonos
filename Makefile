@@ -38,6 +38,7 @@ all ::
 clean ::
 	$(GO) clean -i -x
 	$(GO) clean -i -x $(PACKAGE)/cscl
+	rm -rf $(GOPATH)/pkg/*/$(PACKAGE)
 
 wc ::
 	wc -l *.go */*.go
