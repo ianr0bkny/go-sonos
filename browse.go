@@ -34,6 +34,7 @@ import (
 	"github.com/ianr0bkny/go-sonos/didl"
 	"github.com/ianr0bkny/go-sonos/upnp"
 	"log"
+	"strings"
 )
 
 const (
@@ -186,6 +187,46 @@ func (this *Sonos) ListGenres() (containers []*Container, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID_Attribute_Genres,
+		upnp.BrowseFlag_BrowseDirectChildren,
+		upnp.BrowseFilter_All,
+		0, /*StartingIndex*/
+		0, /*RequestCount*/
+		upnp.BrowseSortCriteria_None,
+	}
+	if result, err = this.Browse(req); nil != err {
+		return
+	} else {
+		containers = makeContainers(result.Doc.Container)
+	}
+	return
+}
+
+func objectIDForGenre(genre string) string {
+	return strings.Join([]string{ObjectID_Attribute_Genres, genre}, "/")
+}
+
+func (this *Sonos) ListGenre(genre string) (containers []*Container, err error) {
+	var result *upnp.BrowseResult
+	req := &upnp.BrowseRequest{
+		objectIDForGenre(genre),
+		upnp.BrowseFlag_BrowseDirectChildren,
+		upnp.BrowseFilter_All,
+		0, /*StartingIndex*/
+		0, /*RequestCount*/
+		upnp.BrowseSortCriteria_None,
+	}
+	if result, err = this.Browse(req); nil != err {
+		return
+	} else {
+		containers = makeContainers(result.Doc.Container)
+	}
+	return
+}
+
+func (this *Sonos) ListChildren(objectId string) (containers []*Container, err error) {
+	var result *upnp.BrowseResult
+	req := &upnp.BrowseRequest{
+		objectId,
 		upnp.BrowseFlag_BrowseDirectChildren,
 		upnp.BrowseFilter_All,
 		0, /*StartingIndex*/

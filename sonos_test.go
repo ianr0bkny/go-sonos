@@ -550,21 +550,21 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%3s %-25s %s", container.ID, container.Title, container.Class)
+			t.Logf("%-25s %s", container.Title, container.Class)
 		}
 	}
 
 	/*
-	t.Logf("===================")
-	t.Logf("Internet Radio")
-	t.Logf("-------------------")
-	if result, err := s.ListInternetRadio(); nil != err {
-		t.Fatal(err)
-	} else {
-		for _, container := range result {
-			t.Logf("%3s %-25s %s", container.ID, container.Title, container.Class)
+		t.Logf("===================")
+		t.Logf("Internet Radio")
+		t.Logf("-------------------")
+		if result, err := s.ListInternetRadio(); nil != err {
+			t.Fatal(err)
+		} else {
+			for _, container := range result {
+				t.Logf("%3s %-25s %s", container.ID, container.Title, container.Class)
+			}
 		}
-	}
 	*/
 
 	t.Logf("===================")
@@ -574,7 +574,7 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%13s %-25s %s", container.ID, container.Title, container.Class)
+			t.Logf("%-25s %s", container.Title, container.Class)
 		}
 	}
 
@@ -585,7 +585,7 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%18s %-20s %s", container.ID, container.Title, container.Class)
+			t.Logf("%-25s %s", container.Title, container.Class)
 		}
 	}
 
@@ -596,36 +596,36 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%32s %-20s %s", container.ID, container.Title, container.Class)
+			t.Logf("%-25s %s", container.Title, container.Class)
 		}
 	}
 
-	//s.GetQueueContents()
-}
+	t.Logf("===================")
+	t.Logf("R&B")
+	t.Logf("-------------------")
+	var target string
+	if result, err := s.ListGenre("R&B"); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%-25s %s", container.Title, container.Class)
+			if "John Legend" == container.Title {
+				target = container.ID
+			}
+		}
+	}
 
-//			/*
-//				// browse root-level metadata
-//				s.Browse("0", "BrowseMetadata", "*", 0, 0, "")
-//				// browse children of the root
-//				s.Browse("0", "BrowseDirectChildren", "*", 0, 0, "")
-//				// browse music shares
-//				s.Browse("S:", "BrowseDirectChildren", "*", 0, 0, "")
-//				// browse the //perseus/sonos share
-//				s.Browse("S://perseus/sonos", "BrowseDirectChildren", "*", 0, 0, "")
-//				// browse the //perseus/sonos/iTunes share
-//				s.Browse("S://perseus/sonos/iTunes", "BrowseDirectChildren", "*", 0, 0, "")
-//				// browse the //perseus/sonos/iTunes/Music share
-//				s.Browse("S://perseus/sonos/iTunes/Music", "BrowseDirectChildren", "*", 0, 0, "")
-//				// browse the //perseus/sonos/iTunes/Music/The Who share
-//				s.Browse("S://perseus/sonos/iTunes/Music/The Who", "BrowseDirectChildren", "*", 0, 0, "")
-//			*/
-//			// browse the //perseus/sonos/iTunes/Music/The Who/Tommy share
-//			x, _ := s.Browse("S://perseus/sonos/iTunes/Music/The Who/Tommy", "BrowseDirectChildren", "*", 0, 0, "")
-//			log.Printf("%#v", x)
-//
-//			/*
-//				// browse music attributes
-//				s.Browse("A:", "BrowseDirectChildren", "*", 0, 0, "")
-//				// return list of composers
-//				s.Browse("A:COMPOSER", "BrowseDirectChildren", "dc:title", 0, 0, "")
-//			*/
+	t.Logf("===================")
+	t.Logf("John Legend")
+	t.Logf("-------------------")
+	if result, err := s.ListChildren(target); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%-25s %s", container.Title, container.Class)
+			if "John Legend" == container.Title {
+				target = container.ID
+			}
+		}
+	}
+}
