@@ -52,13 +52,66 @@ type Sonos struct {
 	upnp.ZoneGroupTopology
 }
 
+const (
+	SVC_ALARM_CLOCK         = 1
+	SVC_AV_TRANSPORT        = SVC_ALARM_CLOCK << 1
+	SVC_CONNECTION_MANAGER  = SVC_AV_TRANSPORT << 1
+	SVC_CONTENT_DIRECTORY   = SVC_CONNECTION_MANAGER << 1
+	SVC_DEVICE_PROPERTIES   = SVC_CONTENT_DIRECTORY << 1
+	SVC_GROUP_MANAGEMENT    = SVC_DEVICE_PROPERTIES << 1
+	SVC_MUSIC_SERVICES      = SVC_GROUP_MANAGEMENT << 1
+	SVC_RENDERING_CONTROL   = SVC_MUSIC_SERVICES << 1
+	SVC_SYSTEM_PROPERTIES   = SVC_RENDERING_CONTROL << 1
+	SVC_ZONE_GROUP_TOPOLOGY = SVC_SYSTEM_PROPERTIES << 1
+	//
+	SVC_ALL = SVC_ALARM_CLOCK |
+		SVC_AV_TRANSPORT |
+		SVC_CONNECTION_MANAGER |
+		SVC_CONTENT_DIRECTORY |
+		SVC_DEVICE_PROPERTIES |
+		SVC_GROUP_MANAGEMENT |
+		SVC_MUSIC_SERVICES |
+		SVC_RENDERING_CONTROL |
+		SVC_SYSTEM_PROPERTIES |
+		SVC_ZONE_GROUP_TOPOLOGY
+)
+
 func sonosHandleUpdate(svc *upnp.Service, value string) {
 	//log.Printf("UPDATE: %s", value)
 }
 
-func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor) (sonos *Sonos) {
+func sonosCheckServiceFlags(svc_type string, flags int) bool {
+	switch svc_type {
+	case "AlarmClock":
+		return flags&SVC_ALARM_CLOCK > 0
+	case "AVTransport":
+		return flags&SVC_AV_TRANSPORT > 0
+	case "ConnectionManager":
+		return flags&SVC_CONNECTION_MANAGER > 0
+	case "ContentDirectory":
+		return flags&SVC_CONTENT_DIRECTORY > 0
+	case "DeviceProperties":
+		return flags&SVC_DEVICE_PROPERTIES > 0
+	case "GroupManagement":
+		return flags&SVC_GROUP_MANAGEMENT > 0
+	case "MusicServices":
+		return flags&SVC_MUSIC_SERVICES > 0
+	case "RenderingControl":
+		return flags&SVC_RENDERING_CONTROL > 0
+	case "SystemProperties":
+		return flags&SVC_SYSTEM_PROPERTIES > 0
+	case "ZoneGroupTopology":
+		return flags&SVC_ZONE_GROUP_TOPOLOGY > 0
+	}
+	return false
+}
+
+func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (sonos *Sonos) {
 	sonos = &Sonos{}
 	for svc_type, svc_list := range svc_map {
+		if !sonosCheckServiceFlags(svc_type, flags) {
+			continue
+		}
 		switch svc_type {
 		case "AlarmClock":
 			for _, svc := range svc_list {
@@ -135,7 +188,7 @@ func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor) (sonos *Sonos) {
 	return
 }
 
-func ConnectAny(mgr ssdp.Manager, reactor upnp.Reactor) (sonos []*Sonos) {
+func ConnectAny(mgr ssdp.Manager, reactor upnp.Reactor, flags int) (sonos []*Sonos) {
 	qry := ssdp.ServiceQueryTerms{
 		ssdp.ServiceKey(MUSIC_SERVICES): -1,
 	}
@@ -146,7 +199,7 @@ func ConnectAny(mgr ssdp.Manager, reactor upnp.Reactor) (sonos []*Sonos) {
 				if svc_map, err := upnp.Describe(dev.Location()); nil != err {
 					panic(err)
 				} else {
-					sonos = append(sonos, MakeSonos(svc_map, reactor))
+					sonos = append(sonos, MakeSonos(svc_map, reactor, flags))
 				}
 				break
 			}
@@ -155,11 +208,11 @@ func ConnectAny(mgr ssdp.Manager, reactor upnp.Reactor) (sonos []*Sonos) {
 	return
 }
 
-func Connect(dev ssdp.Device, reactor upnp.Reactor) (sonos *Sonos) {
+func Connect(dev ssdp.Device, reactor upnp.Reactor, flags int) (sonos *Sonos) {
 	if svc_map, err := upnp.Describe(dev.Location()); nil != err {
 		panic(err)
 	} else {
-		sonos = MakeSonos(svc_map, reactor)
+		sonos = MakeSonos(svc_map, reactor, flags)
 	}
 	return
 }

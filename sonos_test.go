@@ -48,21 +48,21 @@ const (
 
 var testSonos *sonos.Sonos
 
-func initTestSonos() {
+func initTestSonos(flags int) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		testSonos = sonos.Connect(dev, reactor)
+		testSonos = sonos.Connect(dev, reactor, flags)
 	} else {
 		log.Fatal("Could not create test instance")
 	}
 }
 
-func getTestSonos() *sonos.Sonos {
+func getTestSonos(flags int) *sonos.Sonos {
 	if nil == testSonos {
-		initTestSonos()
+		initTestSonos(flags)
 	}
 	return testSonos
 }
@@ -71,7 +71,7 @@ func getTestSonos() *sonos.Sonos {
 // AlarmClock
 //
 func TestAlarmClock(t *testing.T) {
-	s := getTestSonos()
+	s := getTestSonos(sonos.SVC_ALARM_CLOCK)
 
 	if currentTimeFormat, currentDateFormat, err := s.GetFormat(); nil != err {
 		t.Fatal(err)
@@ -129,7 +129,7 @@ func TestAlarmClock(t *testing.T) {
 // AVTransport
 //
 func TestAVTransport(t *testing.T) {
-	s := getTestSonos()
+	s := getTestSonos(sonos.SVC_AV_TRANSPORT)
 
 	if mediaInfo, err := s.GetMediaInfo(0); nil != err {
 		t.Fatal(err)
@@ -220,7 +220,7 @@ func TestAVTransport(t *testing.T) {
 // ConnectiionManager
 //
 func TestConnectionManager(t *testing.T) {
-	s := getTestSonos()
+	s := getTestSonos(sonos.SVC_CONNECTION_MANAGER)
 
 	if source, sink, err := s.GetProtocolInfo(); nil != err {
 		t.Fatal(err)
@@ -240,7 +240,7 @@ func TestConnectionManager(t *testing.T) {
 // @see also TestBrowse
 //
 func TestContentDirectory(t *testing.T) {
-	s := getTestSonos()
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY)
 
 	if searchCaps, err := s.GetSearchCapabilities(); nil != err {
 		t.Fatal(err)
@@ -289,7 +289,7 @@ func TestContentDirectory(t *testing.T) {
 // DeviceProperties
 //
 func TestDeviceProperties(t *testing.T) {
-	s := getTestSonos()
+	s := getTestSonos(sonos.SVC_DEVICE_PROPERTIES)
 
 	if currentLEDState, err := s.GetLEDState(); nil != err {
 		t.Fatal(err)
@@ -365,7 +365,7 @@ func TestGroupManagement(t *testing.T) {
 // MusicServices
 //
 func TestMusicServices(t *testing.T) {
-	s := getTestSonos()
+	s := getTestSonos(sonos.SVC_MUSIC_SERVICES)
 
 	if sessionId, err := s.GetSessionId(6 /*iheartradio*/, ""); nil != err {
 		t.Fatal(err)
@@ -390,7 +390,7 @@ func TestMusicServices(t *testing.T) {
 // RenderingControl
 //
 func TestRenderingControl(t *testing.T) {
-	s := getTestSonos()
+	s := getTestSonos(sonos.SVC_RENDERING_CONTROL)
 
 	if currentMute, err := s.GetMute(0, upnp.Channel_Master); nil != err {
 		t.Fatal(err)
@@ -477,7 +477,7 @@ func TestSystemProperties(t *testing.T) {
 // ZoneGroupTopology
 //
 func TestZoneGroupTopology(t *testing.T) {
-	s := getTestSonos()
+	s := getTestSonos(sonos.SVC_ZONE_GROUP_TOPOLOGY)
 
 	if updateItem, err := s.CheckForUpdate(upnp.ALL, false, ""); nil != err {
 		t.Fatal(err)
@@ -495,7 +495,7 @@ func TestZoneGroupTopology(t *testing.T) {
 // Coverage
 //
 func TestCoverage(t *testing.T) {
-	s := getTestSonos()
+	s := getTestSonos(sonos.SVC_ALL)
 	sonos.Coverage(s)
 }
 
@@ -507,7 +507,7 @@ func _TestDiscovery(t *testing.T) {
 		panic(err)
 	} else {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		found := sonos.ConnectAny(mgr, reactor)
+		found := sonos.ConnectAny(mgr, reactor, sonos.SVC_DEVICE_PROPERTIES)
 		for _, s := range found {
 			id, _ := s.GetHouseholdID()
 			name, _, _ := s.GetZoneAttributes()
@@ -520,7 +520,7 @@ func _TestDiscovery(t *testing.T) {
 // Browse
 //
 func TestBrowse(t *testing.T) {
-	s := getTestSonos()
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY)
 
 	t.Logf("Root Level Children")
 	t.Logf("-------------------")
