@@ -32,9 +32,27 @@ package didl
 
 import (
 	"encoding/xml"
+	"log"
 )
 
-type Title struct {
+type didlValidated struct {
+	Extra []xml.Name `xml:",any"`
+}
+
+func (this *didlValidated) Validate() {
+	if 0 < len(this.Extra) {
+		for _, extra := range this.Extra {
+			log.Printf("Missing <Container><%s/>", extra.Local)
+		}
+	}
+}
+
+type Album struct {
+	XMLName xml.Name
+	Value   string `xml:",chardata"`
+}
+
+type AlbumArtURI struct {
 	XMLName xml.Name
 	Value   string `xml:",chardata"`
 }
@@ -44,32 +62,7 @@ type Class struct {
 	Value   string `xml:",chardata"`
 }
 
-type Container struct {
-	XMLName    xml.Name
-	ID         string  `xml:"id,attr"`
-	ParentID   string  `xml:"parentID,attr"`
-	Restricted bool    `xml:"restricted,attr"`
-	Title      []Title `xml:"title"`
-	Class      []Class `xml:"class"`
-}
-
-type Res struct {
-	XMLName      xml.Name
-	ProtocolInfo string `xml:"protocolInfo,attr"`
-	Value        string `xml:",chardata"`
-}
-
-type AlbumArtURI struct {
-	XMLName xml.Name
-	Value   string `xml:",chardata"`
-}
-
 type Creator struct {
-	XMLName xml.Name
-	Value   string `xml:",chardata"`
-}
-
-type Album struct {
 	XMLName xml.Name
 	Value   string `xml:",chardata"`
 }
@@ -77,6 +70,29 @@ type Album struct {
 type OriginalTrackNumber struct {
 	XMLName xml.Name
 	Value   string `xml:",chardata"`
+}
+
+type Res struct {
+	XMLName      xml.Name
+	ProtocolInfo string `xml:"protocolInfo,attr"`
+	Value        string `xml:",chardata"`
+}
+type Title struct {
+	XMLName xml.Name
+	Value   string `xml:",chardata"`
+}
+
+type Container struct {
+	XMLName     xml.Name
+	ID          string        `xml:"id,attr"`
+	ParentID    string        `xml:"parentID,attr"`
+	Restricted  bool          `xml:"restricted,attr"`
+	Res         []Res         `xml:"res"`
+	Title       []Title       `xml:"title"`
+	Class       []Class       `xml:"class"`
+	AlbumArtURI []AlbumArtURI `xml:"albumArtURI"`
+	Creator     []Creator     `xml:"creator"`
+	didlValidated
 }
 
 type Item struct {
@@ -91,10 +107,12 @@ type Item struct {
 	Creator             []Creator             `xml:"creator"`
 	Album               []Album               `xml:"album"`
 	OriginalTrackNumber []OriginalTrackNumber `xml:"originalTrackNumber"`
+	didlValidated
 }
 
 type Lite struct {
 	XMLName   xml.Name
 	Container []Container `xml:"container"`
 	Item      []Item      `xml:"item"`
+	didlValidated
 }

@@ -59,6 +59,7 @@ type Container struct {
 }
 
 func makeContainer(in *didl.Container) *Container {
+	in.Validate()
 	return &Container{
 		in.ID,
 		in.ParentID,
