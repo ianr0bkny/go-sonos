@@ -528,7 +528,7 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%3s %-15s %s", container.ID, container.Title, container.Class)
+			t.Logf("%3s %-15s %s", container.ID(), container.Title(), container.Class())
 		}
 	}
 
@@ -539,7 +539,7 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%3s %-15s %s", container.ID, container.Title, container.Class)
+			t.Logf("%3s %-15s %s", container.ID(), container.Title(), container.Class())
 		}
 	}
 
@@ -550,7 +550,7 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%-25s %s", container.Title, container.Class)
+			t.Logf("%-25s %s", container.Title(), container.Class())
 		}
 	}
 
@@ -562,7 +562,7 @@ func TestBrowse(t *testing.T) {
 			t.Fatal(err)
 		} else {
 			for _, container := range result {
-				t.Logf("%3s %-25s %s", container.ID, container.Title, container.Class)
+				t.Logf("%3s %-25s %s", container.ID(), container.Title(), container.Class())
 			}
 		}
 	*/
@@ -574,7 +574,7 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%-25s %s", container.Title, container.Class)
+			t.Logf("%-25s %s", container.Title(), container.Class())
 		}
 	}
 
@@ -585,7 +585,7 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%-25s %s", container.Title, container.Class)
+			t.Logf("%-25s %s", container.Title(), container.Class())
 		}
 	}
 
@@ -596,7 +596,7 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%-25s %s", container.Title, container.Class)
+			t.Logf("%-25s %s", container.Title(), container.Class())
 		}
 	}
 
@@ -608,9 +608,9 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%-25s %s", container.Title, container.Class)
-			if "John Legend" == container.Title {
-				target = container.ID
+			t.Logf("%-25s %s", container.Title(), container.Class())
+			if "John Legend" == container.Title() {
+				target = container.ID()
 			}
 		}
 	}
@@ -622,9 +622,9 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%-25s %s", container.Title, container.Class)
-			if "John Legend" == container.Title {
-				target = container.ID
+			t.Logf("%-25s %s", container.Title(), container.Class())
+			if "John Legend" == container.Title() {
+				target = container.ID()
 			}
 		}
 	}

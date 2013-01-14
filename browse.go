@@ -31,7 +31,7 @@
 package sonos
 
 import (
-	"github.com/ianr0bkny/go-sonos/didl"
+	"github.com/ianr0bkny/go-sonos/model"
 	"github.com/ianr0bkny/go-sonos/upnp"
 	"log"
 	"strings"
@@ -50,33 +50,7 @@ const (
 	ObjectID_Attribute_Genres = "A:GENRE"
 )
 
-type Container struct {
-	ID         string
-	ParentID   string
-	Restricted bool
-	Title      string
-	Class      string
-}
-
-func makeContainer(in *didl.Container) *Container {
-	in.Validate()
-	return &Container{
-		in.ID,
-		in.ParentID,
-		in.Restricted,
-		in.Title[0].Value,
-		in.Class[0].Value,
-	}
-}
-
-func makeContainers(in []didl.Container) (out []*Container) {
-	for _, container := range in {
-		out = append(out, makeContainer(&container))
-	}
-	return
-}
-
-func (this *Sonos) GetRootLevelChildren() (containers []*Container, err error) {
+func (this *Sonos) GetRootLevelChildren() (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		upnp.BrowseObjectID_Root,
@@ -89,12 +63,12 @@ func (this *Sonos) GetRootLevelChildren() (containers []*Container, err error) {
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		containers = makeContainers(result.Doc.Container)
+		objects = model.ObjectStream(result.Doc)
 	}
 	return
 }
 
-func (this *Sonos) ListQueues() (containers []*Container, err error) {
+func (this *Sonos) ListQueues() (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID_Queues,
@@ -107,12 +81,12 @@ func (this *Sonos) ListQueues() (containers []*Container, err error) {
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		containers = makeContainers(result.Doc.Container)
+		objects = model.ObjectStream(result.Doc)
 	}
 	return
 }
 
-func (this *Sonos) ListSavedQueues() (containers []*Container, err error) {
+func (this *Sonos) ListSavedQueues() (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID_SavedQueues,
@@ -125,12 +99,12 @@ func (this *Sonos) ListSavedQueues() (containers []*Container, err error) {
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		containers = makeContainers(result.Doc.Container)
+		objects = model.ObjectStream(result.Doc)
 	}
 	return
 }
 
-func (this *Sonos) ListInternetRadio() (containers []*Container, err error) {
+func (this *Sonos) ListInternetRadio() (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID_InternetRadio,
@@ -143,12 +117,12 @@ func (this *Sonos) ListInternetRadio() (containers []*Container, err error) {
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		containers = makeContainers(result.Doc.Container)
+		objects = model.ObjectStream(result.Doc)
 	}
 	return
 }
 
-func (this *Sonos) ListAttributes() (containers []*Container, err error) {
+func (this *Sonos) ListAttributes() (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID_Attributes,
@@ -161,12 +135,12 @@ func (this *Sonos) ListAttributes() (containers []*Container, err error) {
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		containers = makeContainers(result.Doc.Container)
+		objects = model.ObjectStream(result.Doc)
 	}
 	return
 }
 
-func (this *Sonos) ListMusicShares() (containers []*Container, err error) {
+func (this *Sonos) ListMusicShares() (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID_MusicShares,
@@ -179,12 +153,12 @@ func (this *Sonos) ListMusicShares() (containers []*Container, err error) {
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		containers = makeContainers(result.Doc.Container)
+		objects = model.ObjectStream(result.Doc)
 	}
 	return
 }
 
-func (this *Sonos) ListGenres() (containers []*Container, err error) {
+func (this *Sonos) ListGenres() (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID_Attribute_Genres,
@@ -197,7 +171,7 @@ func (this *Sonos) ListGenres() (containers []*Container, err error) {
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		containers = makeContainers(result.Doc.Container)
+		objects = model.ObjectStream(result.Doc)
 	}
 	return
 }
@@ -206,7 +180,7 @@ func objectIDForGenre(genre string) string {
 	return strings.Join([]string{ObjectID_Attribute_Genres, genre}, "/")
 }
 
-func (this *Sonos) ListGenre(genre string) (containers []*Container, err error) {
+func (this *Sonos) ListGenre(genre string) (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		objectIDForGenre(genre),
@@ -219,12 +193,12 @@ func (this *Sonos) ListGenre(genre string) (containers []*Container, err error) 
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		containers = makeContainers(result.Doc.Container)
+		objects = model.ObjectStream(result.Doc)
 	}
 	return
 }
 
-func (this *Sonos) ListChildren(objectId string) (containers []*Container, err error) {
+func (this *Sonos) ListChildren(objectId string) (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		objectId,
@@ -237,7 +211,7 @@ func (this *Sonos) ListChildren(objectId string) (containers []*Container, err e
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		containers = makeContainers(result.Doc.Container)
+		objects = model.ObjectStream(result.Doc)
 	}
 	return
 }
