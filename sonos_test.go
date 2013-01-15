@@ -554,19 +554,6 @@ func TestBrowse(t *testing.T) {
 		}
 	}
 
-	/*
-		t.Logf("===================")
-		t.Logf("Internet Radio")
-		t.Logf("-------------------")
-		if result, err := s.ListInternetRadio(); nil != err {
-			t.Fatal(err)
-		} else {
-			for _, container := range result {
-				t.Logf("%3s %-25s %s", container.ID(), container.Title(), container.Class())
-			}
-		}
-	*/
-
 	t.Logf("===================")
 	t.Logf("Attributes")
 	t.Logf("-------------------")
@@ -652,8 +639,22 @@ func TestBrowse(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
-			t.Logf("%-32s %s", container.Title(), container.Class())
-			t.Logf("%#v", container)
+			t.Logf("%-32s", container.Title())
+		}
+	}
+}
+
+func TestRadio(t *testing.T) {
+	// FAILS: It does not seem possible to Browse() R:
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY)
+
+	t.Logf("Internet Radio")
+	t.Logf("-------------------")
+	if result, err := s.ListInternetRadio(); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%3s %-25s %s", container.ID(), container.Title(), container.Class())
 		}
 	}
 }
