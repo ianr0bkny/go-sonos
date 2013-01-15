@@ -621,11 +621,39 @@ func TestBrowse(t *testing.T) {
 	if result, err := s.ListChildren(target); nil != err {
 		t.Fatal(err)
 	} else {
+		target = ""
 		for _, container := range result {
 			t.Logf("%-25s %s", container.Title(), container.Class())
-			if "John Legend" == container.Title() {
+			if "Get Lifted" == container.Title() {
 				target = container.ID()
 			}
+		}
+	}
+
+	t.Logf("===================")
+	t.Logf("Get Lifted")
+	t.Logf("-------------------")
+	if result, err := s.ListChildren(target); nil != err {
+		t.Fatal(err)
+	} else {
+		target = ""
+		for _, container := range result {
+			t.Logf("%-32s %s", container.Title(), container.Class())
+			if "I Can Change" == container.Title() {
+				target = container.ID()
+			}
+		}
+	}
+
+	t.Logf("===================")
+	t.Logf("I Can Change")
+	t.Logf("-------------------")
+	if result, err := s.GetMetadata(target); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%-32s %s", container.Title(), container.Class())
+			t.Logf("%#v", container)
 		}
 	}
 }

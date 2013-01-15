@@ -99,7 +99,7 @@ type Item struct {
 	XMLName             xml.Name
 	ID                  string                `xml:"id,attr"`
 	ParentID            string                `xml:"parentID,attr"`
-	Restricted          string                `xml:"restricted,attr"`
+	Restricted          bool                  `xml:"restricted,attr"`
 	Res                 []Res                 `xml:"res"`
 	AlbumArtURI         []AlbumArtURI         `xml:"albumArtURI"`
 	Title               []Title               `xml:"title"`

@@ -216,6 +216,24 @@ func (this *Sonos) ListChildren(objectId string) (objects []model.Object, err er
 	return
 }
 
+func (this *Sonos) GetMetadata(objectId string) (objects []model.Object, err error) {
+	var result *upnp.BrowseResult
+	req := &upnp.BrowseRequest{
+		objectId,
+		upnp.BrowseFlag_BrowseMetadata,
+		upnp.BrowseFilter_All,
+		0, /*StartingIndex*/
+		0, /*RequestCount*/
+		upnp.BrowseSortCriteria_None,
+	}
+	if result, err = this.Browse(req); nil != err {
+		return
+	} else {
+		objects = model.ObjectStream(result.Doc)
+	}
+	return
+}
+
 func (this *Sonos) GetQueueContents() (err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{

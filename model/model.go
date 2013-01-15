@@ -182,6 +182,28 @@ func makeMusicGenre(in *didl.Container) Object {
 	return obj
 }
 
+type Item struct {
+	modelObjectImpl
+}
+
+type AudioItem struct {
+	Item
+}
+
+type MusicTrack struct {
+	AudioItem
+}
+
+func makeMusicTrack(in *didl.Item) Object {
+	obj := MusicTrack{}
+	obj.id = in.ID
+	obj.parentId = in.ParentID
+	obj.restricted = in.Restricted
+	obj.title = in.Title[0].Value
+	obj.class = in.Class[0].Value
+	return obj
+}
+
 func makeContainerObject(in *didl.Container) Object {
 	if 0 == len(in.Class) {
 		panic("missing object class")
@@ -208,6 +230,15 @@ func makeContainerObject(in *didl.Container) Object {
 }
 
 func makeItem(in *didl.Item) Object {
+	if 0 == len(in.Class) {
+		panic("missing object class")
+	}
+	switch in.Class[0].Value {
+	case "object.item.audioItem.musicTrack":
+		return makeMusicTrack(in)
+	default:
+		panic(fmt.Sprintf("unsupported DIDL-Lite object class %s", in.Class[0].Value))
+	}
 	return nil
 }
 
