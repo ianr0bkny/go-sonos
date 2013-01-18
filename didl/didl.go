@@ -101,9 +101,9 @@ type Item struct {
 	ParentID            string                `xml:"parentID,attr"`
 	Restricted          bool                  `xml:"restricted,attr"`
 	Res                 []Res                 `xml:"res"`
-	AlbumArtURI         []AlbumArtURI         `xml:"albumArtURI"`
 	Title               []Title               `xml:"title"`
 	Class               []Class               `xml:"class"`
+	AlbumArtURI         []AlbumArtURI         `xml:"albumArtURI"`
 	Creator             []Creator             `xml:"creator"`
 	Album               []Album               `xml:"album"`
 	OriginalTrackNumber []OriginalTrackNumber `xml:"originalTrackNumber"`

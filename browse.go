@@ -33,7 +33,7 @@ package sonos
 import (
 	"github.com/ianr0bkny/go-sonos/model"
 	"github.com/ianr0bkny/go-sonos/upnp"
-	"log"
+	_ "log"
 	"strings"
 )
 
@@ -234,7 +234,7 @@ func (this *Sonos) GetMetadata(objectId string) (objects []model.Object, err err
 	return
 }
 
-func (this *Sonos) GetQueueContents() (err error) {
+func (this *Sonos) GetQueueContents() (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID_Queue_AVT_Instance_0,
@@ -247,16 +247,7 @@ func (this *Sonos) GetQueueContents() (err error) {
 	if result, err = this.Browse(req); nil != err {
 		return
 	} else {
-		/*
-			for _, container := range result.Doc.Container {
-				c := Container{}
-				c.ID = container.ID
-				c.Title = container.Title[0].Value
-				c.Class = container.Class[0].Value
-				containers = append(containers, c)
-			}
-		*/
-		log.Printf("%#v", result.Doc)
+		objects = model.ObjectStream(result.Doc)
 	}
 	return
 }

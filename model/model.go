@@ -28,28 +28,76 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
+// This module is intended to define an object model that go-sonos can
+// use to refer to albums, tracks, and other structures and collections.
+// This object model is based on and derived from the classes found in
+// DIDL-Lite documents.
 package model
 
 import (
-	"fmt"
 	"github.com/ianr0bkny/go-sonos/didl"
 	_ "log"
 )
 
+// An abstraction of a DIDL-Lite <Container> or <Item> block.
 type Object interface {
+	// The ObjectID of this item or container
 	ID() string
+
+	// The ObjectID of the parent container of this item or container
 	ParentID() string
+
+	// When true, the ability to change or delete this item or container is restricted
 	Restricted() bool
+
+	// The URI of the resource described by this item or container.
+	// For a music track this could be the URI of the disk file on
+	// the storage share.  For a playlist the URI may refer to the
+	// queue's ObjectID.
+	Res() string
+
+	// The display name of the container or item.
 	Title() string
+
+	// A string giving the type of resource described by this Object, e.g.:
+	//
+	//	* object.container
+	//	* object.container.albumlist
+	//	* object.container.album.musicAlbum
+	//	* object.container.genre.musicGenre
+	//	* object.container.person.musicArtist
+	//	* object.container.playlistContainer
+	//	* object.container.playlistContainer.sameArtist
+	//	* object.item.audioItem.musicTrack
 	Class() string
+
+	// The URI to use to access the artwork for this container or item.
+	AlbumArtURI() string
+
+	// The display name of the Artist or Album Artist.
+	Creator() string
+
+	// The display name of the containing album.
+	Album() string
+
+	OriginalTrackNumber() string
+
+	// True, if this Object represents a container; false otherwise.
+	IsContainer() bool
 }
 
 type modelObjectImpl struct {
-	id         string
-	parentId   string
-	restricted bool
-	title      string
-	class      string
+	id                  string
+	parentId            string
+	restricted          bool
+	res                 string
+	title               string
+	class               string
+	albumArtURI         string
+	creator             string
+	album               string
+	originalTrackNumber string
+	isContainer         bool
 }
 
 func (this modelObjectImpl) ID() string {
@@ -64,6 +112,10 @@ func (this modelObjectImpl) Restricted() bool {
 	return this.restricted
 }
 
+func (this modelObjectImpl) Res() string {
+	return this.res
+}
+
 func (this modelObjectImpl) Title() string {
 	return this.title
 }
@@ -72,179 +124,83 @@ func (this modelObjectImpl) Class() string {
 	return this.class
 }
 
-type Container struct {
-	modelObjectImpl
+func (this modelObjectImpl) AlbumArtURI() string {
+	return this.albumArtURI
+}
+
+func (this modelObjectImpl) Creator() string {
+	return this.creator
+}
+
+func (this modelObjectImpl) Album() string {
+	return this.album
+}
+
+func (this modelObjectImpl) OriginalTrackNumber() string {
+	return this.originalTrackNumber
+}
+
+func (this modelObjectImpl) IsContainer() bool {
+	return this.isContainer
 }
 
 func makeContainer(in *didl.Container) Object {
-	obj := Container{}
+	obj := modelObjectImpl{}
 	obj.id = in.ID
 	obj.parentId = in.ParentID
 	obj.restricted = in.Restricted
-	obj.title = in.Title[0].Value
-	obj.class = in.Class[0].Value
-	return obj
-}
-
-type Person struct {
-	Container
-}
-
-type MusicArtist struct {
-	Person
-}
-
-func makeMusicArtist(in *didl.Container) Object {
-	obj := MusicArtist{}
-	obj.id = in.ID
-	obj.parentId = in.ParentID
-	obj.restricted = in.Restricted
-	obj.title = in.Title[0].Value
-	obj.class = in.Class[0].Value
-	return obj
-}
-
-type Album struct {
-	Container
-}
-
-type AlbumList struct {
-	Container
-}
-
-func makeAlbumList(in *didl.Container) Object {
-	obj := AlbumList{}
-	obj.id = in.ID
-	obj.parentId = in.ParentID
-	obj.restricted = in.Restricted
-	obj.title = in.Title[0].Value
-	obj.class = in.Class[0].Value
-	return obj
-}
-
-type PlaylistContainer struct {
-	Container
-}
-
-func makePlaylistContainer(in *didl.Container) Object {
-	obj := PlaylistContainer{}
-	obj.id = in.ID
-	obj.parentId = in.ParentID
-	obj.restricted = in.Restricted
-	obj.title = in.Title[0].Value
-	obj.class = in.Class[0].Value
-	return obj
-}
-
-type MusicAlbum struct {
-	modelObjectImpl
-}
-
-func makeMusicAlbum(in *didl.Container) Object {
-	obj := MusicAlbum{}
-	obj.id = in.ID
-	obj.parentId = in.ParentID
-	obj.restricted = in.Restricted
-	obj.title = in.Title[0].Value
-	obj.class = in.Class[0].Value
-	return obj
-}
-
-type SameArtist struct {
-	modelObjectImpl
-}
-
-func makeSameArtist(in *didl.Container) Object {
-	obj := MusicAlbum{}
-	obj.id = in.ID
-	obj.parentId = in.ParentID
-	obj.restricted = in.Restricted
-	obj.title = in.Title[0].Value
-	obj.class = in.Class[0].Value
-	return obj
-}
-
-type Genre struct {
-	Container
-}
-
-type MusicGenre struct {
-	Genre
-}
-
-func makeMusicGenre(in *didl.Container) Object {
-	obj := MusicGenre{}
-	obj.id = in.ID
-	obj.parentId = in.ParentID
-	obj.restricted = in.Restricted
-	obj.title = in.Title[0].Value
-	obj.class = in.Class[0].Value
-	return obj
-}
-
-type Item struct {
-	modelObjectImpl
-}
-
-type AudioItem struct {
-	Item
-}
-
-type MusicTrack struct {
-	AudioItem
-}
-
-func makeMusicTrack(in *didl.Item) Object {
-	obj := MusicTrack{}
-	obj.id = in.ID
-	obj.parentId = in.ParentID
-	obj.restricted = in.Restricted
-	obj.title = in.Title[0].Value
-	obj.class = in.Class[0].Value
-	return obj
-}
-
-func makeContainerObject(in *didl.Container) Object {
-	if 0 == len(in.Class) {
-		panic("missing object class")
+	if 0 < len(in.Res) {
+		obj.res = in.Res[0].Value
 	}
-	switch in.Class[0].Value {
-	case "object.container.album.musicAlbum":
-		return makeMusicAlbum(in)
-	case "object.container.playlistContainer.sameArtist":
-		return makeSameArtist(in)
-	case "object.container":
-		return makeContainer(in)
-	case "object.container.playlistContainer":
-		return makePlaylistContainer(in)
-	case "object.container.albumlist":
-		return makeAlbumList(in)
-	case "object.container.genre.musicGenre":
-		return makeMusicGenre(in)
-	case "object.container.person.musicArtist":
-		return makeMusicArtist(in)
-	default:
-		panic(fmt.Sprintf("unsupported DIDL-Lite object class %s", in.Class[0].Value))
+	if 0 < len(in.Title) {
+		obj.title = in.Title[0].Value
 	}
-	return nil
+	if 0 < len(in.Class) {
+		obj.class = in.Class[0].Value
+	}
+	if 0 < len(in.AlbumArtURI) {
+		obj.albumArtURI = in.AlbumArtURI[0].Value
+	}
+	if 0 < len(in.Creator) {
+		obj.creator = in.Creator[0].Value
+	}
+	obj.isContainer = true
+	return obj
 }
 
 func makeItem(in *didl.Item) Object {
-	if 0 == len(in.Class) {
-		panic("missing object class")
+	obj := modelObjectImpl{}
+	obj.id = in.ID
+	obj.parentId = in.ParentID
+	obj.restricted = in.Restricted
+	if 0 < len(in.Res) {
+		obj.res = in.Res[0].Value
 	}
-	switch in.Class[0].Value {
-	case "object.item.audioItem.musicTrack":
-		return makeMusicTrack(in)
-	default:
-		panic(fmt.Sprintf("unsupported DIDL-Lite object class %s", in.Class[0].Value))
+	if 0 < len(in.Title) {
+		obj.title = in.Title[0].Value
 	}
-	return nil
+	if 0 < len(in.Class) {
+		obj.class = in.Class[0].Value
+	}
+	if 0 < len(in.AlbumArtURI) {
+		obj.albumArtURI = in.AlbumArtURI[0].Value
+	}
+	if 0 < len(in.Creator) {
+		obj.creator = in.Creator[0].Value
+	}
+	if 0 < len(in.Album) {
+		obj.album = in.Album[0].Value
+	}
+	if 0 < len(in.OriginalTrackNumber) {
+		obj.originalTrackNumber = in.OriginalTrackNumber[0].Value
+	}
+	return obj
 }
 
+// Create a list of Objects from a didl.Lite document.
 func ObjectStream(in *didl.Lite) (objects []Object) {
 	for _, container := range in.Container {
-		objects = append(objects, makeContainerObject(&container))
+		objects = append(objects, makeContainer(&container))
 	}
 	for _, item := range in.Item {
 		objects = append(objects, makeItem(&item))

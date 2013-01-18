@@ -658,3 +658,17 @@ func TestRadio(t *testing.T) {
 		}
 	}
 }
+
+func TestQueue(t *testing.T) {
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY)
+
+	t.Logf("Current Queue")
+	t.Logf("-------------------")
+	if result, err := s.GetQueueContents(); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, container := range result {
+			t.Logf("%6s %s", container.ID(), container.Title())
+		}
+	}
+}
