@@ -61,6 +61,7 @@ type Object interface {
 
 	// A string giving the type of resource described by this Object, e.g.:
 	//
+	//  Containers:
 	//	* object.container
 	//	* object.container.albumlist
 	//	* object.container.album.musicAlbum
@@ -68,6 +69,8 @@ type Object interface {
 	//	* object.container.person.musicArtist
 	//	* object.container.playlistContainer
 	//	* object.container.playlistContainer.sameArtist
+	//
+	//  Items:
 	//	* object.item.audioItem.musicTrack
 	Class() string
 
@@ -77,9 +80,12 @@ type Object interface {
 	// The display name of the Artist or Album Artist.
 	Creator() string
 
-	// The display name of the containing album.
+	// The display name of the containing album. This field is Valid
+	// for Items only, not Containers.
 	Album() string
 
+	// The track number of this item in original album sort
+	// order. This field is Valid for Items only, not Containers.
 	OriginalTrackNumber() string
 
 	// True, if this Object represents a container; false otherwise.
