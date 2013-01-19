@@ -659,16 +659,62 @@ func TestRadio(t *testing.T) {
 	}
 }
 
+//
+// This test prints the current queue, removes the last track
+// in the queue, and then empties the queue completely.
+//
 func TestQueue(t *testing.T) {
-	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY)
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
 
+	var lastId string
 	t.Logf("Current Queue")
 	t.Logf("-------------------")
 	if result, err := s.GetQueueContents(); nil != err {
 		t.Fatal(err)
 	} else {
-		for _, container := range result {
-			t.Logf("%6s %s", container.ID(), container.Title())
+		for _, item := range result {
+			t.Logf("%6s %s", item.ID(), item.Title())
+			lastId = item.ID()
+		}
+	}
+
+	if "" != lastId {
+		if err := s.RemoveTrackFromQueue(0 /*instanceId*/, lastId, 0 /*updateId*/); nil != err {
+			t.Fatal(err)
+		}
+	}
+
+	if err := s.RemoveAllTracksFromQueue(0 /*instanceId*/); nil != err {
+		t.Fatal(err)
+	}
+}
+
+//
+// This test duplicates the last track at the end of the queue.
+//
+func TestAddTrack(t *testing.T) {
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+
+	var lastTrackURI string
+	t.Logf("Current Queue")
+	t.Logf("-------------------")
+	if result, err := s.GetQueueContents(); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, item := range result {
+			t.Logf("%#v", item)
+			lastTrackURI = item.Res()
+		}
+	}
+
+	if "" != lastTrackURI {
+		req := upnp.AddURIToQueueRequest{
+			EnqueuedURI: lastTrackURI,
+		}
+		if result, err := s.AddURIToQueue(0 /*instanceId*/, &req); nil != err {
+			t.Fatal(err)
+		} else {
+			t.Logf("%#v", result)
 		}
 	}
 }

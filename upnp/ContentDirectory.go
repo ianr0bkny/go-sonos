@@ -68,10 +68,10 @@ func (this *ContentDirectory) GetSortCapabilities() (sortCaps string, err error)
 	return
 }
 
-func (this *ContentDirectory) GetSystemUpdateID() (id string, err error) {
+func (this *ContentDirectory) GetSystemUpdateID() (id uint32, err error) {
 	type Response struct {
 		XMLName xml.Name
-		Id      string
+		Id      uint32
 		ErrorResponse
 	}
 	response := CallVa(this.Svc, "GetSystemUpdateID")

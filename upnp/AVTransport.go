@@ -56,23 +56,53 @@ func (this *AVTransport) SetAVTransportURI(instanceId uint32, currentURI, curren
 	return
 }
 
-type AddRequest struct {
-	EnqueuedURI                     string
-	EnqueuedURIMetaData             string
+//
+// The input parameters for AddURIToQueue.
+//
+type AddURIToQueueRequest struct {
+	// The URI of the track to be added to the queue, corresponding
+	// the to <res> tag in a DIDL-Lite description (@see dldl,
+	// @ContentDirectory, etc) e.g.:
+	//     "x-file-cifs://servername/path/to/track.mp3"
+	EnqueuedURI string
+
+	// ????
+	EnqueuedURIMetaData string
+
+	// This field should be 0 to insert the new item at the end
+	// of the queue.  If non-zero the new track will be inserted at
+	// this location, and later tracks will see their track numbers
+	// incremented.
 	DesiredFirstTrackNumberEnqueued uint32
-	EnqueueAsNext                   bool
+
+	// ???? (possibly unsupported)
+	EnqueueAsNext bool
 }
 
-type AddResponse struct {
+//
+// The output parameters for AddURIToQueue
+//
+type AddURIToQueueResponse struct {
+	// The track number of the newly added track.
 	FirstTrackNumberEnqueued uint32
-	NumTracksAdded           uint32
-	NewQueueLength           uint32
+
+	// The number of tracks added by this request (always 1).
+	NumTracksAdded uint32
+
+	// The length of the queue now that this track has been added
+	NewQueueLength uint32
 }
 
-func (this *AVTransport) AddURIToQueue(instanceId uint32, req *AddRequest) (resp *AddResponse, err error) {
+//
+// Add a single track to the queue (Q:0).  For Sonos @instanceId will
+// always be 0.  See @AddURIToQueueRequest for a discussion of the input
+// parameters and @AddURIToQueueResponse for a discussion of the output
+// parameters.
+//
+func (this *AVTransport) AddURIToQueue(instanceId uint32, req *AddURIToQueueRequest) (*AddURIToQueueResponse, error) {
 	type Response struct {
 		XMLName xml.Name
-		AddResponse
+		AddURIToQueueResponse
 		ErrorResponse
 	}
 	args := []Arg{
@@ -85,9 +115,7 @@ func (this *AVTransport) AddURIToQueue(instanceId uint32, req *AddRequest) (resp
 	response := Call(this.Svc, "AddURIToQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	resp = &doc.AddResponse
-	err = doc.Error()
-	return
+	return &doc.AddURIToQueueResponse, doc.Error()
 }
 
 type MultiAddRequest struct {
@@ -152,7 +180,13 @@ func (this *AVTransport) ReorderTracksInQueue(instanceId, startingIndex, numberO
 	return
 }
 
-func (this *AVTransport) RemoveTrackFromQueue(instanceId uint32, objectId string, updateId uint32) (err error) {
+//
+// Remove a single track from the queue (Q:0).  For Sonos @instanceId
+// will always be 0; @objectId will be the identifier of the item to be
+// removed from the queue (e.g. "Q:0/5" for the fifth element in the queue);
+// @updateId will always be 0.
+//
+func (this *AVTransport) RemoveTrackFromQueue(instanceId uint32, objectId string, updateId uint32) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -165,8 +199,7 @@ func (this *AVTransport) RemoveTrackFromQueue(instanceId uint32, objectId string
 	response := Call(this.Svc, "RemoveTrackFromQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 func (this *AVTransport) RemoveTrackRangeFromQueue(instanceId, updateId, startingIndex, numberOfTracks uint32) (newUpdateId uint32, err error) {
@@ -189,7 +222,11 @@ func (this *AVTransport) RemoveTrackRangeFromQueue(instanceId, updateId, startin
 	return
 }
 
-func (this *AVTransport) RemoveAllTracksFromQueue(instanceId uint32) (err error) {
+//
+// Remove all tracks from the queue (Q:0).  For Sonos instanceId will
+// always be 0.  Emptying an already empty queue is not an error.
+//
+func (this *AVTransport) RemoveAllTracksFromQueue(instanceId uint32) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -200,8 +237,7 @@ func (this *AVTransport) RemoveAllTracksFromQueue(instanceId uint32) (err error)
 	response := Call(this.Svc, "RemoveAllTracksFromQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 func (this *AVTransport) SaveQueue(instanceId uint32, title, objectId string) (assignedObjectId string, err error) {
