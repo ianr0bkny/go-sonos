@@ -57,9 +57,9 @@ func (this *AVTransport) SetAVTransportURI(instanceId uint32, currentURI, curren
 }
 
 //
-// The input parameters for AddURIToQueue.
+// Input parameters for AddURIToQueue.
 //
-type AddURIToQueueRequest struct {
+type AddURIToQueueIn struct {
 	// The URI of the track to be added to the queue, corresponding
 	// the to <res> tag in a DIDL-Lite description (@see dldl,
 	// @ContentDirectory, etc) e.g.:
@@ -80,9 +80,9 @@ type AddURIToQueueRequest struct {
 }
 
 //
-// The output parameters for AddURIToQueue
+// Output parameters for AddURIToQueue
 //
-type AddURIToQueueResponse struct {
+type AddURIToQueueOut struct {
 	// The track number of the newly added track.
 	FirstTrackNumberEnqueued uint32
 
@@ -95,14 +95,14 @@ type AddURIToQueueResponse struct {
 
 //
 // Add a single track to the queue (Q:0).  For Sonos @instanceId will
-// always be 0.  See @AddURIToQueueRequest for a discussion of the input
-// parameters and @AddURIToQueueResponse for a discussion of the output
+// always be 0.  See @AddURIToQueueIn for a discussion of the input
+// parameters and @AddURIToQueueOut for a discussion of the output
 // parameters.
 //
-func (this *AVTransport) AddURIToQueue(instanceId uint32, req *AddURIToQueueRequest) (*AddURIToQueueResponse, error) {
+func (this *AVTransport) AddURIToQueue(instanceId uint32, req *AddURIToQueueIn) (*AddURIToQueueOut, error) {
 	type Response struct {
 		XMLName xml.Name
-		AddURIToQueueResponse
+		AddURIToQueueOut
 		ErrorResponse
 	}
 	args := []Arg{
@@ -115,10 +115,13 @@ func (this *AVTransport) AddURIToQueue(instanceId uint32, req *AddURIToQueueRequ
 	response := Call(this.Svc, "AddURIToQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	return &doc.AddURIToQueueResponse, doc.Error()
+	return &doc.AddURIToQueueOut, doc.Error()
 }
 
-type MultiAddRequest struct {
+//
+// Input parameters for AddMultipleURIsToQueue.
+//
+type AddMultipleURIsToQueueIn struct {
 	UpdateID                        uint32
 	NumberOfURIs                    uint32
 	EnqueuedURIs                    string
@@ -129,22 +132,25 @@ type MultiAddRequest struct {
 	EnqueueAsNext                   bool
 }
 
-type MultiAddResponse struct {
+//
+// Output parameters for AddMultipleURIsToQueue.
+//
+type AddMultipleURIsToQueueOut struct {
 	FirstTrackNumberEnqueued uint32
 	NumTracksAdded           uint32
 	NewQueueLength           uint32
 	NewUpdateID              uint32
 }
 
-func (this *AVTransport) AddMultipleURIsToQueue(instanceId uint32, req *MultiAddRequest) (resp *MultiAddResponse, err error) {
+func (this *AVTransport) AddMultipleURIsToQueue(instanceId uint32, req *AddMultipleURIsToQueueIn) (*AddMultipleURIsToQueueOut, error) {
 	type Response struct {
 		XMLName xml.Name
-		MultiAddResponse
+		AddMultipleURIsToQueueOut
 		ErrorResponse
 	}
 	args := []Arg{
 		{"InstanceID", instanceId},
-		{"UdpateID", req.UpdateID},
+		{"UpdateID", req.UpdateID},
 		{"NumberOfURIs", req.NumberOfURIs},
 		{"EnqueuedURIs", req.EnqueuedURIs},
 		{"EnqueuedURIsMetaData", req.EnqueuedURIsMetaData},
@@ -156,9 +162,7 @@ func (this *AVTransport) AddMultipleURIsToQueue(instanceId uint32, req *MultiAdd
 	response := Call(this.Svc, "AddMultipleURIsToQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	resp = &doc.MultiAddResponse
-	err = doc.Error()
-	return
+	return &doc.AddMultipleURIsToQueueOut, doc.Error()
 }
 
 func (this *AVTransport) ReorderTracksInQueue(instanceId, startingIndex, numberOfTracks, insertBefore, updateId uint32) (err error) {
@@ -722,7 +726,7 @@ func (this *AVTransport) BecomeGroupCoordinatorAndSource(instanceId uint32, req 
 		{"CurrentSourceState", req.CurrentSourceState},
 		{"ResumePlayback", req.ResumePlayback},
 	}
-	response := Call(this.Svc, "BecomeGroupCoordinatorAndSourceRequest", args)
+	response := Call(this.Svc, "BecomeGroupCoordinatorAndSource", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()

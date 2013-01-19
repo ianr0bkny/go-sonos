@@ -708,7 +708,7 @@ func TestAddTrack(t *testing.T) {
 	}
 
 	if "" != lastTrackURI {
-		req := upnp.AddURIToQueueRequest{
+		req := upnp.AddURIToQueueIn{
 			EnqueuedURI: lastTrackURI,
 		}
 		if result, err := s.AddURIToQueue(0 /*instanceId*/, &req); nil != err {
@@ -717,4 +717,65 @@ func TestAddTrack(t *testing.T) {
 			t.Logf("%#v", result)
 		}
 	}
+}
+
+func TestAddAlbum(t *testing.T) {
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+
+	updateId, err := s.GetSystemUpdateID()
+	if nil != err {
+		t.Fatal(err)
+	}
+	t.Logf("UpdateID = %d", updateId)
+
+	var lastTrackURI string
+	t.Logf("Current Queue")
+	t.Logf("-------------------")
+	if result, err := s.GetQueueContents(); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, item := range result {
+			lastTrackURI = item.Res()
+		}
+	}
+
+	if "" != lastTrackURI {
+		req := upnp.AddMultipleURIsToQueueIn {
+			UpdateID : updateId,
+			NumberOfURIs : 1,
+			EnqueuedURIs : lastTrackURI,
+			EnqueuedURIsMetaData : "",
+			ContainerURI : "",
+			ContainerMetaData : "",
+			DesiredFirstTrackNumberEnqueued: 0,
+			EnqueueAsNext: false,
+		}
+		if result, err := s.AddMultipleURIsToQueue(0, &req); nil != err {
+			t.Fatal(err)
+		} else {
+			t.Logf("%#v", result)
+		}
+	}
+
+	/*
+	if result, err := s.GetMetadata("A:ALBUM/Quadrophenia"); nil != err {
+		t.Fatal(err)
+	} else {
+		req := upnp.AddMultipleURIsToQueueIn {
+			UpdateID : 0,
+			NumberOfURIs : 1,
+			EnqueuedURIs : result[0].Res(),
+			EnqueuedURIsMetaData : "",
+			ContainerURI : result[0].Res(),
+			ContainerMetaData : "",
+			DesiredFirstTrackNumberEnqueued: 0,
+			EnqueueAsNext: false,
+		}
+		if result, err := s.AddMultipleURIsToQueue(0, &req); nil != err {
+			t.Fatal(err)
+		} else {
+			t.Logf("%#v", result)
+		}
+	}
+	*/
 }
