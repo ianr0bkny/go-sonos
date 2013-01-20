@@ -659,11 +659,9 @@ func TestRadio(t *testing.T) {
 	}
 }
 
-//
-// This test prints the current queue, removes the last track
-// in the queue, and then empties the queue completely.
-//
 func TestQueue(t *testing.T) {
+	// This test prints the current queue, removes the last track
+	// in the queue, and then empties the queue completely.
 	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
 
 	var lastId string
@@ -689,10 +687,8 @@ func TestQueue(t *testing.T) {
 	}
 }
 
-//
-// This test duplicates the last track at the end of the queue.
-//
 func TestAddTrack(t *testing.T) {
+	// This test duplicates the last track at the end of the queue.
 	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
 
 	var lastTrackURI string
@@ -720,6 +716,7 @@ func TestAddTrack(t *testing.T) {
 }
 
 func TestAddAlbum(t *testing.T) {
+	// Testing AddMultipleURIsToQueue (currently does not work).
 	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
 
 	updateId, err := s.GetSystemUpdateID()
@@ -740,15 +737,15 @@ func TestAddAlbum(t *testing.T) {
 	}
 
 	if "" != lastTrackURI {
-		req := upnp.AddMultipleURIsToQueueIn {
-			UpdateID : updateId,
-			NumberOfURIs : 1,
-			EnqueuedURIs : lastTrackURI,
-			EnqueuedURIsMetaData : "",
-			ContainerURI : "",
-			ContainerMetaData : "",
+		req := upnp.AddMultipleURIsToQueueIn{
+			UpdateID:                        0, /*updateId*/
+			NumberOfURIs:                    1,
+			EnqueuedURIs:                    lastTrackURI,
+			EnqueuedURIsMetaData:            "",
+			ContainerURI:                    "",
+			ContainerMetaData:               "",
 			DesiredFirstTrackNumberEnqueued: 0,
-			EnqueueAsNext: false,
+			EnqueueAsNext:                   false,
 		}
 		if result, err := s.AddMultipleURIsToQueue(0, &req); nil != err {
 			t.Fatal(err)
@@ -758,24 +755,35 @@ func TestAddAlbum(t *testing.T) {
 	}
 
 	/*
-	if result, err := s.GetMetadata("A:ALBUM/Quadrophenia"); nil != err {
-		t.Fatal(err)
-	} else {
-		req := upnp.AddMultipleURIsToQueueIn {
-			UpdateID : 0,
-			NumberOfURIs : 1,
-			EnqueuedURIs : result[0].Res(),
-			EnqueuedURIsMetaData : "",
-			ContainerURI : result[0].Res(),
-			ContainerMetaData : "",
-			DesiredFirstTrackNumberEnqueued: 0,
-			EnqueueAsNext: false,
-		}
-		if result, err := s.AddMultipleURIsToQueue(0, &req); nil != err {
+		if result, err := s.GetMetadata("A:ALBUM/Quadrophenia"); nil != err {
 			t.Fatal(err)
 		} else {
-			t.Logf("%#v", result)
+			req := upnp.AddMultipleURIsToQueueIn {
+				UpdateID : 0,
+				NumberOfURIs : 1,
+				EnqueuedURIs : result[0].Res(),
+				EnqueuedURIsMetaData : "",
+				ContainerURI : result[0].Res(),
+				ContainerMetaData : "",
+				DesiredFirstTrackNumberEnqueued: 0,
+				EnqueueAsNext: false,
+			}
+			if result, err := s.AddMultipleURIsToQueue(0, &req); nil != err {
+				t.Fatal(err)
+			} else {
+				t.Logf("%#v", result)
+			}
 		}
-	}
 	*/
+}
+
+func TestRemoveRange(t *testing.T) {
+	// This test removes the first two tracks from the queue.
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	updateId, err := s.RemoveTrackRangeFromQueue(0 /*instanceId*/, 0 /*updateId*/, 1 /*startingIndex*/, 2 /*numberofTracks*/)
+	if nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("New UpdateId = %d", updateId)
+	}
 }

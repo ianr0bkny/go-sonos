@@ -206,7 +206,15 @@ func (this *AVTransport) RemoveTrackFromQueue(instanceId uint32, objectId string
 	return doc.Error()
 }
 
-func (this *AVTransport) RemoveTrackRangeFromQueue(instanceId, updateId, startingIndex, numberOfTracks uint32) (newUpdateId uint32, err error) {
+//
+// Remove a continguous range of tracks from the queue (Q:0).  For Sonos
+// @instanceId will always be 0; @updateId should be 0; @startingIndex is
+// the first track to remove where the first track is 1; @numberOfTracks
+// is the number of tracks to remove.  Returns the new @updateId.
+// This method fails with 402 if either @startingIndex or @numberOfTracks
+// is out of range.
+//
+func (this *AVTransport) RemoveTrackRangeFromQueue(instanceId, updateId, startingIndex, numberOfTracks uint32) (uint32, error) {
 	type Response struct {
 		XMLName     xml.Name
 		NewUpdateID uint32
@@ -221,13 +229,11 @@ func (this *AVTransport) RemoveTrackRangeFromQueue(instanceId, updateId, startin
 	response := Call(this.Svc, "RemoveTrackRangeFromQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	newUpdateId = doc.NewUpdateID
-	err = doc.Error()
-	return
+	return doc.NewUpdateID, doc.Error()
 }
 
 //
-// Remove all tracks from the queue (Q:0).  For Sonos instanceId will
+// Remove all tracks from the queue (Q:0).  For Sonos @instanceId will
 // always be 0.  Emptying an already empty queue is not an error.
 //
 func (this *AVTransport) RemoveAllTracksFromQueue(instanceId uint32) error {
