@@ -33,6 +33,7 @@ package upnp
 import (
 	"encoding/xml"
 	_ "log"
+	"strings"
 )
 
 type AVTransport struct {
@@ -420,7 +421,11 @@ func (this *AVTransport) GetTransportSettings(instanceId uint32) (transportSetti
 	return
 }
 
-func (this *AVTransport) GetCrossfadeMode(instanceId uint32) (crossfadeMode bool, err error) {
+//
+// Returns true if crossfade mode is active; false otherwise.  For Sonos
+// @instanceId should always be 0.
+//
+func (this *AVTransport) GetCrossfadeMode(instanceId uint32) (bool, error) {
 	type Response struct {
 		XMLName       xml.Name
 		CrossfadeMode bool
@@ -432,9 +437,7 @@ func (this *AVTransport) GetCrossfadeMode(instanceId uint32) (crossfadeMode bool
 	response := Call(this.Svc, "GetCrossfadeMode", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	crossfadeMode = doc.CrossfadeMode
-	err = doc.Error()
-	return
+	return doc.CrossfadeMode, doc.Error()
 }
 
 func (this *AVTransport) Stop(instanceId uint32) (err error) {
@@ -638,7 +641,12 @@ func (this *AVTransport) NotifyDeletedURI(instanceId uint32, deletedURI string) 
 	return
 }
 
-func (this *AVTransport) GetCurrentTransportActions(instanceId uint32) (actions string, err error) {
+//
+// Returns a list of the actions that are valid at this time.  The list
+// consists of human-readable strings, such as "Play", and "Stop".  For Sonos
+// @instanceId will always be 0.
+//
+func (this *AVTransport) GetCurrentTransportActions(instanceId uint32) ([]string, error) {
 	type Response struct {
 		XMLName xml.Name
 		Actions string
@@ -650,9 +658,7 @@ func (this *AVTransport) GetCurrentTransportActions(instanceId uint32) (actions 
 	response := Call(this.Svc, "GetCurrentTransportActions", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	actions = doc.Actions
-	err = doc.Error()
-	return
+	return strings.Split(doc.Actions, ", "), doc.Error()
 }
 
 func (this *AVTransport) BecomeCoordinatorOfStandaloneGroup(instanceId uint32) (err error) {

@@ -780,7 +780,10 @@ func TestAddAlbum(t *testing.T) {
 func TestRemoveRange(t *testing.T) {
 	// This test removes the first two tracks from the queue.
 	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
-	updateId, err := s.RemoveTrackRangeFromQueue(0 /*instanceId*/, 0 /*updateId*/, 1 /*startingIndex*/, 2 /*numberofTracks*/)
+	updateId, err := s.RemoveTrackRangeFromQueue(0, /*instanceId*/
+		0, /*updateId*/
+		1, /*startingIndex*/
+		2 /*numberofTracks*/)
 	if nil != err {
 		t.Fatal(err)
 	} else {
@@ -791,8 +794,24 @@ func TestRemoveRange(t *testing.T) {
 func TestReorder(t *testing.T) {
 	// This test moves the first two tracks of Sgt. Pepper to the end.
 	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
-	err := s.ReorderTracksInQueue(0 /*instanceId*/, 1 /*startingIndex*/, 2 /*numberOfTracks*/, 14 /*insertBefore*/, 0 /*updateId*/)
+	err := s.ReorderTracksInQueue(0, /*instanceId*/
+		1,  /*startingIndex*/
+		2,  /*numberOfTracks*/
+		14, /*insertBefore*/
+		0 /*updateId*/)
 	if nil != err {
 		t.Fatal(err)
+	}
+}
+
+func TestGetCurrentTransportActions(t *testing.T) {
+	// This test prints the currently available transport actions
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	if actions, err := s.GetCurrentTransportActions(0 /*instanceId*/); nil != err {
+		t.Fatal(err)
+	} else {
+		for _, action := range actions {
+			t.Logf(action)
+		}
 	}
 }
