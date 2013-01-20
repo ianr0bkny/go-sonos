@@ -165,7 +165,18 @@ func (this *AVTransport) AddMultipleURIsToQueue(instanceId uint32, req *AddMulti
 	return &doc.AddMultipleURIsToQueueOut, doc.Error()
 }
 
-func (this *AVTransport) ReorderTracksInQueue(instanceId, startingIndex, numberOfTracks, insertBefore, updateId uint32) (err error) {
+//
+// Move a contiguous range of tracks to a given point in the queue.
+// For Sonos @instanceId will always be 0; @startingIndex is the first
+// track in the range to be moved, where the first track in the queue is
+// track 1; @numberOfTracks is the length of the range; @insertBefore set
+// the destination position in the queue; @updateId should be 0.
+//
+// Note that to move tracks to the end of the queue @insertBefore must be
+// set to the number of tracks in the queue plus 1.  This method fails with
+// 402 if @startingndex, @numberOfTracks, or @insertBefore are out of range.
+//
+func (this *AVTransport) ReorderTracksInQueue(instanceId, startingIndex, numberOfTracks, insertBefore, updateId uint32) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -180,8 +191,7 @@ func (this *AVTransport) ReorderTracksInQueue(instanceId, startingIndex, numberO
 	response := Call(this.Svc, "ReorderTracksInQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 //
@@ -211,6 +221,7 @@ func (this *AVTransport) RemoveTrackFromQueue(instanceId uint32, objectId string
 // @instanceId will always be 0; @updateId should be 0; @startingIndex is
 // the first track to remove where the first track is 1; @numberOfTracks
 // is the number of tracks to remove.  Returns the new @updateId.
+//
 // This method fails with 402 if either @startingIndex or @numberOfTracks
 // is out of range.
 //

@@ -787,3 +787,12 @@ func TestRemoveRange(t *testing.T) {
 		t.Logf("New UpdateId = %d", updateId)
 	}
 }
+
+func TestReorder(t *testing.T) {
+	// This test moves the first two tracks of Sgt. Pepper to the end.
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	err := s.ReorderTracksInQueue(0 /*instanceId*/, 1 /*startingIndex*/, 2 /*numberOfTracks*/, 14 /*insertBefore*/, 0 /*updateId*/)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
