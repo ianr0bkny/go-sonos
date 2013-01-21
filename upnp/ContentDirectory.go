@@ -250,7 +250,12 @@ func (this *ContentDirectory) UpdateObject(objectId, currentTagValue, newTagValu
 	return
 }
 
-func (this *ContentDirectory) DestroyObject(objectId string) (err error) {
+//
+// Remove the directory object given by @objectId (e.g. "SQ:11", to
+// remove a saved queue). A 701 error is returned if an invalid @objectId
+// is specified.
+//
+func (this *ContentDirectory) DestroyObject(objectId string) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -261,8 +266,7 @@ func (this *ContentDirectory) DestroyObject(objectId string) (err error) {
 	response := Call(this.Svc, "DestroyObject", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 func (this *ContentDirectory) RefreshShareList() (err error) {

@@ -66,16 +66,13 @@ type AddURIToQueueIn struct {
 	// @ContentDirectory, etc) e.g.:
 	//     "x-file-cifs://servername/path/to/track.mp3"
 	EnqueuedURI string
-
 	// ????
 	EnqueuedURIMetaData string
-
 	// This field should be 0 to insert the new item at the end
 	// of the queue.  If non-zero the new track will be inserted at
 	// this location, and later tracks will see their track numbers
 	// incremented.
 	DesiredFirstTrackNumberEnqueued uint32
-
 	// ???? (possibly unsupported)
 	EnqueueAsNext bool
 }
@@ -86,10 +83,8 @@ type AddURIToQueueIn struct {
 type AddURIToQueueOut struct {
 	// The track number of the newly added track.
 	FirstTrackNumberEnqueued uint32
-
 	// The number of tracks added by this request (always 1).
 	NumTracksAdded uint32
-
 	// The length of the queue now that this track has been added
 	NewQueueLength uint32
 }
@@ -262,7 +257,13 @@ func (this *AVTransport) RemoveAllTracksFromQueue(instanceId uint32) error {
 	return doc.Error()
 }
 
-func (this *AVTransport) SaveQueue(instanceId uint32, title, objectId string) (assignedObjectId string, err error) {
+//
+// Create a new named queue (SQ:n) from the contents of the current
+// queue (Q:0).  For Sonos @instanceId should always be 0; @title is the
+// display name of the new named queue; @objectId should be left blank.
+// This method returns the objectId of the newly created queue.
+//
+func (this *AVTransport) SaveQueue(instanceId uint32, title, objectId string) (string, error) {
 	type Response struct {
 		XMLName          xml.Name
 		AssignedObjectID string
@@ -276,9 +277,7 @@ func (this *AVTransport) SaveQueue(instanceId uint32, title, objectId string) (a
 	response := Call(this.Svc, "SaveQueue", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	assignedObjectId = doc.AssignedObjectID
-	err = doc.Error()
-	return
+	return doc.AssignedObjectID, doc.Error()
 }
 
 func (this *AVTransport) BackupQueue(instanceId uint32) (err error) {
@@ -296,19 +295,36 @@ func (this *AVTransport) BackupQueue(instanceId uint32) (err error) {
 	return
 }
 
+//
+// The return type of the GetMediaInfo method
+//
 type MediaInfo struct {
-	NrTracks           uint32
-	MediaDuration      string
-	CurrentURI         string
+	// The number of tracks in the queue (Q:0)
+	NrTracks uint32
+	// ???? (possibly not supported)
+	MediaDuration string
+	// The URI of the queue
+	CurrentURI string
+	// ????
 	CurrentURIMetaData string
-	NextURI            string
-	NextURIMetaData    string
-	PlayMedium         string
-	RecordMedium       string
-	WriteStatus        string
+	// ???? (possibly not supported)
+	NextURI string
+	// ???? (possibly not supported)
+	NextURIMetaData string
+	// ????
+	PlayMedium string
+	// ???? (possibly not supported)
+	RecordMedium string
+	// ???? (possibly not supported)
+	WriteStatus string
 }
 
-func (this *AVTransport) GetMediaInfo(instanceId uint32) (mediaInfo *MediaInfo, err error) {
+//
+// Gets information about the currently selected media, its URI, length
+// in tracks, and recording status, if any.  For Sonos @instanceId should
+// always be 0 and most of the fields are unsupported.
+//
+func (this *AVTransport) GetMediaInfo(instanceId uint32) (*MediaInfo, error) {
 	type Response struct {
 		XMLName xml.Name
 		MediaInfo
@@ -320,9 +336,7 @@ func (this *AVTransport) GetMediaInfo(instanceId uint32) (mediaInfo *MediaInfo, 
 	response := Call(this.Svc, "GetMediaInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	mediaInfo = &doc.MediaInfo
-	err = doc.Error()
-	return
+	return &doc.MediaInfo, doc.Error()
 }
 
 type TransportInfo struct {
@@ -348,18 +362,36 @@ func (this *AVTransport) GetTransportInfo(instanceId uint32) (transportInfo *Tra
 	return
 }
 
+//
+// The return type of the GetPositionInfo method
+//
 type PositionInfo struct {
-	Track         uint32
+	// Track number relative to the beginning of the queue (not the containing album).
+	Track uint32
+	// Total length of the track in HH:MM:SS format
 	TrackDuration string
+	// The DIDL-Lite document describing this item in the ContentDirectory
 	TrackMetaData string
-	TrackURI      string
-	RelTime       string
-	AbsTime       string
-	RelCount      uint32
-	AbsCount      uint32
+	// The URI of the track, corresponding // the to <res> tag in
+	// a DIDL-Lite description (@see dldl, @ContentDirectory, etc) e.g.:
+	//     "x-file-cifs://servername/path/to/track.mp3"
+	TrackURI string
+	// The number of elapsed seconds into the track in HH:MM:SS format
+	RelTime string
+	// ???? (possibly unsupported)
+	AbsTime string
+	// ???? (possibly unsupported)
+	RelCount uint32
+	// ???? (possibly unsupported)
+	AbsCount uint32
 }
 
-func (this *AVTransport) GetPositionInfo(instanceId uint32) (positionInfo *PositionInfo, err error) {
+//
+// Get information about the track that is currently playing, its URI,
+// position in the queue (Q:0), and elapsed time.  For Sonos @instanceId
+// should always be 0.
+//
+func (this *AVTransport) GetPositionInfo(instanceId uint32) (*PositionInfo, error) {
 	type Response struct {
 		XMLName xml.Name
 		PositionInfo
@@ -371,18 +403,27 @@ func (this *AVTransport) GetPositionInfo(instanceId uint32) (positionInfo *Posit
 	response := Call(this.Svc, "GetPositionInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	positionInfo = &doc.PositionInfo
-	err = doc.Error()
-	return
+	return &doc.PositionInfo, doc.Error()
 }
 
+//
+// The return type of the GetDeviceCapabilities method
+//
 type DeviceCapabilities struct {
-	PlayMedia       string
-	RecMedia        string
+	// Configured sources of media
+	PlayMedia string
+	// ???? (possibly unsupported)
+	RecMedia string
+	// ???? (possibly unsupported)
 	RecQualityModes string
 }
 
-func (this *AVTransport) GetDeviceCapabilities(instanceId uint32) (deviceCapabilities *DeviceCapabilities, err error) {
+//
+// Return the device capabilities, sources of input media, recording
+// media, and recoding quality modes.  For Sonos @instanceId should always
+// be 0, and the record-related fields are unsupported.
+//
+func (this *AVTransport) GetDeviceCapabilities(instanceId uint32) (*DeviceCapabilities, error) {
 	type Response struct {
 		XMLName xml.Name
 		DeviceCapabilities
@@ -394,9 +435,7 @@ func (this *AVTransport) GetDeviceCapabilities(instanceId uint32) (deviceCapabil
 	response := Call(this.Svc, "GetDeviceCapabilities", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	deviceCapabilities = &doc.DeviceCapabilities
-	err = doc.Error()
-	return
+	return &doc.DeviceCapabilities, doc.Error()
 }
 
 type TransportSettings struct {
@@ -511,7 +550,12 @@ func (this *AVTransport) Seek(instanceId uint32, unit, target string) (err error
 	return
 }
 
-func (this *AVTransport) Next(instanceId uint32) (err error) {
+//
+// Skip ahead to the next track in the queue (Q:).  For Sonos @instanceId
+// should always be 0.  This method returns an error 711 if the current
+// track is the last track in the queue.
+//
+func (this *AVTransport) Next(instanceId uint32) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -522,8 +566,7 @@ func (this *AVTransport) Next(instanceId uint32) (err error) {
 	response := Call(this.Svc, "Next", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 func (this *AVTransport) NextProgrammedRadioTracks(instanceId uint32) (err error) {
@@ -541,7 +584,12 @@ func (this *AVTransport) NextProgrammedRadioTracks(instanceId uint32) (err error
 	return
 }
 
-func (this *AVTransport) Previous(instanceId uint32) (err error) {
+//
+// Move to a previous track in the queue (Q:0).  For Sonos @instanceId
+// should always be 0.  This method returns error 711 if the current track
+// is the first track in the queue.
+//
+func (this *AVTransport) Previous(instanceId uint32) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -552,8 +600,7 @@ func (this *AVTransport) Previous(instanceId uint32) (err error) {
 	response := Call(this.Svc, "Previous", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 func (this *AVTransport) NextSection(instanceId uint32) (err error) {

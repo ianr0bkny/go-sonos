@@ -815,3 +815,77 @@ func TestGetCurrentTransportActions(t *testing.T) {
 		}
 	}
 }
+
+func TestNamedQueue(t *testing.T) {
+	// This test creates a new named queue and then deletes it
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	obj, err := s.SaveQueue(0 /*instanceId*/, "borodin" /*title*/, "" /*objectId*/)
+	if nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("%#v", obj)
+		if err = s.DestroyObject(obj); nil != err {
+			t.Fatal(err)
+		} else {
+			t.Logf("queue removed")
+		}
+	}
+}
+
+func TestPositionInfo(t *testing.T) {
+	// This test fetches and prints the current position info
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	if info, err := s.GetPositionInfo(0 /*instanceId*/); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("%d", info.Track)
+		t.Logf("%s", info.TrackDuration)
+		t.Logf("%s", info.TrackMetaData)
+		t.Logf("%s", info.TrackURI)
+		t.Logf("%s", info.RelTime)
+		t.Logf("%s", info.AbsTime)
+		t.Logf("%d", info.RelCount)
+		t.Logf("%d", info.AbsCount)
+	}
+}
+
+func TestMediaInfo(t *testing.T) {
+	// This test fetches and prints the current media info
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	if info, err := s.GetMediaInfo(0 /*instanceId*/); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("%#v", info.NrTracks)
+		t.Logf("%#v", info.MediaDuration)
+		t.Logf("%#v", info.CurrentURI)
+		t.Logf("%#v", info.CurrentURIMetaData)
+		t.Logf("%#v", info.NextURI)
+		t.Logf("%#v", info.NextURIMetaData)
+		t.Logf("%#v", info.PlayMedium)
+		t.Logf("%#v", info.RecordMedium)
+		t.Logf("%#v", info.WriteStatus)
+	}
+}
+
+func TestDeviceCapabilities(t *testing.T) {
+	// This test fetches and prints the capabilities of the current device
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	if caps, err := s.GetDeviceCapabilities(0 /*instanceId*/); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("%#v", caps.PlayMedia)
+		t.Logf("%#v", caps.RecMedia)
+		t.Logf("%#v", caps.RecQualityModes)
+	}
+}
+
+func TestNavigation(t *testing.T) {
+	// Test of the Next and Previous methods
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	if err := s.Next(0 /*instanceId*/); nil != err {
+		t.Fatal(err)
+	}
+	if err := s.Previous(0 /*instanceId*/); nil != err {
+		t.Fatal(err)
+	}
+}
