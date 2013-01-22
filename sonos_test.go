@@ -889,3 +889,19 @@ func TestNavigation(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestPlayPauseStop(t *testing.T) {
+	// Test of the Play, Pause, and Stop methods
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	if info, err := s.GetTransportInfo(0); nil != err {
+		t.Fatal(err)
+	} else {
+		if upnp.State_PAUSED_PLAYBACK == info.CurrentTransportState {
+			s.Stop(0 /*instanceId*/)
+		} else if upnp.State_STOPPED == info.CurrentTransportState {
+			s.Play(0 /*instanceId*/, upnp.PlaySpeed_1)
+		} else if upnp.State_PLAYING == info.CurrentTransportState {
+			s.Pause(0 /*instanceId*/)
+		}
+	}
+}

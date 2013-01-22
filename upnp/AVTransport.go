@@ -339,13 +339,30 @@ func (this *AVTransport) GetMediaInfo(instanceId uint32) (*MediaInfo, error) {
 	return &doc.MediaInfo, doc.Error()
 }
 
+// Legal values for TransportInfo.CurrentTransportState
+const (
+	State_PLAYING         = "PLAYING"
+	State_PAUSED_PLAYBACK = "PAUSED_PLAYBACK"
+	State_STOPPED         = "STOPPED"
+)
+
+//
+// The return type for the GetTransportInfo method
+//
 type TransportInfo struct {
-	CurrentTransportState  string
+	// Indicates whether the device is playing, paused, or stopped
+	CurrentTransportState string
+	// Indicates if an error condition exists ("OK" otherwise)
 	CurrentTransportStatus string
-	CurrentSpeed           string
+	// Playback speed relative to normal playback speed (e.g. "1" or "1/2")
+	CurrentSpeed string
 }
 
-func (this *AVTransport) GetTransportInfo(instanceId uint32) (transportInfo *TransportInfo, err error) {
+//
+// Return the current state of the transport (playing, stopped, paused),
+// its status, and playback speed.  For Sonos @instanceId should always be 0.
+//
+func (this *AVTransport) GetTransportInfo(instanceId uint32) (*TransportInfo, error) {
 	type Response struct {
 		XMLName xml.Name
 		TransportInfo
@@ -357,9 +374,7 @@ func (this *AVTransport) GetTransportInfo(instanceId uint32) (transportInfo *Tra
 	response := Call(this.Svc, "GetTransportInfo", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	transportInfo = &doc.TransportInfo
-	err = doc.Error()
-	return
+	return &doc.TransportInfo, doc.Error()
 }
 
 //
@@ -479,7 +494,11 @@ func (this *AVTransport) GetCrossfadeMode(instanceId uint32) (bool, error) {
 	return doc.CrossfadeMode, doc.Error()
 }
 
-func (this *AVTransport) Stop(instanceId uint32) (err error) {
+//
+// Stops playback and return to the beginning of the queue (Q:1).
+// For Sonos @instanceId should always be 0.
+//
+func (this *AVTransport) Stop(instanceId uint32) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -490,13 +509,18 @@ func (this *AVTransport) Stop(instanceId uint32) (err error) {
 	response := Call(this.Svc, "Stop", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
+// Playback at normal speed
 const PlaySpeed_1 = "1"
 
-func (this *AVTransport) Play(instanceId uint32, speed string) (err error) {
+//
+// Starts or resumes playback at the given speed.  For Sonos @instanceId
+// should always be 0; @speed is a fraction relative to normal speed
+// (e.g. "1" or "1/2").
+//
+func (this *AVTransport) Play(instanceId uint32, speed string) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -508,11 +532,14 @@ func (this *AVTransport) Play(instanceId uint32, speed string) (err error) {
 	response := Call(this.Svc, "Play", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
-func (this *AVTransport) Pause(instanceId uint32) (err error) {
+//
+// Pause playback, prepared to resume at the current position.  For Sonos
+// @instanceId should always be 0.
+//
+func (this *AVTransport) Pause(instanceId uint32) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -523,8 +550,7 @@ func (this *AVTransport) Pause(instanceId uint32) (err error) {
 	response := Call(this.Svc, "Pause", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 const (
