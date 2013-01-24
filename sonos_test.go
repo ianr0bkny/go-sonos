@@ -35,6 +35,7 @@ import (
 	"github.com/ianr0bkny/go-sonos/config"
 	"github.com/ianr0bkny/go-sonos/upnp"
 	"log"
+	_ "strings"
 	"testing"
 )
 
@@ -860,6 +861,34 @@ func TestPlayPauseStop(t *testing.T) {
 			s.Play(0 /*instanceId*/, upnp.PlaySpeed_1)
 		} else if upnp.State_PLAYING == info.CurrentTransportState {
 			s.Pause(0 /*instanceId*/)
+		}
+	}
+}
+
+func TestAddMultiple(t *testing.T) {
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+
+	if objs, err := s.GetDirectChildren("A:ALBUM/Animals"); nil != err {
+		t.Fatal(err)
+	} else {
+		var tracks []string
+		for _, track := range objs {
+			tracks = append(tracks, track.Res())
+		}
+		req := &upnp.AddMultipleURIsToQueueIn{
+			UpdateID : 0,
+			NumberOfURIs : 2,
+			EnqueuedURIs : "x-file-cifs://perseus/sonos/iTunes/Music/Nine%20Inch%20Nails/The%20Downward%20Spiral/12%20Reptile.mp3 x-file-cifs://perseus/sonos/iTunes/Music/Big%20Boi/Speakerboxxx/1-16%20Reset.mp3",
+			EnqueuedURIsMetaData : "<DIDL-Lite.xmlns:dc=\"http://purl.org/dc/elements/1.1/\".xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\".xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\".xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item.id=\"S://perseus/sonos/iTunes/Music/Nine%20Inch%20Nails/The%20Downward%20Spiral/12%20Reptile.mp3\".parentID=\"A:TRACKS\".restricted=\"true\"><dc:title>Reptile</dc:title><upnp:class>object.item.audioItem.musicTrack</upnp:class><desc.id=\"cdudn\".nameSpace=\"urn:schemas-rinconnetworks-com:metadata-1-0/\">RINCON_AssociatedZPUDN</desc></item></DIDL-Lite>.<DIDL-Lite.xmlns:dc=\"http://purl.org/dc/elements/1.1/\".xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\".xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\".xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item.id=\"S://perseus/sonos/iTunes/Music/Big%20Boi/Speakerboxxx/1-16%20Reset.mp3\".parentID=\"A:TRACKS\".restricted=\"true\"><dc:title>Reset</dc:title><upnp:class>object.item.audioItem.musicTrack</upnp:class><desc.id=\"cdudn\".nameSpace=\"urn:schemas-rinconnetworks-com:metadata-1-0/\">RINCON_AssociatedZPUDN</desc></item></DIDL-Lite>",
+			ContainerURI : "x-rincon-playlist:RINCON_000E58741A8401400#A:TRACKS",
+			ContainerMetaData: "<DIDL-Lite.xmlns:dc=\"http://purl.org/dc/elements/1.1/\".xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\".xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\".xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item.id=\"A:TRACKS\".parentID=\"A:\".restricted=\"true\"><dc:title>Tracks</dc:title><upnp:class>object.container.playlistContainer</upnp:class><desc.id=\"cdudn\".nameSpace=\"urn:schemas-rinconnetworks-com:metadata-1-0/\">RINCON_AssociatedZPUDN</desc></item></DIDL-Lite>",
+			DesiredFirstTrackNumberEnqueued: 0,
+			EnqueueAsNext: false,
+		}
+		if resp, err := s.AddMultipleURIsToQueue(0 /*instanceId*/, req); nil != err {
+			t.Fatal(err)
+		} else {
+			t.Logf("%#v", resp)
 		}
 	}
 }
