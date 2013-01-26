@@ -66,7 +66,7 @@ type AddURIToQueueIn struct {
 	// @ContentDirectory, etc) e.g.:
 	//     "x-file-cifs://servername/path/to/track.mp3"
 	EnqueuedURI string
-	// ????
+	// A DIDL-Lite document describing the the resource given by @EnqueuedURI
 	EnqueuedURIMetaData string
 	// This field should be 0 to insert the new item at the end
 	// of the queue.  If non-zero the new track will be inserted at
@@ -118,26 +118,61 @@ func (this *AVTransport) AddURIToQueue(instanceId uint32, req *AddURIToQueueIn) 
 // Input parameters for AddMultipleURIsToQueue.
 //
 type AddMultipleURIsToQueueIn struct {
-	UpdateID                        uint32
-	NumberOfURIs                    uint32
-	EnqueuedURIs                    string
-	EnqueuedURIsMetaData            string
-	ContainerURI                    string
-	ContainerMetaData               string
+	// UpdateID (in), can be 0
+	UpdateID uint32
+	// The number of URIs to be added in this request
+	NumberOfURIs uint32
+	// A list of @NumberOfURIs URIs, separated by a space
+	EnqueuedURIs string
+	// A list of @NumberOfURIs DIDL-Lite documents, separated by a space
+	EnqueuedURIsMetaData string
+	// URI of a container in the ContentDirectory containing the
+	// URIs to be added.  If adding tracks this should be the URI for
+	// the A:TRACK entry in the directory.
+	ContainerURI string
+	// A DIDL-Lite document describing the resource given by @ContainerURI
+	ContainerMetaData string
+	// This field should be 0 to insert the new item at the end
+	// of the queue.  If non-zero the new track will be inserted at
+	// this location, and later tracks will see their track numbers
+	// incremented.
 	DesiredFirstTrackNumberEnqueued uint32
-	EnqueueAsNext                   bool
+	// ???? (possibly unsupported)
+	EnqueueAsNext bool
 }
 
 //
 // Output parameters for AddMultipleURIsToQueue.
 //
 type AddMultipleURIsToQueueOut struct {
+	// The starting position int the queue (Q:0) of the newly added tracks
 	FirstTrackNumberEnqueued uint32
-	NumTracksAdded           uint32
-	NewQueueLength           uint32
-	NewUpdateID              uint32
+	// The number of tracks added by the request
+	NumTracksAdded uint32
+	// The length of the queue after the request was complete
+	NewQueueLength uint32
+	// The new UpdateID
+	NewUpdateID uint32
 }
 
+//
+// Add multiple tracks to the queue (Q:0).  This method does not seem
+// to be a standard part of AVTransport:1, but rather a Sonos extension.
+// As such it is not entirely clear how it should be used.  For Sonos
+// @instanceId should always be 0; @UpdateID should be 0; @NumberOfURIs
+// should be the number of tracks to be added by the request; @EnqueuedURIs
+// is a space-separated list of URIs (as given by the Res() method of the
+// model.Object class); @EnqueuedURIMetData is a space-separated list of
+// DIDL-Lite documents describing the resources to be added; @ContainerURI
+// should be the ContentDirectory URI for A:TRACK, when adding tracks;
+// @ContainerMetaData should be a DIDL-Lite document describing A:TRACK.
+// Other arguments have the same meaning as in @AddURIToQueue.
+//
+// Note that the number of DIDL-Lite documents in @EnqueuedURIsMetaData
+// must match the number of URIs in @EnqueuedURIs.  These DIDL-Lite documents
+// can be empty, but must be present.  @ContainerMetaData must be a string
+// of non-zero length, but need not be a valid DIDL-Lite document.
+//
 func (this *AVTransport) AddMultipleURIsToQueue(instanceId uint32, req *AddMultipleURIsToQueueIn) (*AddMultipleURIsToQueueOut, error) {
 	type Response struct {
 		XMLName xml.Name
