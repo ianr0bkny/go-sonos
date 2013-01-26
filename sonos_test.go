@@ -867,6 +867,9 @@ func TestPlayPauseStop(t *testing.T) {
 }
 
 func TestAddMultiple(t *testing.T) {
+	// This test adds Reptile from NIN and Reset from Big Boi to the
+	// queue using AddMultipleURIsToQueue.  Note that the containing
+	// album must be known to find the track.
 	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
 
 	var tracks_uri string
