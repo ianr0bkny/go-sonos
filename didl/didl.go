@@ -33,6 +33,7 @@ package didl
 import (
 	"encoding/xml"
 	"log"
+	"strings"
 )
 
 type didlValidated struct {
@@ -115,4 +116,18 @@ type Lite struct {
 	Container []Container `xml:"container"`
 	Item      []Item      `xml:"item"`
 	didlValidated
+}
+
+const emptyDocument = "<DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"></DIDL-Lite>"
+
+func EmptyDocument() string {
+	return emptyDocument
+}
+
+func EmptyDocuments(num int) string {
+	var docs string
+	for i := 0; i < num; i++ {
+		docs = strings.Join([]string{docs, emptyDocument}, " ")
+	}
+	return docs
 }

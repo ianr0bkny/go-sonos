@@ -48,6 +48,7 @@ const (
 	ObjectID_Queue_AVT_Instance_0 = "Q:0"
 	//
 	ObjectID_Attribute_Genres = "A:GENRE"
+	ObjectID_Attribute_Album  = "A:ALBUM"
 )
 
 func (this *Sonos) GetRootLevelChildren() (objects []model.Object, err error) {
@@ -180,6 +181,10 @@ func objectIDForGenre(genre string) string {
 	return strings.Join([]string{ObjectID_Attribute_Genres, genre}, "/")
 }
 
+func objectIDForAlbum(album string) string {
+	return strings.Join([]string{ObjectID_Attribute_Album, album}, "/")
+}
+
 func (this *Sonos) ListGenre(genre string) (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
@@ -268,4 +273,37 @@ func (this *Sonos) GetQueueContents() (objects []model.Object, err error) {
 		objects = model.ObjectStream(result.Doc)
 	}
 	return
+}
+
+func (this *Sonos) GetAlbumTracks(album string) (objects []model.Object, err error) {
+	var result *upnp.BrowseResult
+	req := &upnp.BrowseRequest{
+		objectIDForAlbum(album),
+		upnp.BrowseFlag_BrowseDirectChildren,
+		upnp.BrowseFilter_All,
+		0, /*StartingIndex*/
+		0, /*RequestCount*/
+		upnp.BrowseSortCriteria_None,
+	}
+	if result, err = this.Browse(req); nil != err {
+		return
+	} else {
+		objects = model.ObjectStream(result.Doc)
+	}
+	return
+}
+
+func (this *Sonos) GetTrackFromAlbum(album, track string) ([]model.Object, error) {
+	if tracks, err := this.GetAlbumTracks(album); nil != err {
+		return nil, err
+	} else {
+		var track_objs []model.Object
+		for _, track_obj := range tracks {
+			if track_obj.Title() == track {
+				track_objs = append(track_objs, track_obj)
+			}
+		}
+		return track_objs, nil
+	}
+	panic("unreachable")
 }

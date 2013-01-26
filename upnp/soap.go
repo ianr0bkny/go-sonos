@@ -37,7 +37,7 @@ import (
 	"io/ioutil"
 	_ "log"
 	"net/http"
-	"os"
+	_ "os"
 	"strings"
 )
 
@@ -161,8 +161,8 @@ func Call(svc *Service, action string, args Args) (response string) {
 	req.Header.Set("CONTENT-TYPE", soapContentType)
 	req.Header.Set("USER-AGENT", soapUserAgent)
 	req.Header.Set("SOAPACTION", fmt.Sprintf("\"%s#%s\"", soapBuildNamespace(svc), action))
-	req.Write(os.Stdout)
-	body.Seek(0, 0)
+	//req.Write(os.Stdout)
+	//body.Seek(0, 0)
 	if nil != err {
 		panic(err)
 	}
