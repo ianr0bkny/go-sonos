@@ -34,10 +34,12 @@ PACKAGE = github.com/ianr0bkny/go-sonos
 all ::
 	$(GO) install -v
 	$(GO) install -v $(PACKAGE)/cscl
+	$(GO) install -v $(PACKAGE)/csweb
 
 clean ::
 	$(GO) clean -i -x
 	$(GO) clean -i -x $(PACKAGE)/cscl
+	$(GO) clean -i -x $(PACKAGE)/csweb
 	rm -rf $(GOPATH)/pkg/*/$(PACKAGE)
 
 wc ::

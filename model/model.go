@@ -92,6 +92,38 @@ type Object interface {
 	IsContainer() bool
 }
 
+type ObjectMessage struct {
+	ID          string
+	ParentID    string
+	URI         string
+	Title       string
+	Class       string
+	AlbumArtURI string
+	Creator     string
+	Album       string
+}
+
+func makeObjectMessage(obj Object) *ObjectMessage {
+	return &ObjectMessage{
+		ID:          obj.ID(),
+		ParentID:    obj.ParentID(),
+		URI:         obj.Res(),
+		Title:       obj.Title(),
+		Class:       obj.Class(),
+		AlbumArtURI: obj.AlbumArtURI(),
+		Creator:     obj.Creator(),
+		Album:       obj.Album(),
+	}
+}
+
+func ObjectMessageStream(objs []Object) []*ObjectMessage {
+	var out []*ObjectMessage
+	for _, obj := range objs {
+		out = append(out, makeObjectMessage(obj))
+	}
+	return out
+}
+
 type modelObjectImpl struct {
 	id                  string
 	parentId            string
