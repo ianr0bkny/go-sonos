@@ -92,6 +92,11 @@ type Object interface {
 	IsContainer() bool
 }
 
+//
+// A flattened structure of exported fields to allow Objects to be passed
+// via XML, JSON, or other encoding relying on reflection.  Fields in this
+// struct mirror the usage of like-named methods in the Object interface.
+//
 type ObjectMessage struct {
 	ID          string
 	ParentID    string
@@ -114,14 +119,6 @@ func makeObjectMessage(obj Object) *ObjectMessage {
 		Creator:     obj.Creator(),
 		Album:       obj.Album(),
 	}
-}
-
-func ObjectMessageStream(objs []Object) []*ObjectMessage {
-	var out []*ObjectMessage
-	for _, obj := range objs {
-		out = append(out, makeObjectMessage(obj))
-	}
-	return out
 }
 
 type modelObjectImpl struct {
@@ -244,4 +241,13 @@ func ObjectStream(in *didl.Lite) (objects []Object) {
 		objects = append(objects, makeItem(&item))
 	}
 	return
+}
+
+// Create a list of ObjectMessages from a list of Objects.
+func ObjectMessageStream(objs []Object) []*ObjectMessage {
+	var out []*ObjectMessage
+	for _, obj := range objs {
+		out = append(out, makeObjectMessage(obj))
+	}
+	return out
 }
