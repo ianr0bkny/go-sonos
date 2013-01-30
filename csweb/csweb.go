@@ -34,13 +34,16 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/ianr0bkny/go-sonos"
 	"github.com/ianr0bkny/go-sonos/config"
-	"github.com/ianr0bkny/go-sonos/model"
+	_ "github.com/ianr0bkny/go-sonos/model"
 	"log"
 	"net/http"
+	"strings"
 )
 
+/*
 func getCurrentQueue(sonos *sonos.Sonos, writer http.ResponseWriter, request *http.Request) {
 	if result, err := sonos.GetQueueContents(); nil != err {
 		log.Fatal(err)
@@ -49,24 +52,7 @@ func getCurrentQueue(sonos *sonos.Sonos, writer http.ResponseWriter, request *ht
 		encoder.Encode(model.ObjectMessageStream(result))
 	}
 }
-
-func pressPlay(sonos *sonos.Sonos, writer http.ResponseWriter, request *http.Request) {
-	if err := sonos.Play(0, "1"); nil != err {
-		log.Fatal(err)
-	}
-}
-
-func pressPause(sonos *sonos.Sonos, writer http.ResponseWriter, request *http.Request) {
-	if err := sonos.Pause(0); nil != err {
-		log.Fatal(err)
-	}
-}
-
-func pressStop(sonos *sonos.Sonos, writer http.ResponseWriter, request *http.Request) {
-	if err := sonos.Stop(0); nil != err {
-		log.Fatal(err)
-	}
-}
+*/
 
 const (
 	CSWEB_CONFIG        = "/home/ianr/.go-sonos"
@@ -74,46 +60,54 @@ const (
 	CSWEB_DISCOVER_PORT = "13104"
 	CSWEB_EVENTING_PORT = "13105"
 	CSWEB_NETWORK       = "eth0"
+	CSWEB_HTTP_PORT     = 8080
 )
 
-var testSonos *sonos.Sonos
-
-func initSonos(flags int) {
-	log.SetFlags(log.Ltime | log.Lshortfile)
-	c := config.MakeConfig(CSWEB_CONFIG)
-	c.Init()
-	if dev := c.Lookup(CSWEB_DEVICE); nil != dev {
+func initSonos(config *config.Config) *sonos.Sonos {
+	var s *sonos.Sonos
+	if dev := config.Lookup(CSWEB_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(CSWEB_NETWORK, CSWEB_EVENTING_PORT)
-		testSonos = sonos.Connect(dev, reactor, flags)
+		s = sonos.Connect(dev, reactor, sonos.SVC_CONTENT_DIRECTORY|sonos.SVC_AV_TRANSPORT)
 	} else {
-		log.Fatal("Could not create test instance")
+		log.Fatal("Could not create Sonos instance")
 	}
+	return s
 }
 
-func getSonos(flags int) *sonos.Sonos {
-	if nil == testSonos {
-		initSonos(flags)
+func replyOk(w http.ResponseWriter) {
+	encoder := json.NewEncoder(w)
+	encoder.Encode(true)
+}
+
+func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
+	f := r.FormValue("func")
+	switch f {
+	case "play": s.Play(0, "1")
+	case "stop": s.Stop(0)
+	case "seek-start":
 	}
-	return testSonos
+	replyOk(w)
+}
+
+func setupHttp(s *sonos.Sonos) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, strings.Join([]string{"res", r.RequestURI}, "/"))
+	})
+
+	http.HandleFunc("/control", func(w http.ResponseWriter, r *http.Request) {
+		handleControl(s, w, r)
+	})
 }
 
 func main() {
-	s := getSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	config := config.MakeConfig(CSWEB_CONFIG)
+	config.Init()
 
-	http.HandleFunc("/queue.html", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "res/queue.html")
-	})
-	http.HandleFunc("/current_queue", func(w http.ResponseWriter, r *http.Request) {
-		getCurrentQueue(s, w, r)
-	})
-	http.HandleFunc("/press_play", func(w http.ResponseWriter, r *http.Request) {
-		pressPlay(s, w, r)
-	})
-	http.HandleFunc("/press_pause", func(w http.ResponseWriter, r *http.Request) {
-		pressPause(s, w, r)
-	})
-	http.HandleFunc("/press_stop", func(w http.ResponseWriter, r *http.Request) {
-		pressStop(s, w, r)
-	})
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	s := initSonos(config)
+	if nil != s {
+		setupHttp(s)
+	}
+
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", CSWEB_HTTP_PORT), nil))
 }

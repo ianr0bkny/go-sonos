@@ -1,0 +1,132 @@
+<!--
+   go-sonos
+   ========
+   
+   Copyright (c) 2012, Ian T. Richards <ianr@panix.com>
+   All rights reserved.
+   
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions
+   are met:
+   
+     * Redistributions of source code must retain the above copyright notice,
+       this list of conditions and the following disclaimer.
+     * Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+   
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+   TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<html>
+	<head>
+		<meta charset="utf-8"></meta>
+		<title>Soyes!</title>
+		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/base/jquery-ui.css"/>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
+		<style>
+			#control-panel {
+				padding: 4px;
+				display: inline-block;
+			}
+		</style>
+		<script>
+			$(function() {
+
+				$("#control-panel>#seek-start")
+				.button({
+					text: false,
+					icons: {
+						primary: "ui-icon-seek-start"
+					}
+				})
+				.click(function(event) {
+					$.post("/control", {"func": "seek-start"},
+						function(data) {
+							$("#result").empty().append(data);
+						},
+						"json");
+				});
+
+
+				$("#control-panel>#seek-prev").button({
+					text: false,
+					icons: {
+						primary: "ui-icon-seek-prev"
+					}
+				});
+
+				//
+				// Play Button
+				//
+				$("#control-panel>#play")
+				.button({
+					text: false,
+					icons: {
+						primary: "ui-icon-play"
+					}
+				})
+				.click(function(event) {
+					$.post("/control", {"func": "play"},
+						function(data) {
+							$("#result").empty().append(data);
+						},
+						"json");
+				});
+
+				//
+				// Stop Button
+				//
+				$("#control-panel>#stop").button({
+					text: false,
+					icons: {
+						primary: "ui-icon-stop"
+					}
+				})
+				.click(function(event) {
+					$.post("/control", {"func": "stop"},
+						function(data) {
+							$("#result").empty().append(data);
+						},
+						"json");
+				});
+
+				$("#control-panel>#seek-next").button({
+					text: false,
+					icons: {
+						primary: "ui-icon-seek-next"
+					}
+				});
+
+				$("#control-panel>#seek-end").button({
+					text: false,
+					icons: {
+						primary: "ui-icon-seek-end"
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Soyes!</h1>
+		<div id="control-panel" class="ui-widget-header ui-corner-all">
+			<button id="seek-start"></button>
+			<button id="seek-prev"></button>
+			<button id="play"></button>
+			<button id="stop"></button>
+			<button id="seek-next"></button>
+			<button id="seek-end"></button>
+		</div>
+		<div id="result"></div>
+	</body>
+</html>
