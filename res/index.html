@@ -51,13 +51,12 @@
 					}
 				})
 				.click(function(event) {
-					$.post("/control", {"func": "seek-start"},
+					$.post("/control", {method: "seek-start"},
 						function(data) {
 							$("#result").empty().append(data);
 						},
 						"json");
 				});
-
 
 				$("#control-panel>#seek-prev").button({
 					text: false,
@@ -66,9 +65,6 @@
 					}
 				});
 
-				//
-				// Play Button
-				//
 				$("#control-panel>#play")
 				.button({
 					text: false,
@@ -77,16 +73,37 @@
 					}
 				})
 				.click(function(event) {
-					$.post("/control", {"func": "play"},
-						function(data) {
-							$("#result").empty().append(data);
-						},
-						"json");
+					if ("Play" == $(this).text()) {
+						options = {
+							label: "Pause",
+							icons: {
+								primary: "ui-icon-pause"
+							}
+						}
+						$(this).button("option", options);
+						$.post("/control", {method: "play"},
+							function(data) {
+								$("#result").empty().append(data);
+							},
+							"json");
+					} else if ("Pause" == $(this).text()) {
+						options = {
+							label: "Play",
+							icons: {
+								primary: "ui-icon-play"
+							}
+						}
+						$(this).button("option", options);
+						$.post("/control", {method: "pause"},
+							function(data) {
+								$("#result").empty().append(data);
+							},
+							"json");
+					} else {
+						alert("false");
+					}
 				});
 
-				//
-				// Stop Button
-				//
 				$("#control-panel>#stop").button({
 					text: false,
 					icons: {
@@ -94,11 +111,18 @@
 					}
 				})
 				.click(function(event) {
-					$.post("/control", {"func": "stop"},
+					$.post("/control", {method: "stop"},
 						function(data) {
 							$("#result").empty().append(data);
 						},
 						"json");
+					options = {
+						label: "Play",
+						icons: {
+							primary: "ui-icon-play"
+						}
+					}
+					$("#control-panel > #play").button("option", options);
 				});
 
 				$("#control-panel>#seek-next").button({
@@ -120,12 +144,12 @@
 	<body>
 		<h1>Soyes!</h1>
 		<div id="control-panel" class="ui-widget-header ui-corner-all">
-			<button id="seek-start"></button>
-			<button id="seek-prev"></button>
-			<button id="play"></button>
-			<button id="stop"></button>
-			<button id="seek-next"></button>
-			<button id="seek-end"></button>
+			<button id="seek-start">Previous Track</button>
+			<button id="seek-prev">Previous Section</button>
+			<button id="play">Play</button>
+			<button id="stop">Stop</button>
+			<button id="seek-next">Next Section</button>
+			<button id="seek-end">Next Track</button>
 		</div>
 		<div id="result"></div>
 	</body>

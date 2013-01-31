@@ -80,9 +80,10 @@ func replyOk(w http.ResponseWriter) {
 }
 
 func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
-	f := r.FormValue("func")
+	f := r.FormValue("method")
 	switch f {
 	case "play": s.Play(0, "1")
+	case "pause": s.Pause(0)
 	case "stop": s.Stop(0)
 	case "seek-start":
 	}
