@@ -34,6 +34,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/ianr0bkny/go-sonos"
 	"github.com/ianr0bkny/go-sonos/config"
@@ -41,6 +42,7 @@ import (
 	"github.com/ianr0bkny/go-sonos/upnp"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -86,6 +88,25 @@ func replyError(w http.ResponseWriter, msg string) {
 	encoder.Encode(msg)
 }
 
+type Reply struct {
+	Error string      `json:",omitempty"`
+	Value interface{} `json:",omitempty"`
+}
+
+func reply(w http.ResponseWriter, err error, value interface{}) {
+	encoder := json.NewEncoder(os.Stdout)
+	r := Reply{}
+	if nil != err {
+		r.Error = fmt.Sprintf("%v", err)
+	}
+	if nil != value {
+		r.Value = value
+	}
+	encoder.Encode(r)
+	encoder = json.NewEncoder(w)
+	encoder.Encode(r)
+}
+
 func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 	f := r.FormValue("method")
 	switch f {
@@ -113,6 +134,13 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 		} else {
 			s.SetVolume(0, upnp.Channel_Master, uint16(volume))
 		}
+	case "get-volume":
+		if volume, err := s.GetVolume(0, upnp.Channel_Master); nil != err {
+			reply(w, errors.New(fmt.Sprintf("Error in call to %s: %v", f, err)), nil)
+		} else {
+			reply(w, nil, volume)
+		}
+		return
 	default:
 		replyError(w, fmt.Sprintf("No such method `%s'", f))
 		return

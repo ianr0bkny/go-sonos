@@ -45,7 +45,21 @@
 			}
 		</style>
 		<script>
+			function onVolume(data) {
+				if ("Error" in data) {
+					$("#result").empty().append(data.Error);
+				} else {
+					$("#volume-slider").slider("value", data.Value);
+				}
+			}
+
+			function initUi() {
+				$.post("/control", {method: "get-volume"}, onVolume, "json");
+			}
+
 			$(function() {
+				initUi();
+
 				/////////////////////////////////////////
 				// Previous Track
 				/////////////////////////////////////////

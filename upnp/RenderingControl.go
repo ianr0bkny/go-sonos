@@ -139,7 +139,12 @@ func (this *RenderingControl) GetVolume(instanceId uint32, channel string) (curr
 	return
 }
 
-func (this *RenderingControl) SetVolume(instanceId uint32, channel string, volume uint16) (err error) {
+//
+// Set the playback volume.  For Sonos @instanceId will always be 0;
+// @channel is one of the constants given in this file (e.g. Channel_Master);
+// @volume is an integer between 0 and 100, where 100 is the loudest.
+//
+func (this *RenderingControl) SetVolume(instanceId uint32, channel string, volume uint16) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -152,8 +157,7 @@ func (this *RenderingControl) SetVolume(instanceId uint32, channel string, volum
 	response := Call(this.Svc, "SetVolume", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 func (this *RenderingControl) SetRelativeVolume(instanceId uint32, channel string, adjustment int32) (newVolume uint16, err error) {
