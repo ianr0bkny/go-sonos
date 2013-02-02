@@ -39,10 +39,16 @@
 				padding: 4px;
 				display: inline-block;
 			}
+
+			#volume-slider {
+				width: 400px;
+			}
 		</style>
 		<script>
 			$(function() {
-
+				/////////////////////////////////////////
+				// Previous Track
+				/////////////////////////////////////////
 				$("#control-panel>#seek-start")
 				.button({
 					text: false,
@@ -51,20 +57,33 @@
 					}
 				})
 				.click(function(event) {
-					$.post("/control", {method: "seek-start"},
+					$.post("/control", {method: "previous"},
 						function(data) {
 							$("#result").empty().append(data);
 						},
 						"json");
 				});
 
+				/////////////////////////////////////////
+				// Previous Section
+				/////////////////////////////////////////
 				$("#control-panel>#seek-prev").button({
 					text: false,
 					icons: {
 						primary: "ui-icon-seek-prev"
 					}
+				})
+				.click(function(event) {
+					$.post("/control", {method: "previous-section"},
+						function(data) {
+							$("#result").empty().append(data);
+						},
+						"json");
 				});
 
+				/////////////////////////////////////////
+				// Play/Pause
+				/////////////////////////////////////////
 				$("#control-panel>#play")
 				.button({
 					text: false,
@@ -104,6 +123,9 @@
 					}
 				});
 
+				/////////////////////////////////////////
+				// Stop
+				/////////////////////////////////////////
 				$("#control-panel>#stop").button({
 					text: false,
 					icons: {
@@ -125,17 +147,55 @@
 					$("#control-panel > #play").button("option", options);
 				});
 
+				/////////////////////////////////////////
+				// Next Section
+				/////////////////////////////////////////
 				$("#control-panel>#seek-next").button({
 					text: false,
 					icons: {
 						primary: "ui-icon-seek-next"
 					}
+				})
+				.click(function(event) {
+					$.post("/control", {method: "next-section"},
+						function(data) {
+							$("#result").empty().append(data);
+						},
+						"json");
 				});
 
+				/////////////////////////////////////////
+				// Next Track
+				/////////////////////////////////////////
 				$("#control-panel>#seek-end").button({
 					text: false,
 					icons: {
 						primary: "ui-icon-seek-end"
+					}
+				})
+				.click(function(event) {
+					$.post("/control", {method: "next"},
+						function(data) {
+							$("#result").empty().append(data);
+						},
+						"json");
+				});
+
+				/////////////////////////////////////////
+				// Volume
+				/////////////////////////////////////////
+				$("#volume-slider").slider({
+					range: "min",
+					min: 0,
+					max: 100,
+					value: 15,
+					slide: function(event, ui) {
+						$.post("/control", {method: "volume", value: ui.value},
+							function(data) {
+								$("#result").empty().append(data)
+							},
+							"json");
+						$("#result").append(ui.value);
 					}
 				});
 			});
@@ -144,13 +204,16 @@
 	<body>
 		<h1>Soyes!</h1>
 		<div id="control-panel" class="ui-widget-header ui-corner-all">
-			<button id="seek-start">Previous Track</button>
+			<button id="seek-start">Previous</button>
 			<button id="seek-prev">Previous Section</button>
 			<button id="play">Play</button>
 			<button id="stop">Stop</button>
 			<button id="seek-next">Next Section</button>
-			<button id="seek-end">Next Track</button>
+			<button id="seek-end">Next</button>
 		</div>
+		<p/>
+		<div id="volume-slider"></div>
+		<p/>
 		<div id="result"></div>
 	</body>
 </html>

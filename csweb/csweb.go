@@ -38,8 +38,10 @@ import (
 	"github.com/ianr0bkny/go-sonos"
 	"github.com/ianr0bkny/go-sonos/config"
 	_ "github.com/ianr0bkny/go-sonos/model"
+	"github.com/ianr0bkny/go-sonos/upnp"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -67,7 +69,7 @@ func initSonos(config *config.Config) *sonos.Sonos {
 	var s *sonos.Sonos
 	if dev := config.Lookup(CSWEB_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(CSWEB_NETWORK, CSWEB_EVENTING_PORT)
-		s = sonos.Connect(dev, reactor, sonos.SVC_CONTENT_DIRECTORY|sonos.SVC_AV_TRANSPORT)
+		s = sonos.Connect(dev, reactor, sonos.SVC_CONTENT_DIRECTORY|sonos.SVC_AV_TRANSPORT|sonos.SVC_RENDERING_CONTROL)
 	} else {
 		log.Fatal("Could not create Sonos instance")
 	}
@@ -79,13 +81,41 @@ func replyOk(w http.ResponseWriter) {
 	encoder.Encode(true)
 }
 
+func replyError(w http.ResponseWriter, msg string) {
+	encoder := json.NewEncoder(w)
+	encoder.Encode(msg)
+}
+
 func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 	f := r.FormValue("method")
 	switch f {
-	case "play": s.Play(0, "1")
-	case "pause": s.Pause(0)
-	case "stop": s.Stop(0)
-	case "seek-start":
+	case "previous":
+		s.Previous(0)
+	case "previous-section":
+		s.PreviousSection(0)
+	case "play":
+		s.Play(0, "1")
+	case "pause":
+		s.Pause(0)
+	case "stop":
+		s.Stop(0)
+	case "next-section":
+		s.NextSection(0)
+	case "next":
+		s.Next(0)
+	//
+	case "volume":
+		volume_s := r.FormValue("value")
+		if volume, err := strconv.ParseInt(volume_s, 10, 16); nil != err {
+			replyError(w, fmt.Sprintf("Invalid volume `%s' specified", volume_s))
+			log.Printf("%v", err)
+			return
+		} else {
+			s.SetVolume(0, upnp.Channel_Master, uint16(volume))
+		}
+	default:
+		replyError(w, fmt.Sprintf("No such method `%s'", f))
+		return
 	}
 	replyOk(w)
 }
