@@ -38,7 +38,7 @@ import (
 	"fmt"
 	"github.com/ianr0bkny/go-sonos"
 	"github.com/ianr0bkny/go-sonos/config"
-	_ "github.com/ianr0bkny/go-sonos/model"
+	"github.com/ianr0bkny/go-sonos/model"
 	"github.com/ianr0bkny/go-sonos/upnp"
 	"log"
 	"net/http"
@@ -84,8 +84,7 @@ func replyOk(w http.ResponseWriter) {
 }
 
 func replyError(w http.ResponseWriter, msg string) {
-	encoder := json.NewEncoder(w)
-	encoder.Encode(msg)
+	reply(w, errors.New(msg), nil)
 }
 
 type Reply struct {
@@ -129,16 +128,24 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 		volume_s := r.FormValue("value")
 		if volume, err := strconv.ParseInt(volume_s, 10, 16); nil != err {
 			replyError(w, fmt.Sprintf("Invalid volume `%s' specified", volume_s))
-			log.Printf("%v", err)
 			return
 		} else {
 			s.SetVolume(0, upnp.Channel_Master, uint16(volume))
+			replyOk(w)
 		}
+		return
 	case "get-volume":
 		if volume, err := s.GetVolume(0, upnp.Channel_Master); nil != err {
-			reply(w, errors.New(fmt.Sprintf("Error in call to %s: %v", f, err)), nil)
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
 		} else {
 			reply(w, nil, volume)
+		}
+		return
+	case "get-position-info":
+		if info, err := s.GetPositionInfo(0); nil != err {
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
+		} else {
+			reply(w, nil, model.GetPositionInfoMessage(info))
 		}
 		return
 	default:

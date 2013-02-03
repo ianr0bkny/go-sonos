@@ -53,8 +53,22 @@
 				}
 			}
 
+			function onPositionInfo(data) {
+				if ("Error" in data) {
+					$("#result").empty().append(data.Error);
+				} else if ("Value" in data) {
+					obj = data.Value
+					$("#track").text(obj.Track)
+					$("#track-duration").text(obj.TrackDuration)
+					$("#rel-time").text(obj.RelTime)
+					$("#title").text(obj.Title)
+					$("#album").text(obj.Album)
+				}
+			}
+
 			function initUi() {
 				$.post("/control", {method: "get-volume"}, onVolume, "json");
+				$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
 			}
 
 			$(function() {
@@ -227,6 +241,14 @@
 		</div>
 		<p/>
 		<div id="volume-slider"></div>
+		<p/>
+		<table border="1">
+			<tr><th>Track</th><td><span id="track"></span></td></tr>
+			<tr><th>Duration</th><td><span id="track-duration"></span></td></tr>
+			<tr><th>Elapsed</th><td><span id="rel-time"></span></td></tr>
+			<tr><th>Title</th><td><span id="title"></span></td></tr>
+			<tr><th>Album</th><td><span id="album"></span></td></tr>
+		</table>
 		<p/>
 		<div id="result"></div>
 	</body>
