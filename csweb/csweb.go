@@ -93,7 +93,6 @@ type Reply struct {
 }
 
 func reply(w http.ResponseWriter, err error, value interface{}) {
-	encoder := json.NewEncoder(os.Stdout)
 	r := Reply{}
 	if nil != err {
 		r.Error = fmt.Sprintf("%v", err)
@@ -101,7 +100,10 @@ func reply(w http.ResponseWriter, err error, value interface{}) {
 	if nil != value {
 		r.Value = value
 	}
-	encoder.Encode(r)
+	encoder := json.NewEncoder(os.Stdout)
+	if false {
+		encoder.Encode(r)
+	}
 	encoder = json.NewEncoder(w)
 	encoder.Encode(r)
 }
@@ -146,6 +148,13 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
 		} else {
 			reply(w, nil, model.GetPositionInfoMessage(info))
+		}
+		return
+	case "get-queue":
+		if queue, err := s.GetQueueContents(); nil != err {
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
+		} else {
+			reply(w, nil, model.GetQueueContentsMessage(queue));
 		}
 		return
 	default:

@@ -66,9 +66,27 @@
 				}
 			}
 
+			function onQueue(data) {
+				if ("Error" in data) {
+					$("#result").empty().append(data.Error);
+				} else if ("Value" in data) {
+					$("#current-queue>tbody").empty();
+					for (n in data.Value) {
+						track = data.Value[n];
+						$("#current-queue>tbody").append("<tr>")
+							.append("<td>" + n + "</td>")
+							.append("<td>" + track.Creator + "</td>")
+							.append("<td>" + track.Album + "</td>")
+							.append("<td>" + track.Title + "</td>")
+							.append("</tr>");
+					}
+				}
+			}
+
 			function initUi() {
 				$.post("/control", {method: "get-volume"}, onVolume, "json");
 				$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
+				$.post("/control", {method: "get-queue"}, onQueue, "json");
 			}
 
 			$(function() {
@@ -243,11 +261,18 @@
 		<div id="volume-slider"></div>
 		<p/>
 		<table border="1">
+			<tr><th colspan="2">Now Playing</th></tr>
 			<tr><th>Track</th><td><span id="track"></span></td></tr>
 			<tr><th>Duration</th><td><span id="track-duration"></span></td></tr>
 			<tr><th>Elapsed</th><td><span id="rel-time"></span></td></tr>
 			<tr><th>Title</th><td><span id="title"></span></td></tr>
 			<tr><th>Album</th><td><span id="album"></span></td></tr>
+		</table>
+		<p/>
+		<table id="current-queue" border="1">
+			<tbody>
+				<tr><th colspan="2">Queue</th></tr>
+			</tbody>
 		</table>
 		<p/>
 		<div id="result"></div>

@@ -38,6 +38,7 @@ import (
 	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/didl"
 	"github.com/ianr0bkny/go-sonos/upnp"
+	_ "log"
 )
 
 type PositionInfo struct {
@@ -91,6 +92,36 @@ func GetPositionInfoMessage(in *upnp.PositionInfo) *PositionInfo {
 			break
 		}
 		break
+	}
+	return out
+}
+
+type QueueElement struct {
+	ID                  string
+	ParentID            string
+	TrackURI            string
+	Title               string
+	Class               string
+	AlbumArtURI         string
+	Creator             string
+	Album               string
+	OriginalTrackNumber string
+}
+
+func GetQueueContentsMessage(in []Object) []QueueElement {
+	var out []QueueElement
+	for _, obj := range in {
+		out = append(out, QueueElement{
+			ID:                  obj.ID(),
+			ParentID:            obj.ParentID(),
+			TrackURI:            obj.Res(),
+			Title:               obj.Title(),
+			Class:               obj.Class(),
+			AlbumArtURI:         obj.AlbumArtURI(),
+			Creator:             obj.Creator(),
+			Album:               obj.Album(),
+			OriginalTrackNumber: obj.OriginalTrackNumber(),
+		})
 	}
 	return out
 }
