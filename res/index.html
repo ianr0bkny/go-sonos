@@ -84,6 +84,31 @@
 				}
 			}
 
+			function onTransportInfo(data) {
+				if ("Error" in data) {
+					$("#result").empty().append(data.Error);
+				} else if("Value" in data) {
+					state = data.Value.CurrentTransportState
+					if ("STOPPED" == state) {
+						options = {
+							label: "Play",
+							icons: {
+								primary: "ui-icon-play"
+							}
+						}
+						$("#control-panel>#play").button("option", options);
+					} else if ("PLAYING" == state) {
+						options = {
+							label: "Pause",
+							icons: {
+								primary: "ui-icon-pause"
+							}
+						}
+						$("#control-panel>#play").button("option", options);
+					}
+				}
+			}
+
 			function clearQueue() {
 				$("#current-queue>tbody").empty();
 			}
@@ -92,6 +117,7 @@
 				$.post("/control", {method: "get-volume"}, onVolume, "json");
 				$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
 				$.post("/control", {method: "get-queue"}, onQueue, "json");
+				$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
 			}
 
 			$(function() {

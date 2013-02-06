@@ -157,6 +157,13 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 			reply(w, nil, model.GetQueueContentsMessage(queue));
 		}
 		return
+	case "get-transport-info":
+		if info, err := s.GetTransportInfo(0); nil != err {
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
+		} else {
+			reply(w, nil, info)
+		}
+		return
 	default:
 		replyError(w, fmt.Sprintf("No such method `%s'", f))
 		return

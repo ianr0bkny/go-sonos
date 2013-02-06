@@ -125,3 +125,5 @@ func GetQueueContentsMessage(in []Object) []QueueElement {
 	}
 	return out
 }
+
+type TransportInfo *upnp.TransportInfo
