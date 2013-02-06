@@ -73,14 +73,19 @@
 					$("#current-queue>tbody").empty();
 					for (n in data.Value) {
 						track = data.Value[n];
-						$("#current-queue>tbody").append("<tr>")
-							.append("<td>" + n + "</td>")
-							.append("<td>" + track.Creator + "</td>")
-							.append("<td>" + track.Album + "</td>")
-							.append("<td>" + track.Title + "</td>")
-							.append("</tr>");
+						$("#current-queue>tbody").append(
+							  "<tr>"
+							+ "<td>" + n + "</td>"
+							+ "<td>" + track.Creator + "</td>"
+							+ "<td>" + track.Album + "</td>"
+							+ "<td>" + track.Title + "</td>"
+							+ "</tr>");
 					}
 				}
+			}
+
+			function clearQueue() {
+				$("#current-queue>tbody").empty();
 			}
 
 			function initUi() {
@@ -228,6 +233,26 @@
 				});
 
 				/////////////////////////////////////////
+				// Clear
+				/////////////////////////////////////////
+				$("#control-panel>#clear").button({
+					text: true
+				})
+				.click(function(event) {
+					clearQueue();
+				});
+
+				/////////////////////////////////////////
+				// Refresh
+				/////////////////////////////////////////
+				$("#control-panel>#refresh").button({
+					text: true
+				})
+				.click(function(event) {
+					initUi();
+				});
+
+				/////////////////////////////////////////
 				// Volume
 				/////////////////////////////////////////
 				$("#volume-slider").slider({
@@ -256,6 +281,8 @@
 			<button id="stop">Stop</button>
 			<button id="seek-next">Next Section</button>
 			<button id="seek-end">Next</button>
+			<button id="refresh">Refresh</button>
+			<button id="clear">Clear</button>
 		</div>
 		<p/>
 		<div id="volume-slider"></div>
@@ -270,8 +297,11 @@
 		</table>
 		<p/>
 		<table id="current-queue" border="1">
+			<thead>
+				<tr><th colspan="4">Queue</th></tr>
+				<tr><th>Position</th><th>Artist</th><th>Album</th><th>Name</th></tr>
+			</thead>
 			<tbody>
-				<tr><th colspan="2">Queue</th></tr>
 			</tbody>
 		</table>
 		<p/>
