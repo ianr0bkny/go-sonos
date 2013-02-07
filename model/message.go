@@ -39,13 +39,15 @@ import (
 	"github.com/ianr0bkny/go-sonos/didl"
 	"github.com/ianr0bkny/go-sonos/upnp"
 	_ "log"
+	"strings"
+	"time"
 )
 
 type PositionInfo struct {
 	Track               uint32
-	TrackDuration       string
+	TrackDuration       time.Duration
 	TrackURI            string
-	RelTime             string
+	RelTime             time.Duration
 	ProtocolInfo        string
 	Title               string
 	Class               string
@@ -54,12 +56,34 @@ type PositionInfo struct {
 	OriginalTrackNumber string
 }
 
+func getDuration(in string) (d time.Duration, err error) {
+	in = strings.Replace(in, ":", "h", 1)
+	in = strings.Replace(in, ":", "m", 1)
+	in += "s"
+	return time.ParseDuration(in)
+}
+
 func GetPositionInfoMessage(in *upnp.PositionInfo) *PositionInfo {
+	var trackDuration, relTime time.Duration
+	trackDuration, err := getDuration(in.TrackDuration)
+	if nil != err {
+		panic(err)
+	} else {
+		trackDuration /= time.Second
+	}
+
+	relTime, err = getDuration(in.RelTime)
+	if nil != err {
+		panic(err)
+	} else {
+		relTime /= time.Second
+	}
+
 	out := &PositionInfo{
 		Track:         in.Track,
-		TrackDuration: in.TrackDuration,
+		TrackDuration: trackDuration,
 		TrackURI:      in.TrackURI,
-		RelTime:       in.RelTime,
+		RelTime:       relTime,
 	}
 
 	metadata := &didl.Lite{}

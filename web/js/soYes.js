@@ -44,16 +44,27 @@ function onVolume(data) {
 	}
 }
 
+function formatDuration(d) {
+	seconds = d % 60;
+	d /= 60;
+	minutes = d % 60;
+	d /= 60;
+	hours = d;
+	return Math.floor(hours) + "h" + Math.floor(minutes) + "m" + seconds + "s";
+}
+
 function onPositionInfo(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if ("Value" in data) {
 		obj = data.Value;
 		$("#track").text(obj.Track);
-		$("#track-duration").text(obj.TrackDuration);
-		$("#rel-time").text(obj.RelTime);
+		$("#track-duration").text(formatDuration(obj.TrackDuration));
+		$("#rel-time").text(formatDuration(obj.RelTime));
 		$("#title").text(obj.Title);
 		$("#album").text(obj.Album);
+		$("#progress-bar").progressbar("value", 100 * (obj.RelTime / obj.TrackDuration));
+		$(".progress-label").text(formatDuration(obj.TrackDuration - obj.RelTime));
 	}
 }
 
@@ -98,8 +109,4 @@ function onTransportInfo(data) {
 			$("#control-panel>#play").button("option", options);
 		}
 	}
-}
-
-function clearQueue() {
-	$("#current-queue>tbody").empty();
 }

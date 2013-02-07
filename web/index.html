@@ -44,6 +44,18 @@
 			#volume-slider {
 				width: 400px;
 			}
+
+			#progress-bar {
+				width: 400px;
+			}
+
+			.progress-label {
+				float: left;
+				margin-left: 50%;
+				margin-top: 5px;
+				font-weight: bold;
+				text-shadow: 1px 1px 0 #fff;
+			}
 		</style>
 		<script>
 			function initUi() {
@@ -200,26 +212,6 @@
 				});
 
 				/////////////////////////////////////////
-				// Clear
-				/////////////////////////////////////////
-				$("#control-panel>#clear").button({
-					text: true
-				})
-				.click(function(event) {
-					clearQueue();
-				});
-
-				/////////////////////////////////////////
-				// Refresh
-				/////////////////////////////////////////
-				$("#control-panel>#refresh").button({
-					text: true
-				})
-				.click(function(event) {
-					initUi();
-				});
-
-				/////////////////////////////////////////
 				// Volume
 				/////////////////////////////////////////
 				$("#volume-slider").slider({
@@ -236,6 +228,11 @@
 						$("#result").append(ui.value);
 					}
 				});
+
+				$("#progress-bar").progressbar({
+					max: 100,
+					value: 50,
+				});
 				
 				initUi();
 				setInterval(uiEventLoop, 1000);
@@ -251,8 +248,6 @@
 			<button id="stop">Stop</button>
 			<button id="seek-next">Next Section</button>
 			<button id="seek-end">Next</button>
-			<button id="refresh">Refresh</button>
-			<button id="clear">Clear</button>
 		</div>
 		<p/>
 		<div id="volume-slider"></div>
@@ -265,6 +260,8 @@
 			<tr><th>Title</th><td><span id="title"></span></td></tr>
 			<tr><th>Album</th><td><span id="album"></span></td></tr>
 		</table>
+		<p/>
+		<div id="progress-bar"><div class="progress-label">Loading ...</div></div>
 		<p/>
 		<table id="current-queue" border="1">
 			<thead>
