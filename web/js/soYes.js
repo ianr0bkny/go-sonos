@@ -33,7 +33,7 @@ $(function() {
 });
 
 function onError(msg) {
-	$("#result").empty().append(data.Error);
+	$("#result").empty().append(msg);
 }
 
 function onVolume(data) {
@@ -86,27 +86,35 @@ function onQueue(data) {
 	}
 }
 
+function playButtonPlay() {
+	options = {
+		label: "Play",
+		icons: {
+			primary: "ui-icon-play"
+		}
+	}
+	$("#control-panel>#play").button("option", options);
+}
+
+function playButtonPause() {
+	options = {
+		label: "Pause",
+		icons: {
+			primary: "ui-icon-pause"
+		}
+	}
+	$("#control-panel>#play").button("option", options);
+}
+
 function onTransportInfo(data) {
 	if ("Error" in data) {
-		$("#result").empty().append(data.Error);
+		onError(data.Error);
 	} else if("Value" in data) {
 		state = data.Value.CurrentTransportState
 		if ("STOPPED" == state || "PAUSED_PLAYBACK" == state) {
-			options = {
-				label: "Play",
-				icons: {
-					primary: "ui-icon-play"
-				}
-			}
-			$("#control-panel>#play").button("option", options);
+			playButtonPlay();
 		} else if ("PLAYING" == state) {
-			options = {
-				label: "Pause",
-				icons: {
-					primary: "ui-icon-pause"
-				}
-			}
-			$("#control-panel>#play").button("option", options);
+			playButtonPause();
 		}
 	}
 }
