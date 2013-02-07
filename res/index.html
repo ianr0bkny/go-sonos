@@ -34,6 +34,7 @@
 		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/base/jquery-ui.css"/>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
+		<script src="/js/soYes.js"></script>
 		<style>
 			#control-panel {
 				padding: 4px;
@@ -45,74 +46,6 @@
 			}
 		</style>
 		<script>
-			function onVolume(data) {
-				if ("Error" in data) {
-					$("#result").empty().append(data.Error);
-				} else {
-					$("#volume-slider").slider("value", data.Value);
-				}
-			}
-
-			function onPositionInfo(data) {
-				if ("Error" in data) {
-					$("#result").empty().append(data.Error);
-				} else if ("Value" in data) {
-					obj = data.Value
-					$("#track").text(obj.Track)
-					$("#track-duration").text(obj.TrackDuration)
-					$("#rel-time").text(obj.RelTime)
-					$("#title").text(obj.Title)
-					$("#album").text(obj.Album)
-				}
-			}
-
-			function onQueue(data) {
-				if ("Error" in data) {
-					$("#result").empty().append(data.Error);
-				} else if ("Value" in data) {
-					$("#current-queue>tbody").empty();
-					for (n in data.Value) {
-						track = data.Value[n];
-						$("#current-queue>tbody").append(
-							  "<tr>"
-							+ "<td>" + n + "</td>"
-							+ "<td>" + track.Creator + "</td>"
-							+ "<td>" + track.Album + "</td>"
-							+ "<td>" + track.Title + "</td>"
-							+ "</tr>");
-					}
-				}
-			}
-
-			function onTransportInfo(data) {
-				if ("Error" in data) {
-					$("#result").empty().append(data.Error);
-				} else if("Value" in data) {
-					state = data.Value.CurrentTransportState
-					if ("STOPPED" == state || "PAUSED_PLAYBACK" == state) {
-						options = {
-							label: "Play",
-							icons: {
-								primary: "ui-icon-play"
-							}
-						}
-						$("#control-panel>#play").button("option", options);
-					} else if ("PLAYING" == state) {
-						options = {
-							label: "Pause",
-							icons: {
-								primary: "ui-icon-pause"
-							}
-						}
-						$("#control-panel>#play").button("option", options);
-					}
-				}
-			}
-
-			function clearQueue() {
-				$("#current-queue>tbody").empty();
-			}
-
 			function initUi() {
 				$.post("/control", {method: "get-volume"}, onVolume, "json");
 				$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
