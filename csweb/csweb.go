@@ -47,17 +47,6 @@ import (
 	"strings"
 )
 
-/*
-func getCurrentQueue(sonos *sonos.Sonos, writer http.ResponseWriter, request *http.Request) {
-	if result, err := sonos.GetQueueContents(); nil != err {
-		log.Fatal(err)
-	} else {
-		encoder := json.NewEncoder(writer)
-		encoder.Encode(model.ObjectMessageStream(result))
-	}
-}
-*/
-
 const (
 	CSWEB_CONFIG        = "/home/ianr/.go-sonos"
 	CSWEB_DEVICE        = "kitchen"
@@ -78,9 +67,8 @@ func initSonos(config *config.Config) *sonos.Sonos {
 	return s
 }
 
-func replyOk(w http.ResponseWriter) {
-	encoder := json.NewEncoder(w)
-	encoder.Encode(true)
+func replyOk(w http.ResponseWriter, value interface{}) {
+	reply(w, nil, value)
 }
 
 func replyError(w http.ResponseWriter, msg string) {
@@ -133,47 +121,47 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 			return
 		} else {
 			s.SetVolume(0, upnp.Channel_Master, uint16(volume))
-			replyOk(w)
+			replyOk(w, true)
 		}
 		return
 	case "get-volume":
 		if volume, err := s.GetVolume(0, upnp.Channel_Master); nil != err {
 			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
 		} else {
-			reply(w, nil, volume)
+			replyOk(w, volume)
 		}
 		return
 	case "get-position-info":
 		if info, err := s.GetPositionInfo(0); nil != err {
 			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
 		} else {
-			reply(w, nil, model.GetPositionInfoMessage(info))
+			replyOk(w, model.GetPositionInfoMessage(info))
 		}
 		return
 	case "get-queue":
 		if queue, err := s.GetQueueContents(); nil != err {
 			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
 		} else {
-			reply(w, nil, model.GetQueueContentsMessage(queue));
+			replyOk(w, model.GetQueueContentsMessage(queue))
 		}
 		return
 	case "get-transport-info":
 		if info, err := s.GetTransportInfo(0); nil != err {
 			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
 		} else {
-			reply(w, nil, info)
+			replyOk(w, info)
 		}
 		return
 	default:
 		replyError(w, fmt.Sprintf("No such method `%s'", f))
 		return
 	}
-	replyOk(w)
+	replyOk(w, true)
 }
 
 func setupHttp(s *sonos.Sonos) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, strings.Join([]string{"res", r.RequestURI}, "/"))
+		http.ServeFile(w, r, strings.Join([]string{"web", r.RequestURI}, "/"))
 	})
 
 	http.HandleFunc("/control", func(w http.ResponseWriter, r *http.Request) {
