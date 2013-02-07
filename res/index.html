@@ -30,7 +30,7 @@
 <html>
 	<head>
 		<meta charset="utf-8"></meta>
-		<title>Soyes!</title>
+		<title>SoYes!</title>
 		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/base/jquery-ui.css"/>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
@@ -89,7 +89,7 @@
 					$("#result").empty().append(data.Error);
 				} else if("Value" in data) {
 					state = data.Value.CurrentTransportState
-					if ("STOPPED" == state) {
+					if ("STOPPED" == state || "PAUSED_PLAYBACK" == state) {
 						options = {
 							label: "Play",
 							icons: {
@@ -120,9 +120,17 @@
 				$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
 			}
 
-			$(function() {
-				initUi();
+			var count = 0;
+			function uiEventLoop() {
+				$.post("/control", {method: "get-volume"}, onVolume, "json");
+				$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
+				$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
+				if (++count % 5 == 0) {
+					$.post("/control", {method: "get-queue"}, onQueue, "json");
+				}
+			}
 
+			$(function() {
 				/////////////////////////////////////////
 				// Previous Track
 				/////////////////////////////////////////
@@ -295,11 +303,14 @@
 						$("#result").append(ui.value);
 					}
 				});
+				
+				initUi();
+				setInterval(uiEventLoop, 1000);
 			});
 		</script>
 	</head>
 	<body>
-		<h1>Soyes!</h1>
+		<h1>SoYes!</h1>
 		<div id="control-panel" class="ui-widget-header ui-corner-all">
 			<button id="seek-start">Previous</button>
 			<button id="seek-prev">Previous Section</button>
