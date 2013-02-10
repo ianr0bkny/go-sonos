@@ -588,13 +588,29 @@ func (this *AVTransport) Pause(instanceId uint32) error {
 	return doc.Error()
 }
 
+//
+// Legal values for @unit in calls to Seek.
+//
 const (
+	// Seek to the beginning of the specified track
 	SeekMode_TRACK_NR = "TRACK_NR"
+	// Seek to the given offset in the current track
 	SeekMode_REL_TIME = "REL_TIME"
+	// Seek to the specified section (not tested)
 	SeekMode_SECTION  = "SECTION"
 )
 
-func (this *AVTransport) Seek(instanceId uint32, unit, target string) (err error) {
+//
+// A general function to seek within the playback queue (Q:0).  For Sonos
+// @instanceId should always be 0; @unit should be one of the values given
+// for seek mode (TRACK_NR, REL_TIME, or SECTION); and @target should
+// give the track, time offset, or section where playback should resume.
+//
+// For TRACK_NR the integer track number relative to the start of the queue
+// is supplied to @target.  For REL_TIME a duration in the format HH:MM:SS
+// is given as @target.  SECTION is not tested.
+//
+func (this *AVTransport) Seek(instanceId uint32, unit, target string) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -607,8 +623,7 @@ func (this *AVTransport) Seek(instanceId uint32, unit, target string) (err error
 	response := Call(this.Svc, "Seek", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 //

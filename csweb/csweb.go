@@ -159,6 +159,15 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 		} else {
 			replyOk(w, true)
 		}
+		return
+	case "play-track":
+		track_s := r.FormValue("track")
+		if err := s.Seek(0, upnp.SeekMode_TRACK_NR, track_s); nil != err {
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
+		} else {
+			replyOk(w, true)
+		}
+		return
 	default:
 		replyError(w, fmt.Sprintf("No such method `%s'", f))
 		return

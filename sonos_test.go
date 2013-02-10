@@ -914,3 +914,15 @@ func TestAddMultiple(t *testing.T) {
 		t.Logf("%#v", resp)
 	}
 }
+func TestSeek(t *testing.T) {
+	// A test that sets playback to 30 seconds from the beginning
+	// of the fifth track in the queue.
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	if err := s.Seek(0 /*instanceId*/, upnp.SeekMode_TRACK_NR, "6"); nil != err {
+		t.Fatal(err)
+	}
+
+	if err := s.Seek(0 /*instanceId*/, upnp.SeekMode_REL_TIME, "0:0:30"); nil != err {
+		t.Fatal(err)
+	}
+}

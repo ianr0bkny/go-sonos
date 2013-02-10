@@ -92,11 +92,22 @@ function removeTrack(num) {
 	$.post("/control", {method: "remove-track", track: num}, onRemoveTrack, "json");
 }
 
+function onPlayTrack(data) {
+	if ("Error" in data) {
+		onError(data.Error);
+	}
+}
+
+function playTrack(num) {
+	$.post("/control", {method: "play-track", track: num}, onPlayTrack, "json");
+}
+
 function writeTrackRow(track, num) {
 	$("#current-queue>tbody").append(
 		  "<tr>"
 		+ "<td>" + num + "</td>"
-		+ "<td><a href=\"javascript:removeTrack(" + num + ")\">Remove</a></td>"
+		+ "<td><a href=\"javascript:playTrack(" + num + ")\">Jump</a></td>"
+		+ "<td><a href=\"javascript:removeTrack(" + num + ")\">Dele</a></td>"
 		+ "<td>" + track.Creator + "</td>"
 		+ "<td>" + track.Album + "</td>"
 		+ "<td>" + track.Title + "</td>"
