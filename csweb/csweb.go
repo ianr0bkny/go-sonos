@@ -152,6 +152,13 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 			replyOk(w, info)
 		}
 		return
+	case "remove-track":
+		track_s := r.FormValue("track")
+		if err := s.RemoveTrackFromQueue(0, fmt.Sprintf("Q:0/%s", track_s), 0); nil != err {
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
+		} else {
+			replyOk(w, true)
+		}
 	default:
 		replyError(w, fmt.Sprintf("No such method `%s'", f))
 		return

@@ -28,9 +28,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+var queueSize = 0;
+var updateCount = 0;
+var currentTrack = 0;
+
+/*
 $(function() {
-	//$.getScript("test.js");
+	$.getScript("test.js");
 });
+*/
 
 function onError(msg) {
 	$("#result").empty().append(msg);
@@ -53,35 +59,61 @@ function formatDuration(d) {
 	return Math.floor(hours) + "h" + Math.floor(minutes) + "m" + seconds + "s";
 }
 
+function setCurrentTrack(track) {
+	if (track != currentTrack) {
+		//.remvoveClass()
+	}
+	currentTrack = track - 1;
+}
+
 function onPositionInfo(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if ("Value" in data) {
 		obj = data.Value;
-		$("#track").text(obj.Track);
+		$("#track").text(obj.Track + "/" + queueSize);
 		$("#track-duration").text(formatDuration(obj.TrackDuration));
 		$("#rel-time").text(formatDuration(obj.RelTime));
 		$("#title").text(obj.Title);
 		$("#album").text(obj.Album);
 		$("#progress-bar").progressbar("value", 100 * (obj.RelTime / obj.TrackDuration));
 		$(".progress-label").text(formatDuration(obj.TrackDuration - obj.RelTime));
+		setCurrentTrack(obj.Track);
 	}
+}
+
+function onRemoveTrack(data) {
+	if ("Error" in data) {
+		onError(data.Error);
+	}
+}
+
+function removeTrack(num) {
+	$.post("/control", {method: "remove-track", track: num}, onRemoveTrack, "json");
+}
+
+function writeTrackRow(track, num) {
+	$("#current-queue>tbody").append(
+		  "<tr>"
+		+ "<td>" + num + "</td>"
+		+ "<td><a href=\"javascript:removeTrack(" + num + ")\">Remove</a></td>"
+		+ "<td>" + track.Creator + "</td>"
+		+ "<td>" + track.Album + "</td>"
+		+ "<td>" + track.Title + "</td>"
+		+ "</tr>");
 }
 
 function onQueue(data) {
 	if ("Error" in data) {
-		$("#result").empty().append(data.Error);
+		onError(data.Error);
 	} else if ("Value" in data) {
+		queueSize = data.Value.length;
 		$("#current-queue>tbody").empty();
-		for (n in data.Value) {
-			track = data.Value[n];
-			$("#current-queue>tbody").append(
-				  "<tr>"
-				+ "<td>" + n + "</td>"
-				+ "<td>" + track.Creator + "</td>"
-				+ "<td>" + track.Album + "</td>"
-				+ "<td>" + track.Title + "</td>"
-				+ "</tr>");
+		for (i = currentTrack; i < data.Value.length; i++) {
+			writeTrackRow(data.Value[i], i + 1);
+		}
+		for (i = 0; i < currentTrack; i++) {
+			writeTrackRow(data.Value[i], i + 1);
 		}
 	}
 }
@@ -118,3 +150,20 @@ function onTransportInfo(data) {
 		}
 	}
 }
+
+function eventLoop() {
+	$.post("/control", {method: "get-volume"}, onVolume, "json");
+	$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
+	$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
+	if (++updateCount % 5 == 0) {
+		$.post("/control", {method: "get-queue"}, onQueue, "json");
+	}
+}
+
+function initUi() {
+	$.post("/control", {method: "get-volume"}, onVolume, "json");
+	$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
+	$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
+	$.post("/control", {method: "get-queue"}, onQueue, "json");
+}
+

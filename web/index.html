@@ -34,47 +34,10 @@
 		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/base/jquery-ui.css"/>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
+		<!-- SoYes! -->
+		<link rel="stylesheet" href="/css/soYes.css"/>
 		<script src="/js/soYes.js"></script>
-		<style>
-			#control-panel {
-				padding: 4px;
-				display: inline-block;
-			}
-
-			#volume-slider {
-				width: 400px;
-			}
-
-			#progress-bar {
-				width: 400px;
-			}
-
-			.progress-label {
-				float: left;
-				margin-left: 50%;
-				margin-top: 5px;
-				font-weight: bold;
-				text-shadow: 1px 1px 0 #fff;
-			}
-		</style>
 		<script>
-			function initUi() {
-				$.post("/control", {method: "get-volume"}, onVolume, "json");
-				$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
-				$.post("/control", {method: "get-queue"}, onQueue, "json");
-				$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
-			}
-
-			var count = 0;
-			function uiEventLoop() {
-				$.post("/control", {method: "get-volume"}, onVolume, "json");
-				$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
-				$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
-				if (++count % 5 == 0) {
-					$.post("/control", {method: "get-queue"}, onQueue, "json");
-				}
-			}
-
 			$(function() {
 				/////////////////////////////////////////
 				// Previous Track
@@ -214,7 +177,7 @@
 				});
 				
 				initUi();
-				setInterval(uiEventLoop, 1000);
+				setInterval(eventLoop, 1000);
 			});
 		</script>
 	</head>
@@ -244,8 +207,8 @@
 		<p/>
 		<table id="current-queue" border="1">
 			<thead>
-				<tr><th colspan="4">Queue</th></tr>
-				<tr><th>Position</th><th>Artist</th><th>Album</th><th>Name</th></tr>
+				<tr><th colspan="5">Queue</th></tr>
+				<tr><th>Position</th><th>Remove</th><th>Artist</th><th>Album</th><th>Name</th></tr>
 			</thead>
 			<tbody>
 			</tbody>
