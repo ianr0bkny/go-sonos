@@ -102,6 +102,13 @@ function playTrack(num) {
 	$.post("/control", {method: "play-track", track: num}, onPlayTrack, "json");
 }
 
+function xmlUnescape(s) {
+	s = s.replace(/%3a/g, ":");
+	s = s.replace(/%2f/g, "/");
+	s = s.replace(/%2520/g, " ");
+	return s;
+}
+
 function writeTrackRow(track, num) {
 	$("#current-queue>tbody").append(
 		  "<tr>"
@@ -111,6 +118,7 @@ function writeTrackRow(track, num) {
 		+ "<td>" + track.Creator + "</td>"
 		+ "<td>" + track.Album + "</td>"
 		+ "<td>" + track.Title + "</td>"
+		//+ "<td><img src=\"http://192.168.1.44:1400" + xmlUnescape(track.AlbumArtURI) + "\"/></td>"
 		+ "</tr>");
 }
 
