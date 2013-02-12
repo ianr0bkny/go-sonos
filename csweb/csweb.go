@@ -168,6 +168,13 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 			replyOk(w, true)
 		}
 		return
+	case "list-genres":
+		if queue, err := s.ListGenres(); nil != err {
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
+		} else {
+			replyOk(w, model.GetQueueContentsMessage(queue))
+		}
+		return
 	default:
 		replyError(w, fmt.Sprintf("No such method `%s'", f))
 		return

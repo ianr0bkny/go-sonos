@@ -170,6 +170,25 @@ function onTransportInfo(data) {
 	}
 }
 
+function writeGenreRow(genre) {
+	$("#genre-table>tbody").append(
+		  "<tr>"
+		+ "<td>" + genre.Title + "</td>"
+		+ "</tr>");
+}
+
+function onGenreList(data) {
+	if ("Error" in data) {
+		onError(data.Error);
+	} else if("Value" in data) {
+		$("#genre-table>tbody").empty();
+		for (i in data.Value) {
+			genre = data.Value[i];
+			writeGenreRow(genre);
+		}
+	}
+}
+
 function eventLoop() {
 	$.post("/control", {method: "get-volume"}, onVolume, "json");
 	$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
@@ -184,5 +203,6 @@ function initUi() {
 	$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
 	$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
 	$.post("/control", {method: "get-queue"}, onQueue, "json");
+	$.post("/control", {method: "list-genres"}, onGenreList, "json");
 }
 
