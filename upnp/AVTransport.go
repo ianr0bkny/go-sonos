@@ -158,15 +158,17 @@ type AddMultipleURIsToQueueOut struct {
 //
 // Add multiple tracks to the queue (Q:0).  This method does not seem
 // to be a standard part of AVTransport:1, but rather a Sonos extension.
-// As such it is not entirely clear how it should be used.  For Sonos
-// @instanceId should always be 0; @UpdateID should be 0; @NumberOfURIs
-// should be the number of tracks to be added by the request; @EnqueuedURIs
-// is a space-separated list of URIs (as given by the Res() method of the
-// model.Object class); @EnqueuedURIMetData is a space-separated list of
-// DIDL-Lite documents describing the resources to be added; @ContainerURI
-// should be the ContentDirectory URI for A:TRACK, when adding tracks;
-// @ContainerMetaData should be a DIDL-Lite document describing A:TRACK.
-// Other arguments have the same meaning as in @AddURIToQueue.
+// As such it is not entirely clear how it should be used.
+//
+// For Sonos @instanceId should always be 0; @UpdateID should be 0;
+// @NumberOfURIs should be the number of tracks to be added by the
+// request; @EnqueuedURIs is a space-separated list of URIs (as given by
+// the Res() method of the model.Object class); @EnqueuedURIMetData is a
+// space-separated list of DIDL-Lite documents describing the resources
+// to be added; @ContainerURI should be the ContentDirectory URI for
+// A:TRACK, when adding tracks; @ContainerMetaData should be a DIDL-Lite
+// document describing A:TRACK. Other arguments have the same meaning as
+// in @AddURIToQueue.
 //
 // Note that the number of DIDL-Lite documents in @EnqueuedURIsMetaData
 // must match the number of URIs in @EnqueuedURIs.  These DIDL-Lite documents
