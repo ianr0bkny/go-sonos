@@ -256,7 +256,6 @@ var controlHandlerMap = map[string]handlerFunc{
 
 func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 	f := r.FormValue("method")
-
 	if handler, has := controlHandlerMap[f]; has {
 		if err := handler(s, w, r); nil != err {
 			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
@@ -265,47 +264,12 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch f {
-	case "get-queue":
-		if queue, err := s.GetQueueContents(); nil != err {
-			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
-		} else {
-			replyOk(w, model.GetQueueContentsMessage(queue))
-		}
-		return
 	case "play-track":
 		track_s := r.FormValue("track")
 		if err := s.Seek(0, upnp.SeekMode_TRACK_NR, track_s); nil != err {
 			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
 		} else {
 			replyOk(w, true)
-		}
-		return
-	case "list-genres":
-		if queue, err := s.ListGenres(); nil != err {
-			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
-		} else {
-			replyOk(w, model.GetQueueContentsMessage(queue))
-		}
-		return
-	case "get-genre":
-		if list, err := s.ListGenre(r.FormValue("genre")); nil != err {
-			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
-		} else {
-			replyOk(w, model.GetQueueContentsMessage(list))
-		}
-		return
-	case "get-artist":
-		if list, err := s.ListArtist(r.FormValue("artist")); nil != err {
-			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
-		} else {
-			replyOk(w, model.GetQueueContentsMessage(list))
-		}
-		return
-	case "get-album":
-		if list, err := s.GetAlbumTracks(r.FormValue("album")); nil != err {
-			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
-		} else {
-			replyOk(w, model.GetQueueContentsMessage(list))
 		}
 		return
 	default:
@@ -315,6 +279,86 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 	replyOk(w, true)
 }
 
+//
+// get-album-tracks
+//
+func handle_GetAlbumTracks(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if tracks, err := s.GetAlbumTracks(r.FormValue("album")); nil != err {
+		return err
+	} else {
+		replyOk(w, model.GetQueueContentsMessage(tracks))
+	}
+	return nil
+}
+
+//
+// get-all-genres
+//
+func handle_GetAllGenres(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if list, err := s.GetAllGenres(); nil != err {
+		return err
+	} else {
+		replyOk(w, model.GetQueueContentsMessage(list))
+	}
+	return nil
+}
+
+//
+// get-artist-albums
+//
+func handle_GetArtistAlbums(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if list, err := s.GetArtistAlbums(r.FormValue("artist")); nil != err {
+		return err
+	} else {
+		replyOk(w, model.GetQueueContentsMessage(list))
+	}
+	return nil
+}
+
+//
+// get-genre-artists
+//
+func handle_GetGenreArtists(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if artists, err := s.GetGenreArtists(r.FormValue("genre")); nil != err {
+		return err
+	} else {
+		replyOk(w, model.GetQueueContentsMessage(artists))
+	}
+	return nil
+}
+
+//
+// get-queue-contents
+//
+func handle_GetQueueContents(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if queue, err := s.GetQueueContents(); nil != err {
+		return err
+	} else {
+		replyOk(w, model.GetQueueContentsMessage(queue))
+	}
+	return nil
+}
+
+var browseHandlerMap = map[string]handlerFunc{
+	"get-album-tracks":   handle_GetAlbumTracks,
+	"get-all-genres":     handle_GetAllGenres,
+	"get-artist-albums":  handle_GetArtistAlbums,
+	"get-genre-artists":  handle_GetGenreArtists,
+	"get-queue-contents": handle_GetQueueContents,
+}
+
+func handleBrowse(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
+	f := r.FormValue("method")
+	if handler, has := browseHandlerMap[f]; has {
+		if err := handler(s, w, r); nil != err {
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
+		}
+		return
+	} else {
+		replyError(w, fmt.Sprintf("No such method browse::%s", f))
+	}
+}
+
 func setupHttp(s *sonos.Sonos) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, strings.Join([]string{"web", r.RequestURI}, "/"))
@@ -322,6 +366,10 @@ func setupHttp(s *sonos.Sonos) {
 
 	http.HandleFunc("/control", func(w http.ResponseWriter, r *http.Request) {
 		handleControl(s, w, r)
+	})
+
+	http.HandleFunc("/browse", func(w http.ResponseWriter, r *http.Request) {
+		handleBrowse(s, w, r)
 	})
 }
 

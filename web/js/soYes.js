@@ -190,7 +190,7 @@ function onGetGenre(data) {
 }
 
 function getGenre(genre) {
-	$.post("/control", {method: "get-genre", genre: genre}, onGetGenre, "json");
+	$.post("/browse", {method: "get-genre-artists", genre: genre}, onGetGenre, "json");
 }
 
 function onGetArtist(data) {
@@ -218,11 +218,11 @@ function onGetAlbum(data) {
 }
 
 function getAlbum(album) {
-	$.post("/control", {method: "get-album", album: album}, onGetAlbum, "json");
+	$.post("/browse", {method: "get-album-tracks", album: album}, onGetAlbum, "json");
 }
 
 function getArtist(artist) {
-	$.post("/control", {method: "get-artist", artist: artist}, onGetArtist, "json");
+	$.post("/browse", {method: "get-artist-albums", artist: artist}, onGetArtist, "json");
 }
 
 function writeGenreRow(genre) {
@@ -263,7 +263,7 @@ function eventLoop() {
 	$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
 	$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
 	if (++updateCount % 5 == 0) {
-		$.post("/control", {method: "get-queue"}, onQueue, "json");
+		$.post("/browse", {method: "get-queue-contents"}, onQueue, "json");
 	}
 }
 
@@ -271,7 +271,7 @@ function initUi() {
 	$.post("/control", {method: "get-volume"}, onVolume, "json");
 	$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
 	$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
-	$.post("/control", {method: "get-queue"}, onQueue, "json");
-	$.post("/control", {method: "list-genres"}, onGenreList, "json");
+	$.post("/browse", {method: "get-queue-contents"}, onQueue, "json");
+	$.post("/browse", {method: "get-all-genres"}, onGenreList, "json");
 }
 

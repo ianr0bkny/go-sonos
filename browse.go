@@ -160,7 +160,7 @@ func (this *Sonos) ListMusicShares() (objects []model.Object, err error) {
 	return
 }
 
-func (this *Sonos) ListGenres() (objects []model.Object, err error) {
+func (this *Sonos) GetAllGenres() (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID_Attribute_Genres,
@@ -190,7 +190,7 @@ func objectIDForArtist(artist string) string {
 	return strings.Join([]string{ObjectID_Attribute_Artist, artist}, "/")
 }
 
-func (this *Sonos) ListGenre(genre string) (objects []model.Object, err error) {
+func (this *Sonos) GetGenreArtists(genre string) (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		objectIDForGenre(genre),
@@ -313,7 +313,7 @@ func (this *Sonos) GetTrackFromAlbum(album, track string) ([]model.Object, error
 	panic("unreachable")
 }
 
-func (this *Sonos) ListArtist(artist string) (objects []model.Object, err error) {
+func (this *Sonos) GetArtistAlbums(artist string) (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		objectIDForArtist(artist),
