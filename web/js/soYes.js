@@ -89,7 +89,7 @@ function onRemoveTrack(data) {
 }
 
 function removeTrack(num) {
-	$.post("/control", {method: "remove-track", track: num}, onRemoveTrack, "json");
+	$.post("/control", {method: "remove-track-from-queue", track: num}, onRemoveTrack, "json");
 }
 
 function onPlayTrack(data) {

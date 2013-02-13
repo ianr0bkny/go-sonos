@@ -96,68 +96,180 @@ func reply(w http.ResponseWriter, err error, value interface{}) {
 	encoder.Encode(r)
 }
 
+type handlerFunc func(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error
+
+//
+// get-position-info
+//
+func handle_GetPositionInfo(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if info, err := s.GetPositionInfo(0); nil != err {
+		return err
+	} else {
+		replyOk(w, model.GetPositionInfoMessage(info))
+	}
+	return nil
+}
+
+//
+// get-transport-info
+//
+func handle_GetTransportInfo(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if info, err := s.GetTransportInfo(0); nil != err {
+		return err
+	} else {
+		replyOk(w, info)
+	}
+	return nil
+}
+
+//
+// get-volume
+//
+func handle_GetVolume(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if volume, err := s.GetVolume(0, upnp.Channel_Master); nil != err {
+		return err
+	} else {
+		replyOk(w, volume)
+	}
+	return nil
+}
+
+//
+// next
+//
+func handle_Next(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if err := s.Next(0); nil != err {
+		return err
+	}
+	replyOk(w, true)
+	return nil
+}
+
+//
+// next-section
+//
+func handle_NextSection(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if err := s.NextSection(0); nil != err {
+		return err
+	}
+	replyOk(w, true)
+	return nil
+}
+
+//
+// pause
+//
+func handle_Pause(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if err := s.Pause(0); nil != err {
+		return err
+	}
+	replyOk(w, true)
+	return nil
+}
+
+//
+// play
+//
+func handle_Play(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if err := s.Play(0, "1"); nil != err {
+		return err
+	}
+	replyOk(w, true)
+	return nil
+}
+
+//
+// previous
+//
+func handle_Previous(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if err := s.Previous(0); nil != err {
+		return err
+	}
+	replyOk(w, true)
+	return nil
+}
+
+//
+// previous-section
+//
+func handle_PreviousSection(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if err := s.PreviousSection(0); nil != err {
+		return err
+	}
+	replyOk(w, true)
+	return nil
+}
+
+//
+// remove-track-from-queue
+//
+func handle_RemoveTrackFromQueue(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	track_s := r.FormValue("track")
+	if err := s.RemoveTrackFromQueue(0, fmt.Sprintf("Q:0/%s", track_s), 0); nil != err {
+		return err
+	}
+	replyOk(w, true)
+	return nil
+}
+
+//
+// set-volume
+//
+func handle_SetVolume(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	volume_s := r.FormValue("value")
+	if volume, err := strconv.ParseInt(volume_s, 10, 16); nil != err {
+		return errors.New(fmt.Sprintf("Invalid volume `%s' specified", volume_s))
+	} else {
+		if err := s.SetVolume(0, upnp.Channel_Master, uint16(volume)); nil != err {
+			return err
+		}
+	}
+	replyOk(w, true)
+	return nil
+}
+
+//
+// stop
+//
+func handle_Stop(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if err := s.Stop(0); nil != err {
+		return err
+	}
+	replyOk(w, true)
+	return nil
+}
+
+var controlHandlerMap = map[string]handlerFunc{
+	"get-position-info":       handle_GetPositionInfo,
+	"get-transport-info":      handle_GetTransportInfo,
+	"get-volume":              handle_GetVolume,
+	"next":                    handle_Next,
+	"next-section":            handle_NextSection,
+	"pause":                   handle_Pause,
+	"play":                    handle_Play,
+	"previous":                handle_Previous,
+	"previous-section":        handle_PreviousSection,
+	"remove-track-from-queue": handle_RemoveTrackFromQueue,
+	"set-volume":              handle_SetVolume,
+	"stop":                    handle_Stop,
+}
+
 func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 	f := r.FormValue("method")
+
+	if handler, has := controlHandlerMap[f]; has {
+		if err := handler(s, w, r); nil != err {
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
+		}
+		return
+	}
+
 	switch f {
-	case "previous":
-		s.Previous(0)
-	case "previous-section":
-		s.PreviousSection(0)
-	case "play":
-		s.Play(0, "1")
-	case "pause":
-		s.Pause(0)
-	case "stop":
-		s.Stop(0)
-	case "next-section":
-		s.NextSection(0)
-	case "next":
-		s.Next(0)
-	//
-	case "volume":
-		volume_s := r.FormValue("value")
-		if volume, err := strconv.ParseInt(volume_s, 10, 16); nil != err {
-			replyError(w, fmt.Sprintf("Invalid volume `%s' specified", volume_s))
-			return
-		} else {
-			s.SetVolume(0, upnp.Channel_Master, uint16(volume))
-			replyOk(w, true)
-		}
-		return
-	case "get-volume":
-		if volume, err := s.GetVolume(0, upnp.Channel_Master); nil != err {
-			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
-		} else {
-			replyOk(w, volume)
-		}
-		return
-	case "get-position-info":
-		if info, err := s.GetPositionInfo(0); nil != err {
-			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
-		} else {
-			replyOk(w, model.GetPositionInfoMessage(info))
-		}
-		return
 	case "get-queue":
 		if queue, err := s.GetQueueContents(); nil != err {
 			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
 		} else {
 			replyOk(w, model.GetQueueContentsMessage(queue))
-		}
-		return
-	case "get-transport-info":
-		if info, err := s.GetTransportInfo(0); nil != err {
-			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
-		} else {
-			replyOk(w, info)
-		}
-		return
-	case "remove-track":
-		track_s := r.FormValue("track")
-		if err := s.RemoveTrackFromQueue(0, fmt.Sprintf("Q:0/%s", track_s), 0); nil != err {
-			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
-		} else {
-			replyOk(w, true)
 		}
 		return
 	case "play-track":

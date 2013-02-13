@@ -162,7 +162,7 @@
 					max: 100,
 					value: 15,
 					slide: function(event, ui) {
-						$.post("/control", {method: "volume", value: ui.value},
+						$.post("/control", {method: "set-volume", value: ui.value},
 							function(data) {
 								$("#result").empty().append(data)
 							},
