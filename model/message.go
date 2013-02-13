@@ -57,6 +57,7 @@ type PositionInfo struct {
 }
 
 func getDuration(in string) (d time.Duration, err error) {
+	// TODO: Can be 0:0:-1 ...
 	in = strings.Replace(in, ":", "h", 1)
 	in = strings.Replace(in, ":", "m", 1)
 	in += "s"
@@ -72,6 +73,7 @@ func GetPositionInfoMessage(in *upnp.PositionInfo) *PositionInfo {
 		trackDuration /= time.Second
 	}
 
+	//log.Printf("%s", in.RelTime)
 	relTime, err = getDuration(in.RelTime)
 	if nil != err {
 		panic(err)

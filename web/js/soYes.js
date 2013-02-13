@@ -122,6 +122,13 @@ function writeTrackRow(track, num) {
 		+ "</tr>");
 }
 
+function writeTrackRow_2(track) {
+	$("#track-table>tbody").append(
+		  "<tr>"
+		+ "<td>" + track.Title + "</td>"
+		+ "</tr>");
+}
+
 function onQueue(data) {
 	if ("Error" in data) {
 		onError(data.Error);
@@ -170,10 +177,72 @@ function onTransportInfo(data) {
 	}
 }
 
+function onGetGenre(data) {
+	if ("Error" in data) {
+		onError(data.Error);
+	} else if("Value" in data) {
+		$("#artist-table>tbody").empty();
+		for (i in data.Value) {
+			artist = data.Value[i];
+			writeArtistRow(artist);
+		}
+	}
+}
+
+function getGenre(genre) {
+	$.post("/control", {method: "get-genre", genre: genre}, onGetGenre, "json");
+}
+
+function onGetArtist(data) {
+	if ("Error" in data) {
+		onError(data.Error);
+	} else if("Value" in data) {
+		$("#album-table>tbody").empty();
+		for (i in data.Value) {
+			album = data.Value[i];
+			writeAlbumRow(album);
+		}
+	}
+}
+
+function onGetAlbum(data) {
+	if ("Error" in data) {
+		onError(data.Error);
+	} else if("Value" in data) {
+		$("#track-table>tbody").empty();
+		for (i in data.Value) {
+			track = data.Value[i];
+			writeTrackRow_2(track);
+		}
+	}
+}
+
+function getAlbum(album) {
+	$.post("/control", {method: "get-album", album: album}, onGetAlbum, "json");
+}
+
+function getArtist(artist) {
+	$.post("/control", {method: "get-artist", artist: artist}, onGetArtist, "json");
+}
+
 function writeGenreRow(genre) {
 	$("#genre-table>tbody").append(
 		  "<tr>"
-		+ "<td>" + genre.Title + "</td>"
+		+ "<td><a href=\"javascript:getGenre(\'" + genre.Title + "\')\">" + genre.Title + "</a></td>"
+		+ "</tr>");
+}
+
+function writeArtistRow(artist) {
+	$("#artist-table>tbody").append(
+		  "<tr>"
+		+ "<td><a href=\"javascript:getArtist(\'" + artist.Title + "\')\">" + artist.Title + "</a></td>"
+		+ "</tr>");
+}
+
+function writeAlbumRow(album) {
+	$("#album-table>tbody").append(
+		  "<tr>"
+		+ "<td><a href=\"javascript:getAlbum(\'" + album.Title + "\')\">" + album.Title + "</a></td>"
 		+ "</tr>");
 }
 

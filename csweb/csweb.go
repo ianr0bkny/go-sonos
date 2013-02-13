@@ -175,6 +175,27 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 			replyOk(w, model.GetQueueContentsMessage(queue))
 		}
 		return
+	case "get-genre":
+		if list, err := s.ListGenre(r.FormValue("genre")); nil != err {
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
+		} else {
+			replyOk(w, model.GetQueueContentsMessage(list))
+		}
+		return
+	case "get-artist":
+		if list, err := s.ListArtist(r.FormValue("artist")); nil != err {
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
+		} else {
+			replyOk(w, model.GetQueueContentsMessage(list))
+		}
+		return
+	case "get-album":
+		if list, err := s.GetAlbumTracks(r.FormValue("album")); nil != err {
+			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
+		} else {
+			replyOk(w, model.GetQueueContentsMessage(list))
+		}
+		return
 	default:
 		replyError(w, fmt.Sprintf("No such method `%s'", f))
 		return

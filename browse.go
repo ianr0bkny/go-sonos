@@ -49,6 +49,7 @@ const (
 	//
 	ObjectID_Attribute_Genres = "A:GENRE"
 	ObjectID_Attribute_Album  = "A:ALBUM"
+	ObjectID_Attribute_Artist = "A:ARTIST"
 )
 
 func (this *Sonos) GetRootLevelChildren() (objects []model.Object, err error) {
@@ -185,6 +186,10 @@ func objectIDForAlbum(album string) string {
 	return strings.Join([]string{ObjectID_Attribute_Album, album}, "/")
 }
 
+func objectIDForArtist(artist string) string {
+	return strings.Join([]string{ObjectID_Attribute_Artist, artist}, "/")
+}
+
 func (this *Sonos) ListGenre(genre string) (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
@@ -306,4 +311,22 @@ func (this *Sonos) GetTrackFromAlbum(album, track string) ([]model.Object, error
 		return track_objs, nil
 	}
 	panic("unreachable")
+}
+
+func (this *Sonos) ListArtist(artist string) (objects []model.Object, err error) {
+	var result *upnp.BrowseResult
+	req := &upnp.BrowseRequest{
+		objectIDForArtist(artist),
+		upnp.BrowseFlag_BrowseDirectChildren,
+		upnp.BrowseFilter_All,
+		0, /*StartingIndex*/
+		0, /*RequestCount*/
+		upnp.BrowseSortCriteria_None,
+	}
+	if result, err = this.Browse(req); nil != err {
+		return
+	} else {
+		objects = model.ObjectStream(result.Doc)
+	}
+	return
 }
