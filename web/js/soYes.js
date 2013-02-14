@@ -109,7 +109,7 @@ function onPlayTrack(data) {
 }
 
 function playTrack(num) {
-	$.post("/control", {method: "play-track", track: num}, onPlayTrack, "json");
+	$.post("/control", {method: "seek", unit: "TRACK_NR", target: num}, onPlayTrack, "json");
 }
 
 function xmlUnescape(s) {

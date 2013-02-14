@@ -213,6 +213,19 @@ func handle_RemoveTrackFromQueue(s *sonos.Sonos, w http.ResponseWriter, r *http.
 }
 
 //
+// seek
+//
+func handle_Seek(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	unit := r.FormValue("unit")
+	target := r.FormValue("target")
+	if err := s.Seek(0, unit, target); nil != err {
+		return err
+	}
+	replyOk(w, true)
+	return nil
+}
+
+//
 // set-volume
 //
 func handle_SetVolume(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
@@ -250,6 +263,7 @@ var controlHandlerMap = map[string]handlerFunc{
 	"previous":                handle_Previous,
 	"previous-section":        handle_PreviousSection,
 	"remove-track-from-queue": handle_RemoveTrackFromQueue,
+	"seek":                    handle_Seek,
 	"set-volume":              handle_SetVolume,
 	"stop":                    handle_Stop,
 }
@@ -261,22 +275,9 @@ func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
 			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
 		}
 		return
+	} else {
+		replyError(w, fmt.Sprintf("No such method control::%s", f))
 	}
-
-	switch f {
-	case "play-track":
-		track_s := r.FormValue("track")
-		if err := s.Seek(0, upnp.SeekMode_TRACK_NR, track_s); nil != err {
-			replyError(w, fmt.Sprintf("Error in call to %s: %v", f, err))
-		} else {
-			replyOk(w, true)
-		}
-		return
-	default:
-		replyError(w, fmt.Sprintf("No such method `%s'", f))
-		return
-	}
-	replyOk(w, true)
 }
 
 //
