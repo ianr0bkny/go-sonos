@@ -42,10 +42,15 @@ function onError(msg) {
 	$("#result").empty().append(msg);
 }
 
+function clearError() {
+	$("#result").empty();
+}
+
 function onVolume(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else {
+		clearError();
 		$("#volume-slider").slider("value", data.Value);
 	}
 }
@@ -70,6 +75,7 @@ function onPositionInfo(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if ("Value" in data) {
+		clearError();
 		obj = data.Value;
 		$("#track").text(obj.Track + "/" + queueSize);
 		$("#track-duration").text(formatDuration(obj.TrackDuration));
@@ -85,6 +91,8 @@ function onPositionInfo(data) {
 function onRemoveTrack(data) {
 	if ("Error" in data) {
 		onError(data.Error);
+	} else {
+		clearError();
 	}
 }
 
@@ -95,6 +103,8 @@ function removeTrack(num) {
 function onPlayTrack(data) {
 	if ("Error" in data) {
 		onError(data.Error);
+	} else {
+		clearError();
 	}
 }
 
@@ -133,6 +143,7 @@ function onQueue(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if ("Value" in data) {
+		clearError();
 		queueSize = data.Value.length;
 		$("#current-queue>tbody").empty();
 		for (i = currentTrack; i < data.Value.length; i++) {
@@ -168,6 +179,7 @@ function onTransportInfo(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if("Value" in data) {
+		clearError();
 		state = data.Value.CurrentTransportState
 		if ("STOPPED" == state || "PAUSED_PLAYBACK" == state) {
 			playButtonPlay();
@@ -181,6 +193,7 @@ function onGetGenre(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if("Value" in data) {
+		clearError();
 		$("#artist-table>tbody").empty();
 		for (i in data.Value) {
 			artist = data.Value[i];
@@ -197,6 +210,7 @@ function onGetArtist(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if("Value" in data) {
+		clearError();
 		$("#album-table>tbody").empty();
 		for (i in data.Value) {
 			album = data.Value[i];
@@ -209,6 +223,7 @@ function onGetAlbum(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if("Value" in data) {
+		clearError();
 		$("#track-table>tbody").empty();
 		for (i in data.Value) {
 			track = data.Value[i];
@@ -250,6 +265,7 @@ function onGenreList(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if("Value" in data) {
+		clearError();
 		$("#genre-table>tbody").empty();
 		for (i in data.Value) {
 			genre = data.Value[i];
