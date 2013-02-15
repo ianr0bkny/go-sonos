@@ -32,12 +32,6 @@ var queueSize = 0;
 var updateCount = 0;
 var currentTrack = 0;
 
-/*
-$(function() {
-	$.getScript("test.js");
-});
-*/
-
 function onError(msg) {
 	$("#result").empty().append(msg);
 }
@@ -50,7 +44,6 @@ function onVolume(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else {
-		clearError();
 		$("#volume-slider").slider("value", data.Value);
 	}
 }
@@ -75,7 +68,6 @@ function onPositionInfo(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if ("Value" in data) {
-		clearError();
 		obj = data.Value;
 		$("#track").text(obj.Track + "/" + queueSize);
 		$("#track-duration").text(formatDuration(obj.TrackDuration));
@@ -143,7 +135,6 @@ function onQueue(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if ("Value" in data) {
-		clearError();
 		queueSize = data.Value.length;
 		$("#current-queue>tbody").empty();
 		for (i = currentTrack; i < data.Value.length; i++) {
@@ -179,7 +170,6 @@ function onTransportInfo(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if("Value" in data) {
-		clearError();
 		state = data.Value.CurrentTransportState
 		if ("STOPPED" == state || "PAUSED_PLAYBACK" == state) {
 			playButtonPlay();
@@ -257,7 +247,7 @@ function writeArtistRow(artist) {
 function writeAlbumRow(album) {
 	$("#album-table>tbody").append(
 		  "<tr>"
-		+ "<td><a href=\"javascript:getAlbum(\'" + album.Title + "\')\">" + album.Title + "</a></td>"
+		+ "<td><a href=\"javascript:getAlbum(\'" + album.Title + "\')\">" + album.TrackURI + "</a></td>"
 		+ "</tr>");
 }
 
