@@ -179,12 +179,14 @@ function onTransportInfo(data) {
 	}
 }
 
-function onGetGenre(data) {
+function onGetGenreArtists(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if("Value" in data) {
 		clearError();
 		$("#artist-table>tbody").empty();
+		$("#album-table>tbody").empty();
+		$("#track-table>tbody").empty();
 		for (i in data.Value) {
 			artist = data.Value[i];
 			writeArtistRow(artist);
@@ -193,7 +195,7 @@ function onGetGenre(data) {
 }
 
 function getGenre(genre) {
-	$.post("/browse", {method: "get-genre-artists", genre: genre}, onGetGenre, "json");
+	$.post("/browse", {method: "get-genre-artists", genre: genre}, onGetGenreArtists, "json");
 }
 
 function onGetArtist(data) {
