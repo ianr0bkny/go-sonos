@@ -317,6 +317,18 @@ func handle_GetArtistAlbums(s *sonos.Sonos, w http.ResponseWriter, r *http.Reque
 }
 
 //
+// get-direct-children
+//
+func handle_GetDirectChildren(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
+	if list, err := s.GetDirectChildren(r.FormValue("root")); nil != err {
+		return err
+	} else {
+		replyOk(w, model.GetQueueContentsMessage(list))
+	}
+	return nil
+}
+
+//
 // get-genre-artists
 //
 func handle_GetGenreArtists(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) error {
@@ -341,11 +353,12 @@ func handle_GetQueueContents(s *sonos.Sonos, w http.ResponseWriter, r *http.Requ
 }
 
 var browseHandlerMap = map[string]handlerFunc{
-	"get-album-tracks":   handle_GetAlbumTracks,
-	"get-all-genres":     handle_GetAllGenres,
-	"get-artist-albums":  handle_GetArtistAlbums,
-	"get-genre-artists":  handle_GetGenreArtists,
-	"get-queue-contents": handle_GetQueueContents,
+	"get-album-tracks":    handle_GetAlbumTracks,
+	"get-all-genres":      handle_GetAllGenres,
+	"get-artist-albums":   handle_GetArtistAlbums,
+	"get-direct-children": handle_GetDirectChildren,
+	"get-genre-artists":   handle_GetGenreArtists,
+	"get-queue-contents":  handle_GetQueueContents,
 }
 
 func handleBrowse(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {

@@ -129,13 +129,6 @@ function writeTrackRow(track, num) {
 		+ "</tr>");
 }
 
-function writeTrackRow_2(track) {
-	$("#track-table>tbody").append(
-		  "<tr>"
-		+ "<td>" + track.Title + "</td>"
-		+ "</tr>");
-}
-
 function onQueue(data) {
 	if ("Error" in data) {
 		onError(data.Error);
@@ -184,6 +177,10 @@ function onTransportInfo(data) {
 	}
 }
 
+function getDirectChildren(root, callback) {
+	$.post("/browse", {method: "get-direct-children", root: root}, callback, "json");
+}
+
 function onGetGenreArtists(data) {
 	if ("Error" in data) {
 		onError(data.Error);
@@ -194,16 +191,23 @@ function onGetGenreArtists(data) {
 		$("#track-table>tbody").empty();
 		for (i in data.Value) {
 			artist = data.Value[i];
-			writeArtistRow(artist);
+			writeGenreArtistRow(artist);
 		}
 	}
 }
 
-function getGenre(genre) {
-	$.post("/browse", {method: "get-genre-artists", genre: genre}, onGetGenreArtists, "json");
+function writeGenreRow(genre) {
+	$("#genre-table>tbody").append(
+		  "<tr>"
+		+ "<td><a href=\"javascript:getDirectChildren(\'"
+		+ jsEscape(genre.ID)
+		+ "\', onGetGenreArtists)\">"
+		+ genre.Title +
+		"</a></td>"
+		+ "</tr>");
 }
 
-function onGetArtist(data) {
+function onGetGenreArtist(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if("Value" in data) {
@@ -211,12 +215,29 @@ function onGetArtist(data) {
 		$("#album-table>tbody").empty();
 		for (i in data.Value) {
 			album = data.Value[i];
-			writeAlbumRow(album);
+			writeGenreAlbumRow(album);
 		}
 	}
 }
 
-function onGetAlbum(data) {
+function writeGenreArtistRow(artist) {
+	$("#artist-table>tbody").append(
+		  "<tr>"
+		+ "<td><a href=\"javascript:getDirectChildren(\'"
+		+ jsEscape(artist.ID)
+	       	+ "\', onGetGenreArtist)\">"
+		+ artist.Title + "</a></td>"
+		+ "</tr>");
+}
+
+function writeGenreTrackRow(track) {
+	$("#track-table>tbody").append(
+		  "<tr>"
+		+ "<td>" + track.Title + "</td>"
+		+ "</tr>");
+}
+
+function onGetGenreAlbum(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if("Value" in data) {
@@ -224,37 +245,18 @@ function onGetAlbum(data) {
 		$("#track-table>tbody").empty();
 		for (i in data.Value) {
 			track = data.Value[i];
-			writeTrackRow_2(track);
+			writeGenreTrackRow(track);
 		}
 	}
 }
 
-function getAlbum(album) {
-	$.post("/browse", {method: "get-album-tracks", album: album}, onGetAlbum, "json");
-}
-
-function getArtist(artist) {
-	$.post("/browse", {method: "get-artist-albums", artist: artist}, onGetArtist, "json");
-}
-
-function writeGenreRow(genre) {
-	$("#genre-table>tbody").append(
-		  "<tr>"
-		+ "<td><a href=\"javascript:getGenre(\'" + jsEscape(genre.Title) + "\')\">" + genre.TrackURI + "</a></td>"
-		+ "</tr>");
-}
-
-function writeArtistRow(artist) {
-	$("#artist-table>tbody").append(
-		  "<tr>"
-		+ "<td><a href=\"javascript:getArtist(\'" + artist.Title + "\')\">" + artist.TrackURI + "</a></td>"
-		+ "</tr>");
-}
-
-function writeAlbumRow(album) {
+function writeGenreAlbumRow(album) {
 	$("#album-table>tbody").append(
 		  "<tr>"
-		+ "<td><a href=\"javascript:getAlbum(\'" + album.Title + "\')\">" + album.TrackURI + "</a></td>"
+		+ "<td><a href=\"javascript:getDirectChildren(\'"
+		+ jsEscape(album.ID)
+	       	+ "\', onGetGenreAlbum)\">"
+		+ album.Title + "</a></td>"
 		+ "</tr>");
 }
 
