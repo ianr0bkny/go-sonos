@@ -33,7 +33,7 @@ package sonos
 import (
 	"github.com/ianr0bkny/go-sonos/model"
 	"github.com/ianr0bkny/go-sonos/upnp"
-	_ "log"
+	"log"
 	"strings"
 )
 
@@ -190,8 +190,8 @@ func objectIDForArtist(artist string) string {
 	return strings.Join([]string{ObjectID_Attribute_Artist, artist}, "/")
 }
 
-func (this *Sonos) GetGenreArtists(genre string) (objects []model.Object, err error) {
-	var result *upnp.BrowseResult
+
+func (this *Sonos) GetGenreArtists(genre string) ([]model.Object, error) {
 	req := &upnp.BrowseRequest{
 		objectIDForGenre(genre),
 		upnp.BrowseFlag_BrowseDirectChildren,
@@ -200,12 +200,13 @@ func (this *Sonos) GetGenreArtists(genre string) (objects []model.Object, err er
 		0, /*RequestCount*/
 		upnp.BrowseSortCriteria_None,
 	}
-	if result, err = this.Browse(req); nil != err {
-		return
+	if result, err := this.Browse(req); nil != err {
+		log.Printf("Could not browse artists for genre `%s': %v", genre, err)
+		return nil, err
 	} else {
-		objects = model.ObjectStream(result.Doc)
+		return model.ObjectStream(result.Doc), nil
 	}
-	return
+	panic("unreachable")
 }
 
 func (this *Sonos) ListChildren(objectId string) (objects []model.Object, err error) {
@@ -280,8 +281,7 @@ func (this *Sonos) GetQueueContents() (objects []model.Object, err error) {
 	return
 }
 
-func (this *Sonos) GetAlbumTracks(album string) (objects []model.Object, err error) {
-	var result *upnp.BrowseResult
+func (this *Sonos) GetAlbumTracks(album string) ([]model.Object, error) {
 	req := &upnp.BrowseRequest{
 		objectIDForAlbum(album),
 		upnp.BrowseFlag_BrowseDirectChildren,
@@ -290,12 +290,14 @@ func (this *Sonos) GetAlbumTracks(album string) (objects []model.Object, err err
 		0, /*RequestCount*/
 		upnp.BrowseSortCriteria_None,
 	}
-	if result, err = this.Browse(req); nil != err {
-		return
+	log.Printf("Browsing tracks for album `%s'", album)
+	if result, err := this.Browse(req); nil != err {
+		log.Printf("Could not browse tracks for album `%s': %v", album, err)
+		return nil, err
 	} else {
-		objects = model.ObjectStream(result.Doc)
+		return model.ObjectStream(result.Doc), nil
 	}
-	return
+	panic("unreachable")
 }
 
 func (this *Sonos) GetTrackFromAlbum(album, track string) ([]model.Object, error) {
