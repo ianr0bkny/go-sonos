@@ -111,6 +111,11 @@ function xmlUnescape(s) {
 	return s;
 }
 
+function jsEscape(s) {
+	s = s.replace("'", "\\'");
+	return s;
+}
+
 function writeTrackRow(track, num) {
 	$("#current-queue>tbody").append(
 		  "<tr>"
@@ -235,14 +240,14 @@ function getArtist(artist) {
 function writeGenreRow(genre) {
 	$("#genre-table>tbody").append(
 		  "<tr>"
-		+ "<td><a href=\"javascript:getGenre(\'" + genre.Title + "\')\">" + genre.Title + "</a></td>"
+		+ "<td><a href=\"javascript:getGenre(\'" + jsEscape(genre.Title) + "\')\">" + genre.TrackURI + "</a></td>"
 		+ "</tr>");
 }
 
 function writeArtistRow(artist) {
 	$("#artist-table>tbody").append(
 		  "<tr>"
-		+ "<td><a href=\"javascript:getArtist(\'" + artist.Title + "\')\">" + artist.Title + "</a></td>"
+		+ "<td><a href=\"javascript:getArtist(\'" + artist.Title + "\')\">" + artist.TrackURI + "</a></td>"
 		+ "</tr>");
 }
 
