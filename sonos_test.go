@@ -581,7 +581,7 @@ func TestBrowse(t *testing.T) {
 	t.Logf("===================")
 	t.Logf("Genres")
 	t.Logf("-------------------")
-	if result, err := s.ListGenres(); nil != err {
+	if result, err := s.GetAllGenres(); nil != err {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
@@ -593,7 +593,7 @@ func TestBrowse(t *testing.T) {
 	t.Logf("R&B")
 	t.Logf("-------------------")
 	var target string
-	if result, err := s.ListGenre("R&B"); nil != err {
+	if result, err := s.GetGenreArtists("R&B"); nil != err {
 		t.Fatal(err)
 	} else {
 		for _, container := range result {
