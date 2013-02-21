@@ -160,21 +160,18 @@
 					range: "min",
 					min: 0,
 					max: 100,
-					value: 15,
-					slide: function(event, ui) {
-						$.post("/control", {method: "set-volume", value: ui.value},
-							function(data) {
-								$("#result").empty().append(data)
-							},
-							"json");
-						$("#result").append(ui.value);
-					}
+					slide: onVolumeSlider,
 				});
 
+				/////////////////////////////////////////
+				// Track progress bar
+				/////////////////////////////////////////
 				$("#progress-bar").progressbar({
 					max: 100,
 					value: 50,
 				});
+
+				$("#tabs").tabs();
 				
 				initUi();
 				setInterval(eventLoop, 1000);
@@ -214,46 +211,56 @@
 			</tbody>
 		</table>
 		<p/>
-		<table border="1">
-			<tr>
-				<td valign="top">
-					<table id="genre-table" border="1">
-						<thead>
-							<tr><th>Genre</th></tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</td>
-				<td valign="top">
-					<table id="artist-table" border="1">
-						<thead>
-							<tr><th>Artist</th></tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</td>
-				<td valign="top">
-					<table id="album-table" border="1">
-						<thead>
-							<tr><th>Album</th></tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</td>
-				<td valign="top">
-					<table id="track-table" border="1">
-						<thead>
-							<tr><th>Track</th></tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</td>
-			</tr>
-		</table>
+		<div id="tabs">
+			<ul>
+				<li><a href="#genre-tab">Genre</a></li>
+				<li><a href="#album-tab">Album</a></li>
+			</ul>
+			<div id="album-tab">
+			</div>
+			<div id="genre-tab">
+				<table border="1">
+					<tr>
+						<td valign="top">
+							<table id="genre-table" border="1">
+								<thead>
+									<tr><th>Genre</th></tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</td>
+						<td valign="top">
+							<table id="artist-table" border="1">
+								<thead>
+									<tr><th>Artist</th></tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</td>
+						<td valign="top">
+							<table id="album-table" border="1">
+								<thead>
+									<tr><th>Album</th></tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</td>
+						<td valign="top">
+							<table id="track-table" border="1">
+								<thead>
+									<tr><th>Track</th></tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
 		<p/>
 		<div id="result"></div>
 	</body>

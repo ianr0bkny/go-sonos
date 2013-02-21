@@ -11,6 +11,10 @@
 	width: 400px;
 }
 
+#tabs {
+	width: 80%;
+}
+
 .progress-label {
 	float: left;
 	margin-left: 50%;

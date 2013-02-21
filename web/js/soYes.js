@@ -112,7 +112,7 @@ function xmlUnescape(s) {
 }
 
 function jsEscape(s) {
-	s = s.replace("'", "\\'");
+	s = s.replace(/'/g, "\\'");
 	return s;
 }
 
@@ -271,6 +271,18 @@ function onGenreList(data) {
 			writeGenreRow(genre);
 		}
 	}
+}
+
+function onSetVolume(data) {
+	if ("Error" in data) {
+		onError(data.Error);
+	} else {
+		clearError();
+	}
+}
+
+function onVolumeSlider(event, ui) {
+	$.post("/control", {method: "set-volume", value: ui.value}, onSetVolume, "json");
 }
 
 function eventLoop() {
