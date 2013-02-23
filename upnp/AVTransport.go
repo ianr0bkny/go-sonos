@@ -698,7 +698,12 @@ func (this *AVTransport) Previous(instanceId uint32) error {
 	return doc.Error()
 }
 
-func (this *AVTransport) NextSection(instanceId uint32) (err error) {
+//
+// Advance one section in the current track.  For Sonos @instanceId will
+// always be zero.  Experimentally this method returns 711 if the current
+// track does not contain multiple sections.
+//
+func (this *AVTransport) NextSection(instanceId uint32) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -709,11 +714,15 @@ func (this *AVTransport) NextSection(instanceId uint32) (err error) {
 	response := this.Svc.Call("NextSection", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
-func (this *AVTransport) PreviousSection(instanceId int) (err error) {
+//
+// Retreat one section in the current track.  For Sonos @instanceId will
+// always be zero.  Experimentally this method returns 711 if the current
+// track does not contain multiple sections.
+//
+func (this *AVTransport) PreviousSection(instanceId int) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -724,8 +733,7 @@ func (this *AVTransport) PreviousSection(instanceId int) (err error) {
 	response := this.Svc.Call("PreviousSection", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 //
@@ -762,7 +770,12 @@ func (this *AVTransport) SetPlayMode(instanceId uint32, newPlayMode string) erro
 	return doc.Error()
 }
 
-func (this *AVTransport) SetCrossfadeMode(instanceId uint32, crossfadeMode bool) (err error) {
+//
+// Toggle crossfade mode on or off.  For Sonos @instanceId should always
+// be 0.  If @crossfadeMode is true crossfade mode will be enabled; otherwise
+// disabled.
+//
+func (this *AVTransport) SetCrossfadeMode(instanceId uint32, crossfadeMode bool) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -774,8 +787,7 @@ func (this *AVTransport) SetCrossfadeMode(instanceId uint32, crossfadeMode bool)
 	response := this.Svc.Call("SetCrossfadeMode", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 func (this *AVTransport) NotifyDeletedURI(instanceId uint32, deletedURI string) (err error) {

@@ -966,3 +966,37 @@ func TestSetPlayMode(t *testing.T) {
 		s.SetPlayMode(0 /*instanceId*/, upnp.PlayMode_NORMAL)
 	}
 }
+
+func TestSections(t *testing.T) {
+	// Advance to the next section, then return to the previous section
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	if err := s.NextSection(0); nil != err {
+		t.Error(err)
+	}
+	if err := s.PreviousSection(0); nil != err {
+		t.Error(err)
+	}
+}
+
+func TestCrossfadeMode(t *testing.T) {
+	// Tests setting and geting crossfade mode
+	s := getTestSonos(sonos.SVC_AV_TRANSPORT)
+	var mode, pmode bool
+	var err error
+	if pmode, err = s.GetCrossfadeMode(0 /*instanceId*/); nil != err {
+		t.Fatal(err)
+	}
+	mode = !pmode
+	if err = s.SetCrossfadeMode(0 /*instanceId*/, mode); nil != err {
+		t.Fatal(err)
+	}
+	if pmode, err = s.GetCrossfadeMode(0 /*instanceId*/); nil != err {
+		t.Fatal(err)
+	}
+	if mode != pmode {
+		t.Error("GetCrossfadeMode failed to set crossfade mode")
+	}
+	if err = s.SetCrossfadeMode(0 /*instanceId*/, false); nil != err {
+		t.Fatal(err)
+	}
+}
