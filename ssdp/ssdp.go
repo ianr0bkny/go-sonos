@@ -29,7 +29,7 @@
 // 
 
 //
-// A client implementation of the SSDP protocol:
+// A client implementation of the SSDP protocol.
 //
 //	mgr := ssdp.MakeManager()
 //	mgr.Discover("eth0", "13104", false)
