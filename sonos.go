@@ -28,6 +28,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
+//
+// A go-language implementation of the Sonos UPnP API.
+//
 package sonos
 
 import (

@@ -28,8 +28,11 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
+//
+// A client to demonstrate controlling Sonos from the command line.
+//
 // cscl := (c)ontrol (s)onos from the (c)ommand (l)ine
-
+//
 package main
 
 import (

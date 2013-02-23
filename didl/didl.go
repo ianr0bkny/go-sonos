@@ -28,6 +28,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
+//
+// A minimal implementation of the Digital Item Declaration Language (DIDL).
+//
 package didl
 
 import (

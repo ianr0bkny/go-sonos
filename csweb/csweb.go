@@ -28,8 +28,11 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
+//
+// A server to demonstrate controlling Sonos from a web browser.
+//
 // csweb := (c)ontrol (s)onos from a (web) browser
-
+//
 package main
 
 import (

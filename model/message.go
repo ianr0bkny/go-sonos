@@ -28,10 +28,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
-// This module is intended to define an object model that go-sonos can
-// use to refer to albums, tracks, and other structures and collections.
-// This object model is based on and derived from the classes found in
-// DIDL-Lite documents.
 package model
 
 import (

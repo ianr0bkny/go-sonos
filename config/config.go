@@ -28,6 +28,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
+//
+// A module to support bookmarking discovered UPnP devices.
+//
 package config
 
 import (
