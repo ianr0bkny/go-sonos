@@ -40,7 +40,15 @@ type AVTransport struct {
 	Svc *Service
 }
 
-func (this *AVTransport) SetAVTransportURI(instanceId uint32, currentURI, currentURIMetaData string) (err error) {
+//
+// Set the current playback URI, where @currentURI will be a valid URI
+// as given by the Res() attribute of a ContentDirectory object.  For Sonos
+// @instanceId will always be 0; @currentURIMetaData can be empty.
+//
+// Use this method to, for example, resume playback from a queue after
+// playback from a radio station or other source.
+//
+func (this *AVTransport) SetAVTransportURI(instanceId uint32, currentURI, currentURIMetaData string) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -53,8 +61,7 @@ func (this *AVTransport) SetAVTransportURI(instanceId uint32, currentURI, curren
 	response := Call(this.Svc, "SetAVTransportURI", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 //
@@ -376,7 +383,9 @@ func (this *AVTransport) GetMediaInfo(instanceId uint32) (*MediaInfo, error) {
 	return &doc.MediaInfo, doc.Error()
 }
 
+//
 // Legal values for TransportInfo.CurrentTransportState
+//
 const (
 	State_PLAYING         = "PLAYING"
 	State_PAUSED_PLAYBACK = "PAUSED_PLAYBACK"
@@ -490,12 +499,22 @@ func (this *AVTransport) GetDeviceCapabilities(instanceId uint32) (*DeviceCapabi
 	return &doc.DeviceCapabilities, doc.Error()
 }
 
+//
+// The return value for GetTransportSettings
+//
 type TransportSettings struct {
-	PlayMode       string
+	// The current play mode (NORMAL, REPEAT_ALL, SHUFFLE, etc.)
+	PlayMode string
+	// The record quality (not supported in Sonos)
 	RecQualityMode string
 }
 
-func (this *AVTransport) GetTransportSettings(instanceId uint32) (transportSettings *TransportSettings, err error) {
+//
+// Return the current transport settings; the playback mode (NORMAL,
+// REPEAT_ALL, SHUFFLE, etc.); and the recoding quality (not support
+// on Sonos).  For Sonos @instanceId will always with 0.
+//
+func (this *AVTransport) GetTransportSettings(instanceId uint32) (*TransportSettings, error) {
 	type Response struct {
 		XMLName xml.Name
 		TransportSettings
@@ -507,9 +526,7 @@ func (this *AVTransport) GetTransportSettings(instanceId uint32) (transportSetti
 	response := Call(this.Svc, "GetTransportSettings", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	transportSettings = &doc.TransportSettings
-	err = doc.Error()
-	return
+	return &doc.TransportSettings, doc.Error()
 }
 
 //
@@ -599,7 +616,7 @@ const (
 	// Seek to the given offset in the current track
 	SeekMode_REL_TIME = "REL_TIME"
 	// Seek to the specified section (not tested)
-	SeekMode_SECTION  = "SECTION"
+	SeekMode_SECTION = "SECTION"
 )
 
 //
@@ -711,14 +728,26 @@ func (this *AVTransport) PreviousSection(instanceId int) (err error) {
 	return
 }
 
+//
+// Valid values for PlayMode in SetPlayMode and TransportSettings.
+//
 const (
-	PlayMode_NORMAL           = "NORMAL"
-	PlayMode_REPEAT_ALL       = "REPEAT_ALL"
+	// Play sequentially from the beginning of the queue to the end
+	PlayMode_NORMAL = "NORMAL"
+	// Begin again at the first track of the queue after reaching the last
+	PlayMode_REPEAT_ALL = "REPEAT_ALL"
+	// Play tracks out of order, with repeat
 	PlayMode_SHUFFLE_NOREPEAT = "SHUFFLE_NOREPEAT"
-	PlayMode_SHUFFLE          = "SHUFFLE"
+	// Play through tracks out of order once
+	PlayMode_SHUFFLE = "SHUFFLE"
 )
 
-func (this *AVTransport) SetPlayMode(instanceId uint32, newPlayMode string) (err error) {
+//
+// Set the current playback mode where @newPlayMode is one of the values
+// given for PlayMode above.  For Sonos @instanceId should always be 0.
+// This method returns 712 if an invalid @newPlayMode is supplied.
+//
+func (this *AVTransport) SetPlayMode(instanceId uint32, newPlayMode string) error {
 	type Response struct {
 		XMLName xml.Name
 		ErrorResponse
@@ -730,8 +759,7 @@ func (this *AVTransport) SetPlayMode(instanceId uint32, newPlayMode string) (err
 	response := Call(this.Svc, "SetPlayMode", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	err = doc.Error()
-	return
+	return doc.Error()
 }
 
 func (this *AVTransport) SetCrossfadeMode(instanceId uint32, crossfadeMode bool) (err error) {

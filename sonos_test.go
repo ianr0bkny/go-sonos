@@ -914,6 +914,7 @@ func TestAddMultiple(t *testing.T) {
 		t.Logf("%#v", resp)
 	}
 }
+
 func TestSeek(t *testing.T) {
 	// A test that sets playback to 30 seconds from the beginning
 	// of the fifth track in the queue.
@@ -924,5 +925,44 @@ func TestSeek(t *testing.T) {
 
 	if err := s.Seek(0 /*instanceId*/, upnp.SeekMode_REL_TIME, "0:0:30"); nil != err {
 		t.Fatal(err)
+	}
+}
+
+func TestUseQueue(t *testing.T) {
+	// Select the current queue (Q:0) (e.g., if we were already
+	// listening to the radio)
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	if info, err := s.GetMediaInfo(0 /*instanceId*/); nil != err {
+		t.Fatal(err)
+	} else if sonos.ObjectID_Queue_AVT_Instance_0 != info.CurrentURI {
+		if data, err := s.GetMetadata(sonos.ObjectID_Queue_AVT_Instance_0); nil != err {
+			t.Fatal(err)
+		} else {
+			if err := s.SetAVTransportURI(0 /*instanceId*/, data[0].Res(), ""/*metadata*/); nil != err {
+				t.Fatal(err)
+			}
+		}
+	}
+}
+
+func TestTransportSettings(t *testing.T) {
+	// Get the current playback mode and recording quality
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	if data, err := s.GetTransportSettings(0 /*instanceId*/); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("%#v", data)
+	}
+}
+
+
+func TestSetPlayMode(t *testing.T) {
+	// Changes the playback mode to shuffle, tries to set it to some
+	// garbage value, then reverts it to normal.
+	s := getTestSonos(sonos.SVC_CONTENT_DIRECTORY | sonos.SVC_AV_TRANSPORT)
+	if err := s.SetPlayMode(0 /*instanceId*/, upnp.PlayMode_SHUFFLE); nil != err {
+		t.Fatal(err)
+	} else if err := s.SetPlayMode(0 /*instanceId*/, "SOMETHING_INVALID"); nil != err {
+		s.SetPlayMode(0 /*instanceId*/, upnp.PlayMode_NORMAL)
 	}
 }
