@@ -46,7 +46,7 @@ func (this *ContentDirectory) GetSearchCapabilities() (searchCaps string, err er
 		SearchCaps string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetSearchCapabilities")
+	response := this.Svc.CallVa("GetSearchCapabilities")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	searchCaps = doc.SearchCaps
@@ -60,7 +60,7 @@ func (this *ContentDirectory) GetSortCapabilities() (sortCaps string, err error)
 		SortCaps string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetSortCapabilities")
+	response := this.Svc.CallVa("GetSortCapabilities")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	sortCaps = doc.SortCaps
@@ -74,7 +74,7 @@ func (this *ContentDirectory) GetSystemUpdateID() (id uint32, err error) {
 		Id      uint32
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetSystemUpdateID")
+	response := this.Svc.CallVa("GetSystemUpdateID")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	id = doc.Id
@@ -88,7 +88,7 @@ func (this *ContentDirectory) GetAlbumArtistDisplayOption() (albumArtistDisplayO
 		AlbumArtistDisplayOption string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetAlbumArtistDisplayOption")
+	response := this.Svc.CallVa("GetAlbumArtistDisplayOption")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	albumArtistDisplayOption = doc.AlbumArtistDisplayOption
@@ -102,7 +102,7 @@ func (this *ContentDirectory) GetLastIndexChange() (lastIndexChange string, err 
 		LastIndexChange string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetLastIndexChange")
+	response := this.Svc.CallVa("GetLastIndexChange")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	lastIndexChange = doc.LastIndexChange
@@ -158,7 +158,7 @@ func (this *ContentDirectory) Browse(req *BrowseRequest) (browseResult *BrowseRe
 		{"RequestedCount", req.RequestCount},
 		{"SortCriteria", req.SortCriteria},
 	}
-	response := Call(this.Svc, "Browse", args)
+	response := this.Svc.Call("Browse", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	doc.Doc = &didl.Lite{}
@@ -181,7 +181,7 @@ func (this *ContentDirectory) FindPrefix(objectId, prefix string) (startingIndex
 		{"StartingIndex", startingIndex},
 		{"UpdateID", updateId},
 	}
-	response := Call(this.Svc, "FindPrefix", args)
+	response := this.Svc.Call("FindPrefix", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	startingIndex = doc.StartingIndex
@@ -205,7 +205,7 @@ func (this *ContentDirectory) GetAllPrefixLocations(objectId string) (prefixLoca
 	args := []Arg{
 		{"ObjectID", objectId},
 	}
-	response := Call(this.Svc, "GetAllPrefixLocations", args)
+	response := this.Svc.Call("GetAllPrefixLocations", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	prefixLocations = &doc.PrefixLocations
@@ -224,7 +224,7 @@ func (this *ContentDirectory) CreateObject(container, elements string) (objectId
 		{"Container", container},
 		{"Elements", elements},
 	}
-	response := Call(this.Svc, "CreateObject", args)
+	response := this.Svc.Call("CreateObject", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	objectId = doc.ObjectID
@@ -243,7 +243,7 @@ func (this *ContentDirectory) UpdateObject(objectId, currentTagValue, newTagValu
 		{"CurrentTagValue", currentTagValue},
 		{"NewTagValue", newTagValue},
 	}
-	response := Call(this.Svc, "UpdateObject", args)
+	response := this.Svc.Call("UpdateObject", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -263,7 +263,7 @@ func (this *ContentDirectory) DestroyObject(objectId string) error {
 	args := []Arg{
 		{"ObjectID", objectId},
 	}
-	response := Call(this.Svc, "DestroyObject", args)
+	response := this.Svc.Call("DestroyObject", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.Error()
@@ -274,7 +274,7 @@ func (this *ContentDirectory) RefreshShareList() (err error) {
 		XMLName xml.Name
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "RefreshShareList")
+	response := this.Svc.CallVa("RefreshShareList")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -289,7 +289,7 @@ func (this *ContentDirectory) RefreshShareIndex(albumArtistDisplayOption string)
 	args := []Arg{
 		{"AlbumArtistDisplayOption", albumArtistDisplayOption},
 	}
-	response := Call(this.Svc, "RefreshShareIndex", args)
+	response := this.Svc.Call("RefreshShareIndex", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -304,7 +304,7 @@ func (this *ContentDirectory) RequestResort(sortOrder string) (err error) {
 	args := []Arg{
 		{"SortOrder", sortOrder},
 	}
-	response := Call(this.Svc, "RequestResort", args)
+	response := this.Svc.Call("RequestResort", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -317,7 +317,7 @@ func (this *ContentDirectory) GetShareIndexInProgress() (isIndexing bool, err er
 		IsIndexing bool
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetShareIndexInProgress")
+	response := this.Svc.CallVa("GetShareIndexInProgress")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	isIndexing = doc.IsIndexing
@@ -331,7 +331,7 @@ func (this *ContentDirectory) GetBrowseable() (isBrowseable bool, err error) {
 		IsBrowseable bool
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetBrowseable")
+	response := this.Svc.CallVa("GetBrowseable")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	isBrowseable = doc.IsBrowseable
@@ -347,7 +347,7 @@ func (this *ContentDirectory) SetBrowseable(browseable bool) (err error) {
 	args := []Arg{
 		{"Browseable", browseable},
 	}
-	response := Call(this.Svc, "SetBrowseable", args)
+	response := this.Svc.Call("SetBrowseable", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()

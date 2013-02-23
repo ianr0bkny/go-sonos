@@ -92,7 +92,7 @@ func (this *MusicServices) GetSessionId(serviceId int16, username string) (sessi
 		{"ServiceId", serviceId},
 		{"Username", username},
 	}
-	response := Call(this.Svc, "GetSessionId", args)
+	response := this.Svc.Call("GetSessionId", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	sessionId = doc.SessionId
@@ -108,7 +108,7 @@ func (this *MusicServices) ListAvailableServices() (err error) {
 		AvailableServiceListVersion    string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "ListAvailableServices")
+	response := this.Svc.CallVa("ListAvailableServices")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	services := msServices_XML{}
@@ -123,7 +123,7 @@ func (this *MusicServices) UpdateAvailableServices() (err error) {
 		XMLName xml.Name
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "UpdateAvailableServices")
+	response := this.Svc.CallVa("UpdateAvailableServices")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()

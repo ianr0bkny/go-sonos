@@ -55,7 +55,7 @@ func (this *RenderingControl) GetMute(instanceId uint32, channel string) (curren
 		{"InstanceID", instanceId},
 		{"Channel", channel},
 	}
-	response := Call(this.Svc, "GetMute", args)
+	response := this.Svc.Call("GetMute", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentMute = doc.CurrentMute
@@ -73,7 +73,7 @@ func (this *RenderingControl) SetMute(instanceId uint32, channel string, desired
 		{"Channel", channel},
 		{"DesiredMute", desiredMute},
 	}
-	response := Call(this.Svc, "SetMute", args)
+	response := this.Svc.Call("SetMute", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -97,7 +97,7 @@ func (this *RenderingControl) ResetBasicEQ(instanceId uint32) (basicEQ *BasicEQ,
 	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := Call(this.Svc, "ResetBasicEQ", args)
+	response := this.Svc.Call("ResetBasicEQ", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	basicEQ = &doc.BasicEQ
@@ -114,7 +114,7 @@ func (this *RenderingControl) ResetExtEQ(instanceId uint32, eqType string) (err 
 		{"InstanceID", instanceId},
 		{"EQType", eqType},
 	}
-	response := Call(this.Svc, "ResetExtEQ", args)
+	response := this.Svc.Call("ResetExtEQ", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -131,7 +131,7 @@ func (this *RenderingControl) GetVolume(instanceId uint32, channel string) (curr
 		{"InstanceID", instanceId},
 		{"Channel", channel},
 	}
-	response := Call(this.Svc, "GetVolume", args)
+	response := this.Svc.Call("GetVolume", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentVolume = doc.CurrentVolume
@@ -154,7 +154,7 @@ func (this *RenderingControl) SetVolume(instanceId uint32, channel string, volum
 		{"Channel", channel},
 		{"DesiredVolume", volume},
 	}
-	response := Call(this.Svc, "SetVolume", args)
+	response := this.Svc.Call("SetVolume", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.Error()
@@ -171,7 +171,7 @@ func (this *RenderingControl) SetRelativeVolume(instanceId uint32, channel strin
 		{"Channel", channel},
 		{"Adjustment", adjustment},
 	}
-	response := Call(this.Svc, "SetRelativeVolume", args)
+	response := this.Svc.Call("SetRelativeVolume", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	newVolume = doc.NewVolume
@@ -189,7 +189,7 @@ func (this *RenderingControl) GetVolumeDB(instanceId uint32, channel string) (cu
 		{"InstanceID", instanceId},
 		{"Channel", channel},
 	}
-	response := Call(this.Svc, "GetVolumeDB", args)
+	response := this.Svc.Call("GetVolumeDB", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentVolume = doc.CurrentVolume
@@ -207,7 +207,7 @@ func (this *RenderingControl) SetVolumeDB(instanceId uint32, channel string, vol
 		{"Channel", channel},
 		{"DesiredVolume", volume},
 	}
-	response := Call(this.Svc, "SetVolumeDB", args)
+	response := this.Svc.Call("SetVolumeDB", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -225,7 +225,7 @@ func (this *RenderingControl) GetVolumeDBRange(instanceId uint32, channel string
 		{"InstanceID", instanceId},
 		{"Channel", channel},
 	}
-	response := Call(this.Svc, "GetVolumeDBRange", args)
+	response := this.Svc.Call("GetVolumeDBRange", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	min = doc.MinValue
@@ -243,7 +243,7 @@ func (this *RenderingControl) GetBass(instanceId uint32) (currentBass int16, err
 	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := Call(this.Svc, "GetBass", args)
+	response := this.Svc.Call("GetBass", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentBass = doc.CurrentBass
@@ -260,7 +260,7 @@ func (this *RenderingControl) SetBass(instanceId, desiredBass int16) (err error)
 		{"InstanceID", instanceId},
 		{"DesiredBass", desiredBass},
 	}
-	response := Call(this.Svc, "SetBass", args)
+	response := this.Svc.Call("SetBass", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -276,7 +276,7 @@ func (this *RenderingControl) GetTreble(instanceId uint32) (currentTreble int16,
 	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := Call(this.Svc, "GetTreble", args)
+	response := this.Svc.Call("GetTreble", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentTreble = doc.CurrentTreble
@@ -293,7 +293,7 @@ func (this *RenderingControl) SetTreble(instanceId, desiredTreble int16) (err er
 		{"InstanceID", instanceId},
 		{"DesiredTreble", desiredTreble},
 	}
-	response := Call(this.Svc, "SetTreble", args)
+	response := this.Svc.Call("SetTreble", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -310,7 +310,7 @@ func (this *RenderingControl) GetEQ(instanceId uint32, eqType string) (currentVa
 		{"InstanceID", instanceId},
 		{"EQType", eqType},
 	}
-	response := Call(this.Svc, "GetEQ", args)
+	response := this.Svc.Call("GetEQ", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentValue = doc.CurrentValue
@@ -328,7 +328,7 @@ func (this *RenderingControl) SetEQ(instanceId uint32, eqType string, desiredVal
 		{"EQType", eqType},
 		{"DesiredValue", desiredValue},
 	}
-	response := Call(this.Svc, "SetEQ", args)
+	response := this.Svc.Call("SetEQ", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -345,7 +345,7 @@ func (this *RenderingControl) GetLoudness(instanceId uint32, channel string) (lo
 		{"InstanceID", instanceId},
 		{"Channel", channel},
 	}
-	response := Call(this.Svc, "GetLoudness", args)
+	response := this.Svc.Call("GetLoudness", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	loudness = doc.CurrentLoudness
@@ -363,7 +363,7 @@ func (this *RenderingControl) SetLoudness(instanceId uint32, channel string, lou
 		{"Channel", channel},
 		{"DesiredLoudness", loudness},
 	}
-	response := Call(this.Svc, "SetLoudness", args)
+	response := this.Svc.Call("SetLoudness", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -379,7 +379,7 @@ func (this *RenderingControl) GetSupportsOutputFixed(instanceId uint32) (current
 	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := Call(this.Svc, "GetSupportsOutputFixed", args)
+	response := this.Svc.Call("GetSupportsOutputFixed", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentSupportsFixed = doc.CurrentSupportsFixed
@@ -396,7 +396,7 @@ func (this *RenderingControl) GetOutputFixed(instanceId uint32) (currentFixed bo
 	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := Call(this.Svc, "GetOutputFixed", args)
+	response := this.Svc.Call("GetOutputFixed", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentFixed = doc.CurrentFixed
@@ -413,7 +413,7 @@ func (this *RenderingControl) SetOutputFixed(instanceId uint32, desiredFixed boo
 		{"InstanceID", instanceId},
 		{"DesiredFixed", desiredFixed},
 	}
-	response := Call(this.Svc, "SetOutputFixed", args)
+	response := this.Svc.Call("SetOutputFixed", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -429,7 +429,7 @@ func (this *RenderingControl) GetHeadphoneConnected(instanceId uint32) (currentH
 	args := []Arg{
 		{"InstanceID", instanceId},
 	}
-	response := Call(this.Svc, "GetHeadphoneConnected", args)
+	response := this.Svc.Call("GetHeadphoneConnected", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentHeadphoneConnected = doc.CurrentHeadphoneConnected
@@ -464,7 +464,7 @@ func (this *RenderingControl) RampToVolume(instanceId uint32, channel, req RampR
 		{"ResetVolumeAfter", req.ResetVolumeAfter},
 		{"ProgramURI", req.ProgramURI},
 	}
-	response := Call(this.Svc, "RampToVolume", args)
+	response := this.Svc.Call("RampToVolume", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	rampTime = doc.RampTime
@@ -481,7 +481,7 @@ func (this *RenderingControl) RestoreVolumePriorToRamp(instanceId uint32, channe
 		{"InstanceID", instanceId},
 		{"Channel", channel},
 	}
-	response := Call(this.Svc, "RestoreVolumePriorToRamp", args)
+	response := this.Svc.Call("RestoreVolumePriorToRamp", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -497,7 +497,7 @@ func (this *RenderingControl) SetChannelMap(instanceId uint32, channelMap string
 		{"InstanceID", instanceId},
 		{"ChannelMap", channelMap},
 	}
-	response := Call(this.Svc, "SetChannelMap", args)
+	response := this.Svc.Call("SetChannelMap", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()

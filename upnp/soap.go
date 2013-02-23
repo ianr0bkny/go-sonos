@@ -153,14 +153,14 @@ func upnpBuildRequest(svc *Service, action string, args Args) (msg []byte) {
 	return
 }
 
-func Call(svc *Service, action string, args Args) (response string) {
+func (this *Service) Call(action string, args Args) (response string) {
 	client := &http.Client{}
-	r := upnpBuildRequest(svc, action, args)
+	r := upnpBuildRequest(this, action, args)
 	body := strings.NewReader(xml.Header + string(r))
-	req, err := http.NewRequest("POST", svc.controlURL.String(), body)
+	req, err := http.NewRequest("POST", this.controlURL.String(), body)
 	req.Header.Set("CONTENT-TYPE", soapContentType)
 	req.Header.Set("USER-AGENT", soapUserAgent)
-	req.Header.Set("SOAPACTION", fmt.Sprintf("\"%s#%s\"", soapBuildNamespace(svc), action))
+	req.Header.Set("SOAPACTION", fmt.Sprintf("\"%s#%s\"", soapBuildNamespace(this), action))
 	//req.Write(os.Stdout)
 	//body.Seek(0, 0)
 	if nil != err {
@@ -181,10 +181,10 @@ func Call(svc *Service, action string, args Args) (response string) {
 	return
 }
 
-func CallVa(svc *Service, action string, va_list ...interface{}) (response string) {
+func (this *Service) CallVa(action string, va_list ...interface{}) (response string) {
 	var args Args
 	for i := 0; i < len(va_list); i += 2 {
 		args = append(args, Arg{va_list[i].(string), va_list[i+1]})
 	}
-	return Call(svc, action, args)
+	return this.Call(action, args)
 }

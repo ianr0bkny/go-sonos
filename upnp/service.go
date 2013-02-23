@@ -287,8 +287,8 @@ func (this *upnpDescribeServiceJob) Describe() {
 	}
 }
 
-func DescribeService(svc *Service) (err error) {
-	job := upnpMakeDescribeServiceJob(svc)
+func (this *Service) Describe() (err error) {
+	job := upnpMakeDescribeServiceJob(this)
 	go job.Describe()
 	timeout := time.NewTimer(time.Duration(3) * time.Second)
 	select {

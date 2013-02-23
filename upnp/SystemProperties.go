@@ -48,7 +48,7 @@ func (this *SystemProperties) SetString(variableName, stringValue string) (err e
 		{"VariableName", variableName},
 		{"StringValue", stringValue},
 	}
-	response := Call(this.Svc, "SetString", args)
+	response := this.Svc.Call("SetString", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -64,7 +64,7 @@ func (this *SystemProperties) SetStringX(variableName, stringValue string) (err 
 		{"VariableName", variableName},
 		{"StringValue", stringValue},
 	}
-	response := Call(this.Svc, "SetStringX", args)
+	response := this.Svc.Call("SetStringX", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -80,7 +80,7 @@ func (this *SystemProperties) GetString(variableName string) (stringValue string
 	args := []Arg{
 		{"VariableName", variableName},
 	}
-	response := Call(this.Svc, "GetString", args)
+	response := this.Svc.Call("GetString", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	stringValue = doc.StringValue
@@ -97,7 +97,7 @@ func (this *SystemProperties) GetStringX(variableName string) (stringValue strin
 	args := []Arg{
 		{"VariableName", variableName},
 	}
-	response := Call(this.Svc, "GetStringX", args)
+	response := this.Svc.Call("GetStringX", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	stringValue = doc.StringValue
@@ -113,7 +113,7 @@ func (this *SystemProperties) Remove(variableName string) (err error) {
 	args := []Arg{
 		{"VariableName", variableName},
 	}
-	response := Call(this.Svc, "Remove", args)
+	response := this.Svc.Call("Remove", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -129,7 +129,7 @@ func (this *SystemProperties) GetWebCode(accountType uint32) (webCode string, er
 	args := []Arg{
 		{"AccountType", accountType},
 	}
-	response := Call(this.Svc, "GetWebCode", args)
+	response := this.Svc.Call("GetWebCode", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	webCode = doc.WebCode
@@ -145,7 +145,7 @@ func (this *SystemProperties) ProvisionTrialAccount(accountType uint32) (err err
 	args := []Arg{
 		{"AccountType", accountType},
 	}
-	response := Call(this.Svc, "ProvisionTrialAccount", args)
+	response := this.Svc.Call("ProvisionTrialAccount", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -164,7 +164,7 @@ func (this *SystemProperties) ProvisionCredentialedTrialAccountX(accountType uin
 		{"AccountID", accountId},
 		{"AccountPassword", accountPassword},
 	}
-	response := Call(this.Svc, "ProvisionCredentialedTrialAccountX", args)
+	response := this.Svc.Call("ProvisionCredentialedTrialAccountX", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	isExpired = doc.IsExpired
@@ -182,7 +182,7 @@ func (this *SystemProperties) MigrateTrialAccountX(accountType uint32, accountId
 		{"AccountID", accountId},
 		{"AccountPassword", accountPassword},
 	}
-	response := Call(this.Svc, "MigrateTrialAccountX", args)
+	response := this.Svc.Call("MigrateTrialAccountX", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -199,7 +199,7 @@ func (this *SystemProperties) AddAccountX(accountType uint32, accountId, account
 		{"AccountID", accountId},
 		{"AccountPassword", accountPassword},
 	}
-	response := Call(this.Svc, "AddAccountX", args)
+	response := this.Svc.Call("AddAccountX", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -216,7 +216,7 @@ func (this *SystemProperties) AddAccountWithCredentialsX(accountType uint32, acc
 		{"AccountToken", accountToken},
 		{"AccountKey", accountKey},
 	}
-	response := Call(this.Svc, "AddAccountWithCredentialsX", args)
+	response := this.Svc.Call("AddAccountWithCredentialsX", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -232,7 +232,7 @@ func (this *SystemProperties) RemoveAccount(accountType uint32, accountId string
 		{"AccountType", accountType},
 		{"AccountID", accountId},
 	}
-	response := Call(this.Svc, "RemoveAccount", args)
+	response := this.Svc.Call("RemoveAccount", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -249,7 +249,7 @@ func (this *SystemProperties) EditAccountPasswordX(accountType uint32, accountId
 		{"AccountID", accountId},
 		{"NewAccountPassword", newAccountPassword},
 	}
-	response := Call(this.Svc, "EditAccountPasswordX", args)
+	response := this.Svc.Call("EditAccountPasswordX", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -266,7 +266,7 @@ func (this *SystemProperties) EditAccountMd(accountType uint32, accountId, accou
 		{"AccountID", accountId},
 		{"AccountMD", accountMd},
 	}
-	response := Call(this.Svc, "EditAccountMd", args)
+	response := this.Svc.Call("EditAccountMd", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -278,7 +278,7 @@ func (this *SystemProperties) DoPostUpdateTasks() (err error) {
 		XMLName xml.Name
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "DoPostUpdateTasks")
+	response := this.Svc.CallVa("DoPostUpdateTasks")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -290,7 +290,7 @@ func (this *SystemProperties) ResetThirdPartyCredentials() (err error) {
 		XMLName xml.Name
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "ResetThirdPartyCredentials")
+	response := this.Svc.CallVa("ResetThirdPartyCredentials")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()

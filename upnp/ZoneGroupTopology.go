@@ -53,7 +53,7 @@ func (this *ZoneGroupTopology) BeginSoftwareUpdate(updateURL string, flags uint3
 		{"UpdateURL", updateURL},
 		{"Flags", flags},
 	}
-	response := Call(this.Svc, "BeginSoftwareUpdate", args)
+	response := this.Svc.Call("BeginSoftwareUpdate", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -89,7 +89,7 @@ func (this *ZoneGroupTopology) CheckForUpdate(updateType UpdateType, cachedOnly 
 		{"CachedOnly", cachedOnly},
 		{"Version", version},
 	}
-	response := Call(this.Svc, "CheckForUpdate", args)
+	response := this.Svc.Call("CheckForUpdate", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	rec := UpdateItemHolder{}
@@ -113,7 +113,7 @@ func (this *ZoneGroupTopology) ReportUnresponsiveDevice(deviceUUID string, desir
 		{"DeviceUUID", deviceUUID},
 		{"DesiredAction", desiredAction},
 	}
-	response := Call(this.Svc, "ReportUnresponsiveDevice", args)
+	response := this.Svc.Call("ReportUnresponsiveDevice", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -125,7 +125,7 @@ func (this *ZoneGroupTopology) ReportAlarmStartedRunning() (err error) {
 		XMLName xml.Name
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "ReportAlarmStartedRunning")
+	response := this.Svc.CallVa("ReportAlarmStartedRunning")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -138,7 +138,7 @@ func (this *ZoneGroupTopology) SubmitDiagnostics() (diagnosticId string, err err
 		DiagnosticID string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "SubmitDiagnostics")
+	response := this.Svc.CallVa("SubmitDiagnostics")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	diagnosticId = doc.DiagnosticID
@@ -156,7 +156,7 @@ func (this *ZoneGroupTopology) RegisterMobileDevice(deviceName, deviceUDN, devic
 		{"MobileDeviceUDN", deviceUDN},
 		{"MobileIPAndPort", deviceAddress},
 	}
-	response := Call(this.Svc, "RegisterMobileDevice", args)
+	response := this.Svc.Call("RegisterMobileDevice", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()

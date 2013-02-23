@@ -55,7 +55,7 @@ func (this *GroupManagement) AddMember(memberId string) (memberInfo *MemberInfo,
 	args := []Arg{
 		{"MemberID", memberId},
 	}
-	response := Call(this.Svc, "AddMember", args)
+	response := this.Svc.Call("AddMember", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	memberInfo = &doc.MemberInfo
@@ -71,7 +71,7 @@ func (this *GroupManagement) RemoveMember(memberId string) (err error) {
 	args := []Arg{
 		{"MemberID", memberId},
 	}
-	response := Call(this.Svc, "RemoveMember", args)
+	response := this.Svc.Call("RemoveMember", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -87,7 +87,7 @@ func (this *GroupManagement) ReportTrackBufferingResult(memberId string, resultC
 		{"MemberID", memberId},
 		{"ResultCode", resultCode},
 	}
-	response := Call(this.Svc, "ReportTrackBufferingResult", args)
+	response := this.Svc.Call("ReportTrackBufferingResult", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()

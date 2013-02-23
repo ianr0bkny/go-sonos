@@ -52,7 +52,7 @@ func (this *DeviceProperties) SetLEDState(desiredLEDState string) (err error) {
 	args := []Arg{
 		{"DesiredLEDState", desiredLEDState},
 	}
-	response := Call(this.Svc, "SetLEDState", args)
+	response := this.Svc.Call("SetLEDState", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -65,7 +65,7 @@ func (this *DeviceProperties) GetLEDState() (currentLEDState string, err error) 
 		CurrentLEDState string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetLEDState")
+	response := this.Svc.CallVa("GetLEDState")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentLEDState = doc.CurrentLEDState
@@ -81,7 +81,7 @@ func (this *DeviceProperties) SetInvisible(desiredInvisible bool) (err error) {
 	args := []Arg{
 		{"DesiredInvisible", desiredInvisible},
 	}
-	response := Call(this.Svc, "SetInvisible", args)
+	response := this.Svc.Call("SetInvisible", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -94,7 +94,7 @@ func (this *DeviceProperties) GetInvisible() (currentInvisible bool, err error) 
 		CurrentInvisible bool
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetInvisible")
+	response := this.Svc.CallVa("GetInvisible")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentInvisible = doc.CurrentInvisible
@@ -110,7 +110,7 @@ func (this *DeviceProperties) AddBondedZones(channelMapSet string) (err error) {
 	args := []Arg{
 		{"ChannelMapSet", channelMapSet},
 	}
-	response := Call(this.Svc, "AddBondedZones", args)
+	response := this.Svc.Call("AddBondedZones", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -125,7 +125,7 @@ func (this *DeviceProperties) RemoveBondedZones(channelMapSet string) (err error
 	args := []Arg{
 		{"ChannelMapSet", channelMapSet},
 	}
-	response := Call(this.Svc, "RemoveBondedZones", args)
+	response := this.Svc.Call("RemoveBondedZones", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -140,7 +140,7 @@ func (this *DeviceProperties) CreateStereoPair(channelMapSet string) (err error)
 	args := []Arg{
 		{"ChannelMapSet", channelMapSet},
 	}
-	response := Call(this.Svc, "CreateStereoPair", args)
+	response := this.Svc.Call("CreateStereoPair", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -155,7 +155,7 @@ func (this *DeviceProperties) SeparateStereoPair(channelMapSet string) (err erro
 	args := []Arg{
 		{"ChannelMapSet", channelMapSet},
 	}
-	response := Call(this.Svc, "SeparateStereoPair", args)
+	response := this.Svc.Call("SeparateStereoPair", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -171,7 +171,7 @@ func (this *DeviceProperties) SetZoneAttributes(desiredZoneName, desiredIcon str
 		{"DesiredZoneName,", desiredZoneName},
 		{"DesiredIcon,", desiredIcon},
 	}
-	response := Call(this.Svc, "SetZoneAttributes", args)
+	response := this.Svc.Call("SetZoneAttributes", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -185,7 +185,7 @@ func (this *DeviceProperties) GetZoneAttributes() (currentZoneName, currentIcon 
 		CurrentIcon     string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetZoneAttributes")
+	response := this.Svc.CallVa("GetZoneAttributes")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentZoneName = doc.CurrentZoneName
@@ -200,7 +200,7 @@ func (this *DeviceProperties) GetHouseholdID() (currentHouseholdId string, err e
 		CurrentHouseholdID string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetHouseholdID")
+	response := this.Svc.CallVa("GetHouseholdID")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentHouseholdId = doc.CurrentHouseholdID
@@ -225,7 +225,7 @@ func (this *DeviceProperties) GetZoneInfo() (zoneInfo *ZoneInfo, err error) {
 		ZoneInfo
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetZoneInfo")
+	response := this.Svc.CallVa("GetZoneInfo")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	zoneInfo = &doc.ZoneInfo
@@ -241,7 +241,7 @@ func (this *DeviceProperties) SetAutoplayLinkedZones(includeLinkedZones bool) (e
 	args := []Arg{
 		{"IncludeLinkedZones", includeLinkedZones},
 	}
-	response := Call(this.Svc, "SetAutoplayLinkedZones", args)
+	response := this.Svc.Call("SetAutoplayLinkedZones", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -254,7 +254,7 @@ func (this *DeviceProperties) GetAutoplayLinkedZones() (includeLinkedZones bool,
 		IncludeLinkedZones bool
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetAutoplayLinkedZones")
+	response := this.Svc.CallVa("GetAutoplayLinkedZones")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	includeLinkedZones = doc.IncludeLinkedZones
@@ -270,7 +270,7 @@ func (this *DeviceProperties) SetAutoplayRoomUUID(roomUUID string) (err error) {
 	args := []Arg{
 		{"RoomUUID", roomUUID},
 	}
-	response := Call(this.Svc, "SetAutoplayRoomUUID", args)
+	response := this.Svc.Call("SetAutoplayRoomUUID", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -283,7 +283,7 @@ func (this *DeviceProperties) GetAutoplayRoomUUID() (roomUUID string, err error)
 		RoomUUID string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetAutoplayRoomUUID")
+	response := this.Svc.CallVa("GetAutoplayRoomUUID")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	roomUUID = doc.RoomUUID
@@ -299,7 +299,7 @@ func (this *DeviceProperties) SetAutoplayVolume(volume uint16) (err error) {
 	args := []Arg{
 		{"Volume", volume},
 	}
-	response := Call(this.Svc, "SetAutoplayVolume", args)
+	response := this.Svc.Call("SetAutoplayVolume", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -312,7 +312,7 @@ func (this *DeviceProperties) GetAutoplayVolume() (currentVolume uint16, err err
 		CurrentVolume uint16
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetAutoplayVolume")
+	response := this.Svc.CallVa("GetAutoplayVolume")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentVolume = doc.CurrentVolume
@@ -329,7 +329,7 @@ func (this *DeviceProperties) ImportSetting(settingID uint32, settingURI string)
 		{"SettingID", settingID},
 		{"SettingURI", settingURI},
 	}
-	response := Call(this.Svc, "ImportSettings", args)
+	response := this.Svc.Call("ImportSettings", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -344,7 +344,7 @@ func (this *DeviceProperties) SetUseAutoplayVolume(useVolume bool) (err error) {
 	args := []Arg{
 		{"UseVolume", useVolume},
 	}
-	response := Call(this.Svc, "SetUseAutoplayVolume", args)
+	response := this.Svc.Call("SetUseAutoplayVolume", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -357,7 +357,7 @@ func (this *DeviceProperties) GetUseAutoplayVolume() (useVolume bool, err error)
 		UseVolume bool
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetUseAutoplayVolume")
+	response := this.Svc.CallVa("GetUseAutoplayVolume")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	useVolume = doc.UseVolume

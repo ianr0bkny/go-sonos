@@ -48,7 +48,7 @@ func (this *AlarmClock) SetFormat(desiredTimeFormat, desiredDateFormat string) (
 		{"DesiredTimeFormat", desiredTimeFormat},
 		{"DesiredDateFormat", desiredDateFormat},
 	}
-	response := Call(this.Svc, "SetFormat", args)
+	response := this.Svc.Call("SetFormat", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -62,7 +62,7 @@ func (this *AlarmClock) GetFormat() (currentTimeFormat, currentDateFormat string
 		CurrentDateFormat string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetFormat")
+	response := this.Svc.CallVa("GetFormat")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentTimeFormat = doc.CurrentTimeFormat
@@ -80,7 +80,7 @@ func (this *AlarmClock) SetTimeZone(index int32, autoAdjustDst bool) (err error)
 		{"Index", index},
 		{"AutoAdjustDst", autoAdjustDst},
 	}
-	response := Call(this.Svc, "SetTimeZone", args)
+	response := this.Svc.Call("SetTimeZone", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -94,7 +94,7 @@ func (this *AlarmClock) GetTimeZone() (index int32, autoAdjustDst bool, err erro
 		AutoAdjustDst bool
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetTimeZone")
+	response := this.Svc.CallVa("GetTimeZone")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	index = doc.Index
@@ -111,7 +111,7 @@ func (this *AlarmClock) GetTimeZoneAndRule() (index int32, autoAdjustDst bool, t
 		TimeZone      string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetTimeZoneAndRule")
+	response := this.Svc.CallVa("GetTimeZoneAndRule")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	index = doc.Index
@@ -130,7 +130,7 @@ func (this *AlarmClock) GetTimeZoneRule(index int32) (timeZone string, err error
 	args := []Arg{
 		{"Index", index},
 	}
-	response := Call(this.Svc, "GetTimeZoneRule", args)
+	response := this.Svc.Call("GetTimeZoneRule", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	timeZone = doc.TimeZone
@@ -146,7 +146,7 @@ func (this *AlarmClock) SetTimeServer(desiredTimeServer string) (err error) {
 	args := []Arg{
 		{"DesiredTimeServer", desiredTimeServer},
 	}
-	response := Call(this.Svc, "SetTimeServer", args)
+	response := this.Svc.Call("SetTimeServer", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -159,7 +159,7 @@ func (this *AlarmClock) GetTimeServer() (currentTimeServer string, err error) {
 		CurrentTimeServer string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetTimeServer")
+	response := this.Svc.CallVa("GetTimeServer")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentTimeServer = doc.CurrentTimeServer
@@ -176,7 +176,7 @@ func (this *AlarmClock) SetTimeNow(desiredTime, timeZoneForDesiredTime string) (
 		{"DesiredTime", desiredTime},
 		{"TimeZoneForDesiredTime", timeZoneForDesiredTime},
 	}
-	response := Call(this.Svc, "SetTimeNow", args)
+	response := this.Svc.Call("SetTimeNow", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -192,7 +192,7 @@ func (this *AlarmClock) GetHouseholdTimeAtStamp(timeStamp string) (householdUTCT
 	args := []Arg{
 		{"TimeStamp", timeStamp},
 	}
-	response := Call(this.Svc, "GetHouseholdTimeAtStamp", args)
+	response := this.Svc.Call("GetHouseholdTimeAtStamp", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	householdUTCTime = doc.HouseholdUTCTime
@@ -213,7 +213,7 @@ func (this *AlarmClock) GetTimeNow() (getTimeNowResponse *GetTimeNowResponse, er
 		GetTimeNowResponse
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetTimeNow")
+	response := this.Svc.CallVa("GetTimeNow")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	getTimeNowResponse = &doc.GetTimeNowResponse
@@ -266,7 +266,7 @@ func (this *AlarmClock) CreateAlarm(req *CreateAlarmRequest) (assignedId uint32,
 		{"Volume", req.Volume},
 		{"IncludeLinkedZones", req.IncludeLinkedZones},
 	}
-	response := Call(this.Svc, "CreateAlarm", args)
+	response := this.Svc.Call("CreateAlarm", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	assignedId = doc.AssignedID
@@ -294,7 +294,7 @@ func (this *AlarmClock) UpdateAlarm(id uint32, req *UpdateAlarmRequest) (err err
 		{"Volume", req.Volume},
 		{"IncludeLinkedZones", req.IncludeLinkedZones},
 	}
-	response := Call(this.Svc, "UpdateAlarm", args)
+	response := this.Svc.Call("UpdateAlarm", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -309,7 +309,7 @@ func (this *AlarmClock) DestroyAlarm(id uint32) (err error) {
 	args := []Arg{
 		{"ID", id},
 	}
-	response := Call(this.Svc, "DestroyAlarm", args)
+	response := this.Svc.Call("DestroyAlarm", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -323,7 +323,7 @@ func (this *AlarmClock) ListAlarms() (currentAlarmList, currentAlarmListVersion 
 		CurrentAlarmListVersion string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "ListAlarms")
+	response := this.Svc.CallVa("ListAlarms")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentAlarmList = doc.CurrentAlarmList
@@ -340,7 +340,7 @@ func (this *AlarmClock) SetDailyIndexRefreshTime(desiredDailyIndexRefreshTime st
 	args := []Arg{
 		{"DesiredDailyIndexRefreshTime", desiredDailyIndexRefreshTime},
 	}
-	response := Call(this.Svc, "SetDailyIndexRefreshTime", args)
+	response := this.Svc.Call("SetDailyIndexRefreshTime", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	err = doc.Error()
@@ -353,7 +353,7 @@ func (this *AlarmClock) GetDailyIndexRefreshTime() (currentDailyIndexRefreshTime
 		CurrentDailyIndexRefreshTime string
 		ErrorResponse
 	}
-	response := CallVa(this.Svc, "GetDailyIndexRefreshTime")
+	response := this.Svc.CallVa("GetDailyIndexRefreshTime")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	currentDailyIndexRefreshTime = doc.CurrentDailyIndexRefreshTime
