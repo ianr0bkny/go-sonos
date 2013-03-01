@@ -28,18 +28,31 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-var queueSize = 0;
+
+/* Kepp track of the number of interface updates */
 var updateCount = 0;
+
+/* Position in the playback queue [1...n] */
 var currentTrack = 0;
 
+/*
+ * A helper function to write a diagnostic error message to the screen.
+ */
 function onError(msg) {
 	$("#result").empty().append(msg);
 }
 
+/*
+ * Clear a displayed diagnostic error message.
+ */
 function clearError() {
 	$("#result").empty();
 }
 
+/*
+ * Called in response to control::get-volume; adjusted the volume slider
+ * to reflect the current volume level.
+ */
 function onVolume(data) {
 	if ("Error" in data) {
 		onError(data.Error);
@@ -48,6 +61,10 @@ function onVolume(data) {
 	}
 }
 
+/*
+ * Format a duration in seconds into a string similar to the output of
+ * time(1), with hours, minutes, and seconds broken out.
+ */
 function formatDuration(d) {
 	seconds = d % 60;
 	d /= 60;
@@ -57,14 +74,22 @@ function formatDuration(d) {
 	return Math.floor(hours) + "h" + Math.floor(minutes) + "m" + seconds + "s";
 }
 
+/*
+ * Called when playback moves to a new track.  This method should change
+ * the shading in the queue display of the track currently playing.
+ */
 function setCurrentTrack(track) {
 	if (track != currentTrack) {
-		//.remvoveClass()
+		// TODO
 	}
 	currentTrack = track - 1;
 }
 
-function onPositionInfo(data) {
+/*
+ * Callback associated with control::get-position-info.  This method
+ * populated the position information table and update the progress.
+ */
+function onPositionInfo(data, queueSize) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if ("Value" in data) {
@@ -80,6 +105,11 @@ function onPositionInfo(data) {
 	}
 }
 
+/*
+ * Callback associated with control::remove-track-from-queue.  This method
+ * just updates the currently displayed error message.  Consider merging
+ * into a generic error callback.
+ */
 function onRemoveTrack(data) {
 	if ("Error" in data) {
 		onError(data.Error);
@@ -88,10 +118,19 @@ function onRemoveTrack(data) {
 	}
 }
 
+/*
+ * Called to remove a track from the playback queue.  Note that @num
+ * starts at 1 for the first track in the queue.
+ */
 function removeTrack(num) {
 	$.post("/control", {method: "remove-track-from-queue", track: num}, onRemoveTrack, "json");
 }
 
+/*
+ * Callback associated with control::seek(TRACK_NR).  This method just
+ * updates the currently displayed error message.  Consider merging into
+ * a generic error callback.
+ */
 function onPlayTrack(data) {
 	if ("Error" in data) {
 		onError(data.Error);
@@ -100,22 +139,26 @@ function onPlayTrack(data) {
 	}
 }
 
+/*
+ * Called to advance playback to the indicated track.  Note that @num
+ * starts at 1 for the first track in the queue.
+ */
 function playTrack(num) {
 	$.post("/control", {method: "seek", unit: "TRACK_NR", target: num}, onPlayTrack, "json");
 }
 
-function xmlUnescape(s) {
-	s = s.replace(/%3a/g, ":");
-	s = s.replace(/%2f/g, "/");
-	s = s.replace(/%2520/g, " ");
-	return s;
-}
-
+/*
+ * Escape single quotes in argument strings.
+ */
 function jsEscape(s) {
 	s = s.replace(/'/g, "\\'");
 	return s;
 }
 
+/*
+ * Write an empty in the playback queue as a row in a table.  Note that
+ * @num starts at 1 for the first track in the queue.
+ */
 function writeTrackRow(track, num) {
 	$("#current-queue>tbody").append(
 		  "<tr>"
@@ -125,25 +168,31 @@ function writeTrackRow(track, num) {
 		+ "<td>" + track.Creator + "</td>"
 		+ "<td>" + track.Album + "</td>"
 		+ "<td>" + track.Title + "</td>"
-		//+ "<td><img src=\"http://192.168.1.44:1400" + xmlUnescape(track.AlbumArtURI) + "\"/></td>"
 		+ "</tr>");
 }
 
+/*
+ * Callback associated with get-queue-contents.  This metod rewrites
+ * the contents of the #current-queue table.
+ */
 function onQueue(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if ("Value" in data) {
-		queueSize = data.Value.length;
+		var queueSize = data.Value.length;
 		$("#current-queue>tbody").empty();
 		for (i = currentTrack; i < data.Value.length; i++) {
-			writeTrackRow(data.Value[i], i + 1);
+			writeTrackRow(data.Value[i], i + 1, queueSize);
 		}
 		for (i = 0; i < currentTrack; i++) {
-			writeTrackRow(data.Value[i], i + 1);
+			writeTrackRow(data.Value[i], i + 1, queueSize);
 		}
 	}
 }
 
+/*
+ * Toggles the Play/Pause button to Play.
+ */
 function playButtonPlay() {
 	options = {
 		label: "Play",
@@ -154,6 +203,9 @@ function playButtonPlay() {
 	$("#control-panel>#play").button("option", options);
 }
 
+/*
+ * Toggles the Play/Pause button to Pause.
+ */
 function playButtonPause() {
 	options = {
 		label: "Pause",
@@ -164,6 +216,10 @@ function playButtonPause() {
 	$("#control-panel>#play").button("option", options);
 }
 
+/*
+ * The callback associated with get-transport-info.  This method updates
+ * the appearance of the Play/Pause button using the current playback state.
+ */
 function onTransportInfo(data) {
 	if ("Error" in data) {
 		onError(data.Error);
@@ -177,10 +233,75 @@ function onTransportInfo(data) {
 	}
 }
 
+/*
+ * Callback associated with the control::set-volume request. This method
+ * just updates the currently displayed error message.  Consider merging
+ * into a generic error callback.
+ */
+function onSetVolume(data) {
+	if ("Error" in data) {
+		onError(data.Error);
+	} else {
+		clearError();
+	}
+}
+
+/*
+ * Callback associated with an update to the value of the slider widget.
+ */
+function onVolumeSlider(event, ui) {
+	$.post("/control", {method: "set-volume", value: ui.value}, onSetVolume, "json");
+}
+
+/*
+ * Adapter for the browse::get-direct-children request to use to browse
+ * the music library.  Results are sent to @callback.
+ */
 function getDirectChildren(root, callback) {
 	$.post("/browse", {method: "get-direct-children", root: root}, callback, "json");
 }
 
+/*
+ * Genre
+ */
+
+/*
+ * The callback associated with the browse::get-all-genres request.
+ * This method populates the Genre list in the navigation table.
+ */
+function onGenreList(data) {
+	if ("Error" in data) {
+		onError(data.Error);
+	} else if("Value" in data) {
+		clearError();
+		$("#genre-table>tbody").empty();
+		for (i in data.Value) {
+			genre = data.Value[i];
+			writeGenreRow(genre);
+		}
+	}
+}
+
+/*
+ * Write a row to the list of available genres.  Selecting a genre in
+ * this list returns a sublist of the artists associated with that genre.
+ */
+function writeGenreRow(genre) {
+	$("#genre-table>tbody").append(
+		  "<tr>"
+		+ "<td><a href=\"javascript:getDirectChildren(\'"
+		+ jsEscape(genre.ID)
+		+ "\', onGetGenreArtists)\">"
+		+ genre.Title +
+		"</a></td>"
+		+ "</tr>");
+}
+
+/*
+ * Callback associated with getting a list of artists associated with
+ * a given genre.  This method populates the Artist list in the Genre
+ * navigation table.
+ */
 function onGetGenreArtists(data) {
 	if ("Error" in data) {
 		onError(data.Error);
@@ -196,30 +317,11 @@ function onGetGenreArtists(data) {
 	}
 }
 
-function writeGenreRow(genre) {
-	$("#genre-table>tbody").append(
-		  "<tr>"
-		+ "<td><a href=\"javascript:getDirectChildren(\'"
-		+ jsEscape(genre.ID)
-		+ "\', onGetGenreArtists)\">"
-		+ genre.Title +
-		"</a></td>"
-		+ "</tr>");
-}
-
-function onGetGenreArtist(data) {
-	if ("Error" in data) {
-		onError(data.Error);
-	} else if("Value" in data) {
-		clearError();
-		$("#album-table>tbody").empty();
-		for (i in data.Value) {
-			album = data.Value[i];
-			writeGenreAlbumRow(album);
-		}
-	}
-}
-
+/*
+ * Write a row to the list of artists associated with the selected genre.
+ * Selecting an artist in this list returns a list of albums associated
+ * with the selected genre and artist.
+ */
 function writeGenreArtistRow(artist) {
 	$("#artist-table>tbody").append(
 		  "<tr>"
@@ -230,13 +332,45 @@ function writeGenreArtistRow(artist) {
 		+ "</tr>");
 }
 
-function writeGenreTrackRow(track) {
-	$("#track-table>tbody").append(
+/*
+ * Callback associated with getting a list of albums associated with a
+ * given genre and artist.  This method populates the Album list in the
+ * Genre navigation table.
+ */
+function onGetGenreArtist(data) {
+	if ("Error" in data) {
+		onError(data.Error);
+	} else if("Value" in data) {
+		clearError();
+		$("#album-table>tbody").empty();
+		$("#track-table>tbody").empty();
+		for (i in data.Value) {
+			album = data.Value[i];
+			writeGenreAlbumRow(album);
+		}
+	}
+}
+
+/*
+ * Write a row to the list of albums associated with the selected genre
+ * and artist.  Selecting an album in the list returns a list of tracks
+ * from that album associated with the selected genre and artist.
+ */
+function writeGenreAlbumRow(album) {
+	$("#album-table>tbody").append(
 		  "<tr>"
-		+ "<td>" + track.Title + "</td>"
+		+ "<td><a href=\"javascript:getDirectChildren(\'"
+		+ jsEscape(album.ID)
+	       	+ "\', onGetGenreAlbum)\">"
+		+ album.Title + "</a></td>"
 		+ "</tr>");
 }
 
+/*
+ * Callback associated with getting a list of tracks associated with a
+ * given genre, artist, and album combination.  This method populates the
+ * Track list in the Genre navigation table.
+ */
 function onGetGenreAlbum(data) {
 	if ("Error" in data) {
 		onError(data.Error);
@@ -250,55 +384,47 @@ function onGetGenreAlbum(data) {
 	}
 }
 
-function writeGenreAlbumRow(album) {
-	$("#album-table>tbody").append(
+/*
+ * Write a row to the list of traks associated with the selected genre,
+ * artist, and album combination.
+ */
+function writeGenreTrackRow(track) {
+	$("#track-table>tbody").append(
 		  "<tr>"
-		+ "<td><a href=\"javascript:getDirectChildren(\'"
-		+ jsEscape(album.ID)
-	       	+ "\', onGetGenreAlbum)\">"
-		+ album.Title + "</a></td>"
+		+ "<td>" + track.Title + "</td>"
 		+ "</tr>");
 }
 
-function onGenreList(data) {
-	if ("Error" in data) {
-		onError(data.Error);
-	} else if("Value" in data) {
-		clearError();
-		$("#genre-table>tbody").empty();
-		for (i in data.Value) {
-			genre = data.Value[i];
-			writeGenreRow(genre);
-		}
-	}
-}
-
-function onSetVolume(data) {
-	if ("Error" in data) {
-		onError(data.Error);
-	} else {
-		clearError();
-	}
-}
-
-function onVolumeSlider(event, ui) {
-	$.post("/control", {method: "set-volume", value: ui.value}, onSetVolume, "json");
-}
-
-function eventLoop() {
+/*
+ * Get the current playback state.
+ */
+function getState() {
 	$.post("/control", {method: "get-volume"}, onVolume, "json");
 	$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
 	$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
+}
+
+/*
+ * For each trip through the event loop load the current playback state.
+ * Geting the current queue is more expensive, both from a messaging and
+ * a UI standpoint, so try to do that less often.
+ */
+function eventLoop() {
+	getState()
 	if (++updateCount % 5 == 0) {
 		$.post("/browse", {method: "get-queue-contents"}, onQueue, "json");
 	}
 }
 
+/*
+ * Called when the page loads.  Get the current playback state, queue
+ * contents, and initialize the navigation pane.
+ */
 function initUi() {
-	$.post("/control", {method: "get-volume"}, onVolume, "json");
-	$.post("/control", {method: "get-position-info"}, onPositionInfo, "json");
-	$.post("/control", {method: "get-transport-info"}, onTransportInfo, "json");
+	getState()
 	$.post("/browse", {method: "get-queue-contents"}, onQueue, "json");
 	$.post("/browse", {method: "get-all-genres"}, onGenreList, "json");
 }
+
+/* END!*/
 
