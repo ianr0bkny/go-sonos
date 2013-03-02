@@ -35,6 +35,9 @@ var updateCount = 0;
 /* Position in the playback queue [1...n] */
 var currentTrack = 0;
 
+/* Number of tracks in the playback queue */
+var queueSize = 0;
+
 /*
  * A helper function to write a diagnostic error message to the screen.
  */
@@ -89,7 +92,7 @@ function setCurrentTrack(track) {
  * Callback associated with control::get-position-info.  This method
  * populated the position information table and update the progress.
  */
-function onPositionInfo(data, queueSize) {
+function onPositionInfo(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if ("Value" in data) {
@@ -179,13 +182,13 @@ function onQueue(data) {
 	if ("Error" in data) {
 		onError(data.Error);
 	} else if ("Value" in data) {
-		var queueSize = data.Value.length;
+		queueSize = data.Value.length;
 		$("#current-queue>tbody").empty();
 		for (i = currentTrack; i < data.Value.length; i++) {
-			writeTrackRow(data.Value[i], i + 1, queueSize);
+			writeTrackRow(data.Value[i], i + 1);
 		}
 		for (i = 0; i < currentTrack; i++) {
-			writeTrackRow(data.Value[i], i + 1, queueSize);
+			writeTrackRow(data.Value[i], i + 1);
 		}
 	}
 }
