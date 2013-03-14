@@ -1,20 +1,20 @@
-// 
+//
 // go-sonos
 // ========
-// 
+//
 // Copyright (c) 2012, Ian T. Richards <ianr@panix.com>
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
+//
 //   * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //   * Redistributions in binary form must reproduce the above copyright
 //     notice, this list of conditions and the following disclaimer in the
 //     documentation and/or other materials provided with the distribution.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -26,7 +26,7 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 
 package upnp
 
@@ -208,18 +208,33 @@ func (this *DeviceProperties) GetHouseholdID() (currentHouseholdId string, err e
 	return
 }
 
+//
+// The return value for the GetZoneInfo method
+//
 type ZoneInfo struct {
-	SerialNumber           string
-	SoftwareVersion        string
+	// Appliance serial number
+	SerialNumber string
+	// Software version string
+	SoftwareVersion string
+	// Display software version string
 	DisplaySoftwareVersion string
-	HardwareVersion        string
-	IPAddress              string
-	MACAddress             string
-	CopyrightInfo          string
-	ExtraInfo              string
+	// Hardware version
+	HardwareVersion string
+	// the IP address of the appliance
+	IPAddress string
+	// The hardware MAC address of the appliance
+	MACAddress string
+	// The Sonos Copyright statement
+	CopyrightInfo string
+	// ???
+	ExtraInfo string
 }
 
-func (this *DeviceProperties) GetZoneInfo() (zoneInfo *ZoneInfo, err error) {
+//
+// Fetches basic properties of the appliance including IP address,
+// MAC address, and relevant hardware and software version.
+//
+func (this *DeviceProperties) GetZoneInfo() (*ZoneInfo, error) {
 	type Response struct {
 		XMLName xml.Name
 		ZoneInfo
@@ -228,9 +243,7 @@ func (this *DeviceProperties) GetZoneInfo() (zoneInfo *ZoneInfo, err error) {
 	response := this.Svc.CallVa("GetZoneInfo")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	zoneInfo = &doc.ZoneInfo
-	err = doc.Error()
-	return
+	return &doc.ZoneInfo, doc.Error()
 }
 
 func (this *DeviceProperties) SetAutoplayLinkedZones(includeLinkedZones bool) (err error) {

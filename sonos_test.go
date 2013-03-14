@@ -1000,3 +1000,13 @@ func TestCrossfadeMode(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGetZoneInfo(t *testing.T) {
+	// Tests getting basic information about the Sonos appliance
+	s := getTestSonos(sonos.SVC_DEVICE_PROPERTIES)
+	if info, err := s.GetZoneInfo(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("%#v", info)
+	}
+}
