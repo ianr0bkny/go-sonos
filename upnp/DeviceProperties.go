@@ -377,3 +377,31 @@ func (this *DeviceProperties) GetUseAutoplayVolume() (useVolume bool, err error)
 	err = doc.Error()
 	return
 }
+
+func (this *DeviceProperties) AddHTSatellite(htSatChanMapSet string) error {
+	type Response struct {
+		XMLName xml.Name
+		ErrorResponse
+	}
+	args := []Arg{
+		{"HTSatChanMapSet", htSatChanMapSet},
+	}
+	response := this.Svc.Call("AddHTSatellite", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.Error()
+}
+
+func (this *DeviceProperties) RemoveHTSatellite(satRoomUUID string) error {
+	type Response struct {
+		XMLName xml.Name
+		ErrorResponse
+	}
+	args := []Arg{
+		{"SatRoomUUID", satRoomUUID},
+	}
+	response := this.Svc.Call("RemoveHTSatellite", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.Error()
+}
