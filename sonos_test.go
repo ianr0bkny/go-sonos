@@ -1010,3 +1010,13 @@ func TestGetZoneInfo(t *testing.T) {
 		t.Logf("%#v", info)
 	}
 }
+
+func TestGetZoneGroup(t *testing.T) {
+	// Tests getting basic information about the Sonos appliance
+	s := getTestSonos(sonos.SVC_ZONE_GROUP_TOPOLOGY)
+	if info, err := s.GetZoneGroupAttributes(); nil != err {
+		t.Fatal(err)
+	} else {
+		t.Logf("%#v", info)
+	}
+}
