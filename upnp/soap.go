@@ -48,14 +48,14 @@ const (
 	soapUserAgent      = "Linux UPnP/1.1 crash"
 )
 
-type Arg struct {
+type upnpArg struct {
 	Key   string
 	Value interface{}
 }
 
-type Args []Arg
+type upnpArgs []upnpArg
 
-type ErrorResponse struct {
+type upnpErrorResponse struct {
 	FaultCode   string `xml:"faultcode"`
 	FaultString string `xml:"faultstring"`
 	Detail      struct {
@@ -67,7 +67,7 @@ type ErrorResponse struct {
 	} `xml:"detail"`
 }
 
-func (this *ErrorResponse) Error() (err error) {
+func (this *upnpErrorResponse) Error() (err error) {
 	if 0 < len(this.FaultCode) {
 		err = errors.New(this.Detail.UPnPError.ErrorCode)
 	}
@@ -84,7 +84,7 @@ func soapBuildNamespace(svc *Service) (ns string) {
 	return fmt.Sprintf("urn:%s:service:%s:%s", svc.serviceURI, svc.serviceType, svc.serviceVersion)
 }
 
-func soapNewRequestAction(action string, svc *Service, args Args) (ra soapRequestAction) {
+func soapNewRequestAction(action string, svc *Service, args upnpArgs) (ra soapRequestAction) {
 	ns := soapBuildNamespace(svc)
 	ra = soapRequestAction{}
 	ra.XMLName.Local = "u:" + action
@@ -132,7 +132,7 @@ type soapRequest struct {
 	Envelope soapRequestEnvelope
 }
 
-func soapNewRequest(action string, svc *Service, args Args) (req *soapRequest) {
+func soapNewRequest(action string, svc *Service, args upnpArgs) (req *soapRequest) {
 	req = &soapRequest{}
 	req.Envelope.XMLNS_s = soapEnvelopeSchema
 	req.Envelope.EncodingStyle = soapEncodingStyle
@@ -140,7 +140,7 @@ func soapNewRequest(action string, svc *Service, args Args) (req *soapRequest) {
 	return
 }
 
-func upnpBuildRequest(svc *Service, action string, args Args) (msg []byte) {
+func upnpBuildRequest(svc *Service, action string, args upnpArgs) (msg []byte) {
 	if act, err := svc.findAction(action); nil != err {
 		panic(err)
 	} else {
@@ -153,7 +153,7 @@ func upnpBuildRequest(svc *Service, action string, args Args) (msg []byte) {
 	return
 }
 
-func (this *Service) Call(action string, args Args) (response string) {
+func (this *Service) Call(action string, args upnpArgs) (response string) {
 	client := &http.Client{}
 	r := upnpBuildRequest(this, action, args)
 	body := strings.NewReader(xml.Header + string(r))
@@ -182,9 +182,9 @@ func (this *Service) Call(action string, args Args) (response string) {
 }
 
 func (this *Service) CallVa(action string, va_list ...interface{}) (response string) {
-	var args Args
+	var args upnpArgs
 	for i := 0; i < len(va_list); i += 2 {
-		args = append(args, Arg{va_list[i].(string), va_list[i+1]})
+		args = append(args, upnpArg{va_list[i].(string), va_list[i+1]})
 	}
 	return this.Call(action, args)
 }

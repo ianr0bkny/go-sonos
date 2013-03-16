@@ -50,9 +50,9 @@ func (this *GroupManagement) AddMember(memberId string) (memberInfo *MemberInfo,
 	type Response struct {
 		XMLName xml.Name
 		MemberInfo
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"MemberID", memberId},
 	}
 	response := this.Svc.Call("AddMember", args)
@@ -66,9 +66,9 @@ func (this *GroupManagement) AddMember(memberId string) (memberInfo *MemberInfo,
 func (this *GroupManagement) RemoveMember(memberId string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"MemberID", memberId},
 	}
 	response := this.Svc.Call("RemoveMember", args)
@@ -81,9 +81,9 @@ func (this *GroupManagement) RemoveMember(memberId string) (err error) {
 func (this *GroupManagement) ReportTrackBufferingResult(memberId string, resultCode int32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"MemberID", memberId},
 		{"ResultCode", resultCode},
 	}

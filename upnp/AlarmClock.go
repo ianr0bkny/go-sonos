@@ -42,9 +42,9 @@ type AlarmClock struct {
 func (this *AlarmClock) SetFormat(desiredTimeFormat, desiredDateFormat string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"DesiredTimeFormat", desiredTimeFormat},
 		{"DesiredDateFormat", desiredDateFormat},
 	}
@@ -60,7 +60,7 @@ func (this *AlarmClock) GetFormat() (currentTimeFormat, currentDateFormat string
 		XMLName           xml.Name
 		CurrentTimeFormat string
 		CurrentDateFormat string
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("GetFormat")
 	doc := Response{}
@@ -74,9 +74,9 @@ func (this *AlarmClock) GetFormat() (currentTimeFormat, currentDateFormat string
 func (this *AlarmClock) SetTimeZone(index int32, autoAdjustDst bool) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"Index", index},
 		{"AutoAdjustDst", autoAdjustDst},
 	}
@@ -92,7 +92,7 @@ func (this *AlarmClock) GetTimeZone() (index int32, autoAdjustDst bool, err erro
 		XMLName       xml.Name
 		Index         int32
 		AutoAdjustDst bool
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("GetTimeZone")
 	doc := Response{}
@@ -109,7 +109,7 @@ func (this *AlarmClock) GetTimeZoneAndRule() (index int32, autoAdjustDst bool, t
 		Index         int32
 		AutoAdjustDst bool
 		TimeZone      string
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("GetTimeZoneAndRule")
 	doc := Response{}
@@ -125,9 +125,9 @@ func (this *AlarmClock) GetTimeZoneRule(index int32) (timeZone string, err error
 	type Response struct {
 		XMLName  xml.Name
 		TimeZone string
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"Index", index},
 	}
 	response := this.Svc.Call("GetTimeZoneRule", args)
@@ -141,9 +141,9 @@ func (this *AlarmClock) GetTimeZoneRule(index int32) (timeZone string, err error
 func (this *AlarmClock) SetTimeServer(desiredTimeServer string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"DesiredTimeServer", desiredTimeServer},
 	}
 	response := this.Svc.Call("SetTimeServer", args)
@@ -157,7 +157,7 @@ func (this *AlarmClock) GetTimeServer() (currentTimeServer string, err error) {
 	type Response struct {
 		XMLName           xml.Name
 		CurrentTimeServer string
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("GetTimeServer")
 	doc := Response{}
@@ -170,9 +170,9 @@ func (this *AlarmClock) GetTimeServer() (currentTimeServer string, err error) {
 func (this *AlarmClock) SetTimeNow(desiredTime, timeZoneForDesiredTime string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"DesiredTime", desiredTime},
 		{"TimeZoneForDesiredTime", timeZoneForDesiredTime},
 	}
@@ -187,9 +187,9 @@ func (this *AlarmClock) GetHouseholdTimeAtStamp(timeStamp string) (householdUTCT
 	type Response struct {
 		XMLName          xml.Name
 		HouseholdUTCTime string
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"TimeStamp", timeStamp},
 	}
 	response := this.Svc.Call("GetHouseholdTimeAtStamp", args)
@@ -211,7 +211,7 @@ func (this *AlarmClock) GetTimeNow() (getTimeNowResponse *GetTimeNowResponse, er
 	type Response struct {
 		XMLName xml.Name
 		GetTimeNowResponse
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("GetTimeNow")
 	doc := Response{}
@@ -252,9 +252,9 @@ func (this *AlarmClock) CreateAlarm(req *CreateAlarmRequest) (assignedId uint32,
 	type Response struct {
 		XMLName    xml.Name
 		AssignedID uint32
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"StartLocalTime", req.StartLocalTime},
 		{"Duration", req.Duration},
 		{"Recurrence", req.Recurrence},
@@ -279,9 +279,9 @@ type UpdateAlarmRequest CreateAlarmRequest
 func (this *AlarmClock) UpdateAlarm(id uint32, req *UpdateAlarmRequest) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"ID", id},
 		{"StartLocalTime", req.StartLocalTime},
 		{"Duration", req.Duration},
@@ -304,9 +304,9 @@ func (this *AlarmClock) UpdateAlarm(id uint32, req *UpdateAlarmRequest) (err err
 func (this *AlarmClock) DestroyAlarm(id uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"ID", id},
 	}
 	response := this.Svc.Call("DestroyAlarm", args)
@@ -321,7 +321,7 @@ func (this *AlarmClock) ListAlarms() (currentAlarmList, currentAlarmListVersion 
 		XMLName                 xml.Name
 		CurrentAlarmList        string
 		CurrentAlarmListVersion string
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("ListAlarms")
 	doc := Response{}
@@ -335,9 +335,9 @@ func (this *AlarmClock) ListAlarms() (currentAlarmList, currentAlarmListVersion 
 func (this *AlarmClock) SetDailyIndexRefreshTime(desiredDailyIndexRefreshTime string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"DesiredDailyIndexRefreshTime", desiredDailyIndexRefreshTime},
 	}
 	response := this.Svc.Call("SetDailyIndexRefreshTime", args)
@@ -351,7 +351,7 @@ func (this *AlarmClock) GetDailyIndexRefreshTime() (currentDailyIndexRefreshTime
 	type Response struct {
 		XMLName                      xml.Name
 		CurrentDailyIndexRefreshTime string
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("GetDailyIndexRefreshTime")
 	doc := Response{}

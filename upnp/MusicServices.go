@@ -86,9 +86,9 @@ func (this *MusicServices) GetSessionId(serviceId int16, username string) (sessi
 	type Response struct {
 		XMLName   xml.Name
 		SessionId string
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"ServiceId", serviceId},
 		{"Username", username},
 	}
@@ -106,7 +106,7 @@ func (this *MusicServices) ListAvailableServices() (err error) {
 		AvailableServiceDescriptorList string
 		AvailableServiceTypeList       string
 		AvailableServiceListVersion    string
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("ListAvailableServices")
 	doc := Response{}
@@ -121,7 +121,7 @@ func (this *MusicServices) ListAvailableServices() (err error) {
 func (this *MusicServices) UpdateAvailableServices() (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("UpdateAvailableServices")
 	doc := Response{}

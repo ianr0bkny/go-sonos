@@ -44,7 +44,7 @@ func (this *ConnectionManager) GetProtocolInfo() (source, sink string, err error
 		XMLName xml.Name
 		Source  string
 		Sink    string
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("GetProtocolInfo")
 	doc := Response{}
@@ -59,7 +59,7 @@ func (this *ConnectionManager) GetCurrentConnectionIDs() (connectionIds string, 
 	type Response struct {
 		XMLName       xml.Name
 		ConnectionIDs string
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("GetCurrentConnectionIDs")
 	doc := Response{}
@@ -96,9 +96,9 @@ func (this *ConnectionManager) GetCurrentConnectionInfo(connectionId int32) (con
 	type Response struct {
 		XMLName xml.Name
 		ConnectionInfo
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"ConnectionID", connectionId},
 	}
 	response := this.Svc.Call("GetCurrentConnectionInfo", args)

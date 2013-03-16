@@ -47,9 +47,9 @@ const (
 func (this *ZoneGroupTopology) BeginSoftwareUpdate(updateURL string, flags uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"UpdateURL", updateURL},
 		{"Flags", flags},
 	}
@@ -82,9 +82,9 @@ func (this *ZoneGroupTopology) CheckForUpdate(updateType UpdateType, cachedOnly 
 	type Response struct {
 		XMLName    xml.Name
 		UpdateItem UpdateItemText
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"UpdateType", updateType},
 		{"CachedOnly", cachedOnly},
 		{"Version", version},
@@ -107,9 +107,9 @@ const (
 func (this *ZoneGroupTopology) ReportUnresponsiveDevice(deviceUUID string, desiredAction string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"DeviceUUID", deviceUUID},
 		{"DesiredAction", desiredAction},
 	}
@@ -123,7 +123,7 @@ func (this *ZoneGroupTopology) ReportUnresponsiveDevice(deviceUUID string, desir
 func (this *ZoneGroupTopology) ReportAlarmStartedRunning() (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("ReportAlarmStartedRunning")
 	doc := Response{}
@@ -136,7 +136,7 @@ func (this *ZoneGroupTopology) SubmitDiagnostics() (diagnosticId string, err err
 	type Response struct {
 		XMLName      xml.Name
 		DiagnosticID string
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("SubmitDiagnostics")
 	doc := Response{}
@@ -149,9 +149,9 @@ func (this *ZoneGroupTopology) SubmitDiagnostics() (diagnosticId string, err err
 func (this *ZoneGroupTopology) RegisterMobileDevice(deviceName, deviceUDN, deviceAddress string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		ErrorResponse
+		upnpErrorResponse
 	}
-	args := []Arg{
+	args := []upnpArg{
 		{"MobileDeviceName", deviceName},
 		{"MobileDeviceUDN", deviceUDN},
 		{"MobileIPAndPort", deviceAddress},
@@ -173,7 +173,7 @@ func (this *ZoneGroupTopology) GetZoneGroupAttributes() (*ZoneGroupAttributes, e
 	type Response struct {
 		XMLName xml.Name
 		ZoneGroupAttributes
-		ErrorResponse
+		upnpErrorResponse
 	}
 	response := this.Svc.CallVa("GetZoneGroupAttributes")
 	doc := Response{}
