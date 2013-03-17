@@ -31,6 +31,26 @@
 //
 // A module to support bookmarking discovered UPnP devices.
 //
+// This module is intended to solve the problem of addressing commands to
+// a specific UPnP device, where each device is known by a user-unfriendly
+// UUID, where network addresses are subject to change, ala DHCP, and where
+// it is not desirable to repeat device discovery each time a command is
+// to be sent.
+//
+// Since device discovery is slow, it should only be run once in a while
+// when DHCP leases would have expired.  The discovery process writes the
+// list of discovered devices to the list of bookmarks.
+//
+// Once, when the device is installed, an association is added to the
+// list of bookmarks, making a memorable alias, i.e. 'kitchen', point to
+// a particular UUID.
+//
+// Now whenever network addresses change disovery can be rerun, with
+// aliases automatically pointing to the new address associated with the
+// static UUID.
+//
+// Look at sonos_test.go for examples of how this class is used.
+//
 package config
 
 import (
@@ -42,19 +62,37 @@ import (
 	"path"
 )
 
+//
+// A container for the runtime configuration used by go-sonos application.
+//
 type Config struct {
-	dirname   string
-	dir       *os.File
+	// The path to the configuration directory
+	dirname string
+	// A handle to the configuration directory
+	dir *os.File
+	// A set of discovered devices
 	Bookmarks Bookmarks
 }
 
+//
+// A strucutre that holds all of the fields required to build a UPnP
+// device without first trying to discover it.
+//
 type Bookmark struct {
-	Alias    string        `json:"alias,omitempty"`
-	Product  string        `json:"product,omitempty"`
+	// A memorable string standing in for a UUID
+	Alias string `json:"alias,omitempty"`
+	// The name of the device's product, e.g. 'Sonos'
+	Product string `json:"product,omitempty"`
+	// The last know location of the device
 	Location ssdp.Location `json:"location,omitempty"`
-	UUID     ssdp.UUID     `json:"uuid"`
+	// The device's UUID
+	UUID ssdp.UUID `json:"uuid"`
 }
 
+//
+// A map holding a set of bookmarks, where the key is alternately the
+// UUID of the device, or an alias to a device.
+//
 type Bookmarks map[string]Bookmark
 
 type configDevice struct {
@@ -79,10 +117,20 @@ func (this *configDevice) Service(key ssdp.ServiceKey) (service ssdp.Service, ha
 	return
 }
 
+//
+// Create a configuration object where @dir is the path to the
+// configuration directory.  Note that Init() must be called in order to
+// use the newly created object.
+//
 func MakeConfig(dir string) *Config {
 	return &Config{dir, nil, Bookmarks{}}
 }
 
+//
+// Initialize the configuration object by loading any existing
+// configuration from disk.  This method creates the configuration directory,
+// if needed.
+//
 func (this *Config) Init() {
 	var err error
 	if this.dir, err = os.Open(this.dirname); nil != err {
@@ -104,6 +152,9 @@ func (this *Config) Init() {
 	this.loadFromDisk()
 }
 
+//
+// Write the current configuration to disk.
+//
 func (this *Config) Save() {
 	if nil == this.dir {
 		return
@@ -123,6 +174,13 @@ func (this *Config) saveBookmarks() {
 	}
 }
 
+//
+// Add a bookmark to the bookmark set where @ident is either the uuid
+// or the alias to add; @product is the product string, such as 'Sonos';
+// @localtion is the network location of the resource; and @uuid is the
+// device's UUID.  When adding a device @ident and @uuid should be the same;
+// when adding an alias @ident and @uuid will be different.
+//
 func (this *Config) AddBookmark(ident, product string, location ssdp.Location, uuid ssdp.UUID) {
 	if ident != string(uuid) {
 		this.Bookmarks[ident] = Bookmark{ident, product, location, uuid}
@@ -131,11 +189,17 @@ func (this *Config) AddBookmark(ident, product string, location ssdp.Location, u
 	}
 }
 
+//
+// Add @alias as an alias for @uuid.
+//
 func (this *Config) AddAlias(uuid ssdp.UUID, alias string) {
 	old := this.Bookmarks[string(uuid)]
 	this.AddBookmark(alias, "", ssdp.Location(""), old.UUID)
 }
 
+//
+// Remove all aliases from the set of bookmarks.
+//
 func (this *Config) ClearAliases() {
 	for key, rec := range this.Bookmarks {
 		if 0 < len(rec.Alias) {
@@ -144,6 +208,10 @@ func (this *Config) ClearAliases() {
 	}
 }
 
+//
+// Remove any association of a device to the alias @alias.  If @alias
+// is a UUID this method is a noop.
+//
 func (this *Config) ClearAlias(alias string) {
 	if rec, has := this.Bookmarks[alias]; has {
 		if 0 < len(rec.Alias) {
@@ -196,7 +264,7 @@ func (this *Config) lookupImpl(ident string, history map[string]bool) (dev ssdp.
 		history[ident] = true
 		if bookmark, has := this.Bookmarks[ident]; has {
 			if 0 < len(bookmark.Alias) {
-				return this.lookupImpl(string(bookmark.UUID), history)
+				dev = this.lookupImpl(string(bookmark.UUID), history)
 			} else {
 				dev = &configDevice{bookmark.Product, bookmark.Location, bookmark.UUID}
 			}
@@ -205,6 +273,10 @@ func (this *Config) lookupImpl(ident string, history map[string]bool) (dev ssdp.
 	return
 }
 
+//
+// Try to find the device associated with the UUID or alias
+// @ident. Returns nil if there is no device associated with @ident.
+//
 func (this *Config) Lookup(ident string) ssdp.Device {
 	return this.lookupImpl(ident, map[string]bool{})
 }
