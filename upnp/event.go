@@ -80,6 +80,10 @@ type upnpDefaultReactor struct {
 	eventChan   chan *upnpEvent
 }
 
+func (this *upnpDefaultReactor) serve() {
+	log.Fatal(this.server.ListenAndServe())
+}
+
 func (this *upnpDefaultReactor) Init(ifiname, port string) {
 	if this.initialized {
 		panic("Attempt to reinitialize reactor")
@@ -108,7 +112,7 @@ func (this *upnpDefaultReactor) Init(ifiname, port string) {
 	http.Handle("/eventSub", this)
 	log.Printf("Listening for events on %s", this.localAddr)
 	go this.run()
-	go this.server.ListenAndServe()
+	go this.serve()
 }
 
 func (this *upnpDefaultReactor) handleAck(svc *Service, resp *http.Response) (sid string, err error) {

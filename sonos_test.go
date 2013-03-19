@@ -1,20 +1,20 @@
-// 
+//
 // go-sonos
 // ========
-// 
+//
 // Copyright (c) 2012, Ian T. Richards <ianr@panix.com>
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
+//
 //   * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //   * Redistributions in binary form must reproduce the above copyright
 //     notice, this list of conditions and the following disclaimer in the
 //     documentation and/or other materials provided with the distribution.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -26,7 +26,7 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 
 package sonos_test
 
@@ -38,13 +38,14 @@ import (
 	"log"
 	"strings"
 	"testing"
+	"time"
 )
 
 const (
 	TEST_CONFIG        = "/home/ianr/.go-sonos"
 	TEST_DEVICE        = "kitchen"
 	TEST_DISCOVER_PORT = "13104"
-	TEST_EVENTING_PORT = "13105"
+	TEST_EVENTING_PORT = "13106"
 	TEST_NETWORK       = "eth0"
 )
 
@@ -938,7 +939,7 @@ func TestUseQueue(t *testing.T) {
 		if data, err := s.GetMetadata(sonos.ObjectID_Queue_AVT_Instance_0); nil != err {
 			t.Fatal(err)
 		} else {
-			if err := s.SetAVTransportURI(0 /*instanceId*/, data[0].Res(), ""/*metadata*/); nil != err {
+			if err := s.SetAVTransportURI(0 /*instanceId*/, data[0].Res(), "" /*metadata*/); nil != err {
 				t.Fatal(err)
 			}
 		}
@@ -954,7 +955,6 @@ func TestTransportSettings(t *testing.T) {
 		t.Logf("%#v", data)
 	}
 }
-
 
 func TestSetPlayMode(t *testing.T) {
 	// Changes the playback mode to shuffle, tries to set it to some
@@ -1018,5 +1018,22 @@ func TestGetZoneGroup(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		t.Logf("%#v", info)
+	}
+}
+
+func TestEvent(t *testing.T) {
+	// Startup and listen to events for 10 seconds
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	c := config.MakeConfig(TEST_CONFIG)
+	c.Init()
+	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
+		testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALL)
+		for i := 0; i < 10; i++ {
+			time.Sleep(1 * time.Second)
+			log.Printf("Heartbeat")
+		}
+	} else {
+		log.Fatal("Could not create test instance")
 	}
 }
