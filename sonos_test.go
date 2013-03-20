@@ -1028,10 +1028,9 @@ func TestEvent(t *testing.T) {
 	c.Init()
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALL)
-		for i := 0; i < 10; i++ {
+		testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALARM_CLOCK)
+		for i := 0; i < 900; i++ {
 			time.Sleep(1 * time.Second)
-			log.Printf("Heartbeat")
 		}
 	} else {
 		log.Fatal("Could not create test instance")
