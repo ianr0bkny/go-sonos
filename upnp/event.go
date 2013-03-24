@@ -52,9 +52,14 @@ type upnpEvent_XML struct {
 
 type EventCallback func(svc *Service, value string)
 
+type EventFactory interface {
+	HandleProperty(svc *Service, value string, channel chan Event)
+}
+
 type Reactor interface {
 	Init(ifiname, port string)
-	Subscribe(svc *Service, callback EventCallback) error
+	Subscribe(svc *Service, factory EventFactory) error
+	Channel() chan Event
 }
 
 type upnpEvent struct {
@@ -63,11 +68,14 @@ type upnpEvent struct {
 }
 
 type upnpEventRecord struct {
-	svc      *Service
-	callback EventCallback
+	svc     *Service
+	factory EventFactory
 }
 
 type upnpEventMap map[string]*upnpEventRecord
+
+type Event interface {
+}
 
 type upnpDefaultReactor struct {
 	ifiname     string
@@ -77,7 +85,8 @@ type upnpDefaultReactor struct {
 	localAddr   string
 	eventMap    upnpEventMap
 	subscrChan  chan *upnpEventRecord
-	eventChan   chan *upnpEvent
+	unpackChan  chan *upnpEvent
+	eventChan   chan Event
 }
 
 func (this *upnpDefaultReactor) serve() {
@@ -125,13 +134,17 @@ func (this *upnpDefaultReactor) handleAck(svc *Service, resp *http.Response) (si
 	return
 }
 
-func (this *upnpDefaultReactor) Subscribe(svc *Service, callback EventCallback) (err error) {
+func (this *upnpDefaultReactor) Subscribe(svc *Service, factory EventFactory) (err error) {
 	rec := upnpEventRecord{
-		svc:      svc,
-		callback: callback,
+		svc:     svc,
+		factory: factory,
 	}
 	this.subscrChan <- &rec
 	return
+}
+
+func (this *upnpDefaultReactor) Channel() chan Event {
+	return this.eventChan
 }
 
 func (this *upnpDefaultReactor) subscribeImpl(rec *upnpEventRecord) (err error) {
@@ -157,7 +170,7 @@ func (this *upnpDefaultReactor) subscribeImpl(rec *upnpEventRecord) (err error) 
 
 func (this *upnpDefaultReactor) maybePostEvent(event *upnpEvent) {
 	if rec, has := this.eventMap[event.sid]; has {
-		rec.callback(rec.svc, event.value)
+		rec.factory.HandleProperty(rec.svc, event.value, this.eventChan)
 	}
 }
 
@@ -166,7 +179,7 @@ func (this *upnpDefaultReactor) run() {
 		select {
 		case subscr := <-this.subscrChan:
 			this.subscribeImpl(subscr)
-		case event := <-this.eventChan:
+		case event := <-this.unpackChan:
 			this.maybePostEvent(event)
 		}
 	}
@@ -181,7 +194,7 @@ func (this *upnpDefaultReactor) notify(sid, value string) {
 		sid:   sid,
 		value: value,
 	}
-	this.eventChan <- event
+	this.unpackChan <- event
 }
 
 func (this *upnpDefaultReactor) unpack(sid string, doc *upnpEvent_XML) {
@@ -215,6 +228,7 @@ func MakeReactor() Reactor {
 	reactor := &upnpDefaultReactor{}
 	reactor.eventMap = make(upnpEventMap)
 	reactor.subscrChan = make(chan *upnpEventRecord)
-	reactor.eventChan = make(chan *upnpEvent)
+	reactor.unpackChan = make(chan *upnpEvent)
+	reactor.eventChan = make(chan Event)
 	return reactor
 }
