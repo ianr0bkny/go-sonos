@@ -50,8 +50,6 @@ type upnpEvent_XML struct {
 	Properties []upnpEventProperty_XML `xml:"urn:schemas-upnp-org:event-1-0 property"`
 }
 
-type EventCallback func(svc *Service, value string)
-
 type EventFactory interface {
 	BeginSet(svc *Service, channel chan Event)
 	HandleProperty(svc *Service, value string, channel chan Event)
@@ -86,6 +84,7 @@ type upnpEventRecord struct {
 type upnpEventMap map[string]*upnpEventRecord
 
 type Event interface {
+	Service() *Service
 }
 
 type upnpDefaultReactor struct {
