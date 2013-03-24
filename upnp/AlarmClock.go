@@ -47,6 +47,11 @@ type AlarmClockState struct {
 
 type AlarmClockEvent struct {
 	AlarmClockState
+	Svc *Service
+}
+
+func (this AlarmClockEvent) Service() *Service {
+	return this.Svc
 }
 
 type AlarmClock struct {
@@ -62,7 +67,7 @@ func (this *AlarmClock) HandleProperty(svc *Service, value string, channel chan 
 }
 
 func (this *AlarmClock) EndSet(svc *Service, channel chan Event) {
-	evt := AlarmClockEvent{AlarmClockState: this.AlarmClockState}
+	evt := AlarmClockEvent{AlarmClockState: this.AlarmClockState, Svc: svc}
 	channel <- evt
 }
 
