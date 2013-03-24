@@ -45,9 +45,25 @@ type AlarmClockState struct {
 	DateFormat            string
 }
 
+type AlarmClockEvent struct {
+	AlarmClockState
+}
+
 type AlarmClock struct {
 	AlarmClockState
 	Svc *Service
+}
+
+func (this *AlarmClock) BeginSet(svc *Service, channel chan Event) {
+}
+
+func (this *AlarmClock) HandleProperty(svc *Service, value string, channel chan Event) {
+	xml.Unmarshal([]byte("<AlarmClockState>"+value+"</AlarmClockState>"), &this.AlarmClockState)
+}
+
+func (this *AlarmClock) EndSet(svc *Service, channel chan Event) {
+	evt := AlarmClockEvent{AlarmClockState: this.AlarmClockState}
+	channel <- evt
 }
 
 func (this *AlarmClock) SetFormat(desiredTimeFormat, desiredDateFormat string) (err error) {

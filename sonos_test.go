@@ -1030,6 +1030,12 @@ func TestEvent(t *testing.T) {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALARM_CLOCK)
 		//testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALL)
+		for {
+			select {
+			case evt := <- reactor.Channel():
+				log.Printf("%#v", evt)
+			}
+		}
 		for i := 0; i < 900; i++ {
 			t.Logf("Heartbeat")
 			time.Sleep(1 * time.Second)

@@ -84,8 +84,14 @@ const (
 type sonosEventFactory struct {
 }
 
-func (this sonosEventFactory) HandleProperty(svc *upnp.Service, value string, channel chan upnp.Event) {
+func (this *sonosEventFactory) BeginSet(svc *upnp.Service, channel chan upnp.Event) {
+}
+
+func (this *sonosEventFactory) HandleProperty(svc *upnp.Service, value string, channel chan upnp.Event) {
 	log.Printf("UPDATE: %s", value)
+}
+
+func (this *sonosEventFactory) EndSet(svc *upnp.Service, channel chan upnp.Event) {
 }
 
 func sonosCheckServiceFlags(svc_type string, flags int) bool {
@@ -125,70 +131,70 @@ func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (sonos 
 			for _, svc := range svc_list {
 				sonos.AlarmClock.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.AlarmClock)
 				break
 			}
 		case "AVTransport":
 			for _, svc := range svc_list {
 				sonos.AVTransport.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.eventFactory)
 				break
 			}
 		case "ConnectionManager":
 			for _, svc := range svc_list {
 				sonos.ConnectionManager.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.eventFactory)
 				break
 			}
 		case "ContentDirectory":
 			for _, svc := range svc_list {
 				sonos.ContentDirectory.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.eventFactory)
 				break
 			}
 		case "DeviceProperties":
 			for _, svc := range svc_list {
 				sonos.DeviceProperties.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.eventFactory)
 				break
 			}
 		case "GroupManagement":
 			for _, svc := range svc_list {
 				sonos.GroupManagement.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.eventFactory)
 				break
 			}
 		case "MusicServices":
 			for _, svc := range svc_list {
 				sonos.MusicServices.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.eventFactory)
 				break
 			}
 		case "RenderingControl":
 			for _, svc := range svc_list {
 				sonos.RenderingControl.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.eventFactory)
 				break
 			}
 		case "SystemProperties":
 			for _, svc := range svc_list {
 				sonos.SystemProperties.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.eventFactory)
 				break
 			}
 		case "ZoneGroupTopology":
 			for _, svc := range svc_list {
 				sonos.ZoneGroupTopology.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.eventFactory)
 				break
 			}
 		}

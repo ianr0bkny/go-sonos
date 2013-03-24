@@ -53,7 +53,9 @@ type upnpEvent_XML struct {
 type EventCallback func(svc *Service, value string)
 
 type EventFactory interface {
+	BeginSet(svc *Service, channel chan Event)
 	HandleProperty(svc *Service, value string, channel chan Event)
+	EndSet(svc *Service, channel chan Event)
 }
 
 type Reactor interface {
@@ -62,9 +64,18 @@ type Reactor interface {
 	Channel() chan Event
 }
 
+type upnpEventType int
+
+const (
+	upnpEventTypeBeginSet upnpEventType = iota
+	upnpEventTypeProperty
+	upnpEventTypeEndSet
+)
+
 type upnpEvent struct {
 	sid   string
 	value string
+	etype upnpEventType
 }
 
 type upnpEventRecord struct {
@@ -170,7 +181,14 @@ func (this *upnpDefaultReactor) subscribeImpl(rec *upnpEventRecord) (err error) 
 
 func (this *upnpDefaultReactor) maybePostEvent(event *upnpEvent) {
 	if rec, has := this.eventMap[event.sid]; has {
-		rec.factory.HandleProperty(rec.svc, event.value, this.eventChan)
+		switch event.etype {
+		case upnpEventTypeProperty:
+			rec.factory.HandleProperty(rec.svc, event.value, this.eventChan)
+		case upnpEventTypeBeginSet:
+			rec.factory.BeginSet(rec.svc, this.eventChan)
+		case upnpEventTypeEndSet:
+			rec.factory.EndSet(rec.svc, this.eventChan)
+		}
 	}
 }
 
@@ -189,18 +207,37 @@ func (this *upnpDefaultReactor) sendAck(writer http.ResponseWriter) {
 	writer.Write(nil)
 }
 
+func (this *upnpDefaultReactor) notifyBegin(sid string) {
+	event := &upnpEvent{
+		sid:   sid,
+		etype: upnpEventTypeBeginSet,
+	}
+	this.unpackChan <- event
+}
+
 func (this *upnpDefaultReactor) notify(sid, value string) {
 	event := &upnpEvent{
 		sid:   sid,
 		value: value,
+		etype: upnpEventTypeProperty,
+	}
+	this.unpackChan <- event
+}
+
+func (this *upnpDefaultReactor) notifyEnd(sid string) {
+	event := &upnpEvent{
+		sid:   sid,
+		etype: upnpEventTypeEndSet,
 	}
 	this.unpackChan <- event
 }
 
 func (this *upnpDefaultReactor) unpack(sid string, doc *upnpEvent_XML) {
+	this.notifyBegin(sid)
 	for _, prop := range doc.Properties {
 		this.notify(sid, prop.Content)
 	}
+	this.notifyEnd(sid)
 }
 
 func (this *upnpDefaultReactor) handle(request *http.Request) {
