@@ -1033,7 +1033,11 @@ func TestEvent(t *testing.T) {
 		for {
 			select {
 			case evt := <- reactor.Channel():
-				log.Printf("%#v", evt)
+				switch evt.Type() {
+				case upnp.AlarmClock_EventType:
+					ace := evt.(upnp.AlarmClockEvent)
+					log.Printf("%#v", ace)
+				}
 			}
 		}
 		for i := 0; i < 900; i++ {

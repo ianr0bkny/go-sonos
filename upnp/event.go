@@ -62,6 +62,23 @@ type Reactor interface {
 	Channel() chan Event
 }
 
+var (
+	nextEventType = 0
+	eventTypeMap  = make(map[string]int)
+)
+
+func registerEventType(tag string) int {
+	if id, has := eventTypeMap[tag]; has {
+		return id
+	} else {
+		eventTypeMap[tag] = nextEventType
+		defer func() {
+			nextEventType++
+		}()
+	}
+	return nextEventType
+}
+
 type upnpEventType int
 
 const (
@@ -85,6 +102,7 @@ type upnpEventMap map[string]*upnpEventRecord
 
 type Event interface {
 	Service() *Service
+	Type() int
 }
 
 type upnpDefaultReactor struct {
