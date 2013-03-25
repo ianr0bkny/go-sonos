@@ -35,6 +35,10 @@ import (
 	_ "log"
 )
 
+var (
+	AlarmClock_EventType = registerEventType("AlarmClock")
+)
+
 type AlarmClockState struct {
 	TimeZone              string
 	TimeServer            string
@@ -52,6 +56,10 @@ type AlarmClockEvent struct {
 
 func (this AlarmClockEvent) Service() *Service {
 	return this.Svc
+}
+
+func (this AlarmClockEvent) Type() int {
+	return AlarmClock_EventType
 }
 
 type AlarmClock struct {
