@@ -70,8 +70,9 @@ type AlarmClock struct {
 func (this *AlarmClock) BeginSet(svc *Service, channel chan Event) {
 }
 
-func (this *AlarmClock) HandleProperty(svc *Service, value string, channel chan Event) {
+func (this *AlarmClock) HandleProperty(svc *Service, value string, channel chan Event) error {
 	xml.Unmarshal([]byte("<AlarmClockState>"+value+"</AlarmClockState>"), &this.AlarmClockState)
+	return nil
 }
 
 func (this *AlarmClock) EndSet(svc *Service, channel chan Event) {

@@ -52,7 +52,7 @@ type upnpEvent_XML struct {
 
 type EventFactory interface {
 	BeginSet(svc *Service, channel chan Event)
-	HandleProperty(svc *Service, value string, channel chan Event)
+	HandleProperty(svc *Service, value string, channel chan Event) error
 	EndSet(svc *Service, channel chan Event)
 }
 
