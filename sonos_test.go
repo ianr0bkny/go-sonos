@@ -1022,17 +1022,17 @@ func TestGetZoneGroup(t *testing.T) {
 }
 
 func TestEvent(t *testing.T) {
-	// Startup and listen to events for 10 seconds
+	// Startup and listen to events
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALARM_CLOCK)
+		testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALARM_CLOCK | sonos.SVC_ZONE_GROUP_TOPOLOGY)
 		//testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALL)
 		for {
 			select {
-			case evt := <- reactor.Channel():
+			case evt := <-reactor.Channel():
 				switch evt.Type() {
 				case upnp.AlarmClock_EventType:
 					ace := evt.(upnp.AlarmClockEvent)
