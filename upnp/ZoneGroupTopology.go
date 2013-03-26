@@ -32,7 +32,7 @@ package upnp
 
 import (
 	"encoding/xml"
-	"log"
+	_ "log"
 )
 
 var (
@@ -40,6 +40,13 @@ var (
 )
 
 type ZoneGroupTopologyState struct {
+	ZoneGroupState          string
+	ThirdPartyMediaServersX string
+	AvailableSoftwareUpdate string
+	AlarmRunSequence        string
+	ZoneGroupName           string
+	ZoneGroupID             string
+	ZonePlayerUUIDsInGroup  string
 }
 
 type ZoneGroupTopologyEvent struct {
@@ -63,9 +70,21 @@ type ZoneGroupTopology struct {
 func (this *ZoneGroupTopology) BeginSet(svc *Service, channel chan Event) {
 }
 
-func (this *ZoneGroupTopology) HandleProperty(svc *Service, value string, channel chan Event) {
-	log.Printf("%#v", value)
-	//xml.Unmarshal([]byte("<ZoneGroupTopologyState>"+value+"</ZoneGroupTopologyState>"), &this.ZoneGroupTopologyState)
+type zoneGroupTopologyUpdate_XML struct {
+	XMLName xml.Name `xml:"ZoneGroupTopologyState"`
+	Value   string   `xml:",innerxml"`
+}
+
+func (this *ZoneGroupTopology) HandleProperty(svc *Service, value string, channel chan Event) error {
+	update := zoneGroupTopologyUpdate_XML{
+		Value: value,
+	}
+	if bytes, err := xml.Marshal(update); nil != err {
+		return err
+	} else {
+		xml.Unmarshal(bytes, &this.ZoneGroupTopologyState)
+	}
+	return nil
 }
 
 func (this *ZoneGroupTopology) EndSet(svc *Service, channel chan Event) {

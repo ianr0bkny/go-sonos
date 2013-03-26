@@ -1028,7 +1028,7 @@ func TestEvent(t *testing.T) {
 	c.Init()
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALARM_CLOCK | sonos.SVC_ZONE_GROUP_TOPOLOGY)
+		testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALARM_CLOCK|sonos.SVC_ZONE_GROUP_TOPOLOGY)
 		//testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALL)
 		for {
 			select {
@@ -1037,6 +1037,9 @@ func TestEvent(t *testing.T) {
 				case upnp.AlarmClock_EventType:
 					ace := evt.(upnp.AlarmClockEvent)
 					log.Printf("%#v", ace)
+				case upnp.ZoneGroupTopology_EventType:
+					zgpe := evt.(upnp.ZoneGroupTopologyEvent)
+					log.Printf("%#v", zgpe)
 				}
 			}
 		}

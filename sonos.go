@@ -87,8 +87,9 @@ type sonosEventFactory struct {
 func (this *sonosEventFactory) BeginSet(svc *upnp.Service, channel chan upnp.Event) {
 }
 
-func (this *sonosEventFactory) HandleProperty(svc *upnp.Service, value string, channel chan upnp.Event) {
+func (this *sonosEventFactory) HandleProperty(svc *upnp.Service, value string, channel chan upnp.Event) error {
 	log.Printf("UPDATE: %s", value)
+	return nil
 }
 
 func (this *sonosEventFactory) EndSet(svc *upnp.Service, channel chan upnp.Event) {
