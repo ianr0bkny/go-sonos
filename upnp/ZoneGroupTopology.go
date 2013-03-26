@@ -32,11 +32,45 @@ package upnp
 
 import (
 	"encoding/xml"
-	_ "log"
+	"log"
 )
 
-type ZoneGroupTopology struct {
+var (
+	ZoneGroupTopology_EventType = registerEventType("ZoneGroupTopology")
+)
+
+type ZoneGroupTopologyState struct {
+}
+
+type ZoneGroupTopologyEvent struct {
+	ZoneGroupTopologyState
 	Svc *Service
+}
+
+func (this ZoneGroupTopologyEvent) Service() *Service {
+	return this.Svc
+}
+
+func (this ZoneGroupTopologyEvent) Type() int {
+	return ZoneGroupTopology_EventType
+}
+
+type ZoneGroupTopology struct {
+	ZoneGroupTopologyState
+	Svc *Service
+}
+
+func (this *ZoneGroupTopology) BeginSet(svc *Service, channel chan Event) {
+}
+
+func (this *ZoneGroupTopology) HandleProperty(svc *Service, value string, channel chan Event) {
+	log.Printf("%#v", value)
+	//xml.Unmarshal([]byte("<ZoneGroupTopologyState>"+value+"</ZoneGroupTopologyState>"), &this.ZoneGroupTopologyState)
+}
+
+func (this *ZoneGroupTopology) EndSet(svc *Service, channel chan Event) {
+	evt := ZoneGroupTopologyEvent{ZoneGroupTopologyState: this.ZoneGroupTopologyState, Svc: svc}
+	channel <- evt
 }
 
 const (
