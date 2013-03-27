@@ -40,9 +40,9 @@ var (
 )
 
 type ZoneGroupTopologyState struct {
-	ZoneGroupState          string
+	ZoneGroupState          string // TODO: Unpack
 	ThirdPartyMediaServersX string
-	AvailableSoftwareUpdate string
+	AvailableSoftwareUpdate string // TODO: Unpack
 	AlarmRunSequence        string
 	ZoneGroupName           string
 	ZoneGroupID             string
