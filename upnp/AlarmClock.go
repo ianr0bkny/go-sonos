@@ -70,8 +70,20 @@ type AlarmClock struct {
 func (this *AlarmClock) BeginSet(svc *Service, channel chan Event) {
 }
 
+type alarmClockUpdate_XML struct {
+	XMLName xml.Name `xml:"AlarmClockState"`
+	Value   string   `xml:",innerxml"`
+}
+
 func (this *AlarmClock) HandleProperty(svc *Service, value string, channel chan Event) error {
-	xml.Unmarshal([]byte("<AlarmClockState>"+value+"</AlarmClockState>"), &this.AlarmClockState)
+	update := alarmClockUpdate_XML{
+		Value: value,
+	}
+	if bytes, err := xml.Marshal(update); nil != err {
+		return err
+	} else {
+		xml.Unmarshal(bytes, &this.AlarmClockState)
+	}
 	return nil
 }
 
