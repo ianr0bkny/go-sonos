@@ -32,11 +32,58 @@ package upnp
 
 import (
 	"encoding/xml"
-	_ "log"
+	"log"
 )
 
-type SystemProperties struct {
+var (
+	SystemProperties_EventType = registerEventType("SystemProperties")
+)
+
+type SystemPropertiesState struct {
+}
+
+type SystemPropertiesEvent struct {
+	SystemPropertiesState
 	Svc *Service
+}
+
+func (this SystemPropertiesEvent) Service() *Service {
+	return this.Svc
+}
+
+func (this SystemPropertiesEvent) Type() int {
+	return SystemProperties_EventType
+}
+
+type SystemProperties struct {
+	SystemPropertiesState
+	Svc *Service
+}
+
+func (this *SystemProperties) BeginSet(svc *Service, channel chan Event) {
+}
+
+type systemPropertiesUpdate_XML struct {
+	XMLName xml.Name `xml:"SystemPropertiesState"`
+	Value   string   `xml:",innerxml"`
+}
+
+func (this *SystemProperties) HandleProperty(svc *Service, value string, channel chan Event) error {
+	log.Printf("%s", value)
+	update := systemPropertiesUpdate_XML{
+		Value: value,
+	}
+	if bytes, err := xml.Marshal(update); nil != err {
+		return err
+	} else {
+		xml.Unmarshal(bytes, &this.SystemPropertiesState)
+	}
+	return nil
+}
+
+func (this *SystemProperties) EndSet(svc *Service, channel chan Event) {
+	evt := SystemPropertiesEvent{SystemPropertiesState: this.SystemPropertiesState, Svc: svc}
+	channel <- evt
 }
 
 func (this *SystemProperties) SetString(variableName, stringValue string) (err error) {
