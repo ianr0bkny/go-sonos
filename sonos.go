@@ -174,7 +174,7 @@ func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (sonos 
 			for _, svc := range svc_list {
 				sonos.MusicServices.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.MusicServices)
 				break
 			}
 		case "RenderingControl":
@@ -188,7 +188,7 @@ func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (sonos 
 			for _, svc := range svc_list {
 				sonos.SystemProperties.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.SystemProperties)
 				break
 			}
 		case "ZoneGroupTopology":

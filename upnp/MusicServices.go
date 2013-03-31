@@ -1,20 +1,20 @@
-// 
+//
 // go-sonos
 // ========
-// 
+//
 // Copyright (c) 2012, Ian T. Richards <ianr@panix.com>
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
+//
 //   * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //   * Redistributions in binary form must reproduce the above copyright
 //     notice, this list of conditions and the following disclaimer in the
 //     documentation and/or other materials provided with the distribution.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -26,7 +26,7 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 
 package upnp
 
@@ -35,8 +35,55 @@ import (
 	_ "log"
 )
 
-type MusicServices struct {
+var (
+	MusicServices_EventType = registerEventType("MusicServices")
+)
+
+type MusicServicesState struct {
+	ServiceListVersion string
+}
+
+type MusicServicesEvent struct {
+	MusicServicesState
 	Svc *Service
+}
+
+func (this MusicServicesEvent) Service() *Service {
+	return this.Svc
+}
+
+func (this MusicServicesEvent) Type() int {
+	return MusicServices_EventType
+}
+
+type MusicServices struct {
+	MusicServicesState
+	Svc *Service
+}
+
+func (this *MusicServices) BeginSet(svc *Service, channel chan Event) {
+}
+
+type musicServicesUpdate_XML struct {
+	XMLName xml.Name `xml:"MusicServicesState"`
+	Value   string   `xml:",innerxml"`
+}
+
+func (this *MusicServices) HandleProperty(svc *Service, value string, channel chan Event) error {
+	update := musicServicesUpdate_XML{
+		Value: value,
+	}
+	if bytes, err := xml.Marshal(update); nil != err {
+		return err
+	} else {
+		xml.Unmarshal(bytes, &this.MusicServicesState)
+	}
+	return nil
+}
+
+func (this *MusicServices) EndSet(svc *Service, channel chan Event) {
+	evt := MusicServicesEvent{MusicServicesState: this.MusicServicesState, Svc: svc}
+	channel <- evt
 }
 
 type msPolicy_XML struct {
