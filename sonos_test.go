@@ -1037,6 +1037,9 @@ func TestEvent(t *testing.T) {
 				case upnp.AlarmClock_EventType:
 					ace := evt.(upnp.AlarmClockEvent)
 					log.Printf("%#v", ace)
+				case upnp.MusicServices_EventType:
+					mse := evt.(upnp.MusicServicesEvent)
+					log.Printf("%#v", mse)
 				case upnp.SystemProperties_EventType:
 					spe := evt.(upnp.SystemPropertiesEvent)
 					log.Printf("%#v", spe)

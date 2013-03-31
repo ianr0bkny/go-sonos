@@ -32,7 +32,7 @@ package upnp
 
 import (
 	"encoding/xml"
-	"log"
+	_ "log"
 )
 
 var (
@@ -69,7 +69,6 @@ type systemPropertiesUpdate_XML struct {
 }
 
 func (this *SystemProperties) HandleProperty(svc *Service, value string, channel chan Event) error {
-	log.Printf("%s", value)
 	update := systemPropertiesUpdate_XML{
 		Value: value,
 	}
