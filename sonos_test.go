@@ -1029,23 +1029,26 @@ func TestEvent(t *testing.T) {
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		//testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALARM_CLOCK/*|sonos.SVC_ZONE_GROUP_TOPOLOGY|sonos.SVC_SYSTEM_PROPERTIES*/)
-		testSonos = sonos.Connect(dev, reactor, sonos.SVC_SYSTEM_PROPERTIES)
+		testSonos = sonos.Connect(dev, reactor, sonos.SVC_GROUP_MANAGEMENT)
 		for {
 			select {
 			case evt := <-reactor.Channel():
 				switch evt.Type() {
 				case upnp.AlarmClock_EventType:
-					ace := evt.(upnp.AlarmClockEvent)
-					log.Printf("%#v", ace)
+					b := evt.(upnp.AlarmClockEvent)
+					log.Printf("%#v", b)
+				case upnp.GroupManagement_EventType:
+					b := evt.(upnp.GroupManagementEvent)
+					log.Printf("%#v", b)
 				case upnp.MusicServices_EventType:
-					mse := evt.(upnp.MusicServicesEvent)
-					log.Printf("%#v", mse)
+					b := evt.(upnp.MusicServicesEvent)
+					log.Printf("%#v", b)
 				case upnp.SystemProperties_EventType:
-					spe := evt.(upnp.SystemPropertiesEvent)
-					log.Printf("%#v", spe)
+					b := evt.(upnp.SystemPropertiesEvent)
+					log.Printf("%#v", b)
 				case upnp.ZoneGroupTopology_EventType:
-					zgpe := evt.(upnp.ZoneGroupTopologyEvent)
-					log.Printf("%#v", zgpe)
+					b := evt.(upnp.ZoneGroupTopologyEvent)
+					log.Printf("%#v", b)
 				}
 			}
 		}

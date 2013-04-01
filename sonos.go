@@ -167,7 +167,7 @@ func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (sonos 
 			for _, svc := range svc_list {
 				sonos.GroupManagement.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.GroupManagement)
 				break
 			}
 		case "MusicServices":
