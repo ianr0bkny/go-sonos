@@ -181,7 +181,7 @@ func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (sonos 
 			for _, svc := range svc_list {
 				sonos.RenderingControl.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.eventFactory)
+				reactor.Subscribe(svc, &sonos.RenderingControl)
 				break
 			}
 		case "SystemProperties":
