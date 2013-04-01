@@ -35,8 +35,63 @@ import (
 	_ "log"
 )
 
-type DeviceProperties struct {
+var (
+	DeviceProperties_EventType = registerEventType("DeviceProperties")
+)
+
+type DevicePropertiesState struct {
+	SettingsReplicationState string
+	ZoneName                 string
+	Icon                     string
+	Configuration            string
+	Invisible                bool
+	IsZoneBridge             bool
+	ChannelMapSet            string
+	HTSatChanMapSet          string
+	HTFreq                   uint32
+}
+
+type DevicePropertiesEvent struct {
+	DevicePropertiesState
 	Svc *Service
+}
+
+func (this DevicePropertiesEvent) Service() *Service {
+	return this.Svc
+}
+
+func (this DevicePropertiesEvent) Type() int {
+	return DeviceProperties_EventType
+}
+
+type DeviceProperties struct {
+	DevicePropertiesState
+	Svc *Service
+}
+
+func (this *DeviceProperties) BeginSet(svc *Service, channel chan Event) {
+}
+
+type devicePropertiesUpdate_XML struct {
+	XMLName xml.Name `xml:"DevicePropertiesState"`
+	Value   string   `xml:",innerxml"`
+}
+
+func (this *DeviceProperties) HandleProperty(svc *Service, value string, channel chan Event) error {
+	update := devicePropertiesUpdate_XML{
+		Value: value,
+	}
+	if bytes, err := xml.Marshal(update); nil != err {
+		return err
+	} else {
+		xml.Unmarshal(bytes, &this.DevicePropertiesState)
+	}
+	return nil
+}
+
+func (this *DeviceProperties) EndSet(svc *Service, channel chan Event) {
+	evt := DevicePropertiesEvent{DevicePropertiesState: this.DevicePropertiesState, Svc: svc}
+	channel <- evt
 }
 
 const (

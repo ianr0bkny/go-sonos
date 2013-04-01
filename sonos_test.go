@@ -1029,13 +1029,16 @@ func TestEvent(t *testing.T) {
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		//testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALARM_CLOCK/*|sonos.SVC_ZONE_GROUP_TOPOLOGY|sonos.SVC_SYSTEM_PROPERTIES*/)
-		testSonos = sonos.Connect(dev, reactor, sonos.SVC_GROUP_MANAGEMENT)
+		testSonos = sonos.Connect(dev, reactor, sonos.SVC_DEVICE_PROPERTIES)
 		for {
 			select {
 			case evt := <-reactor.Channel():
 				switch evt.Type() {
 				case upnp.AlarmClock_EventType:
 					b := evt.(upnp.AlarmClockEvent)
+					log.Printf("%#v", b)
+				case upnp.DeviceProperties_EventType:
+					b := evt.(upnp.DevicePropertiesEvent)
 					log.Printf("%#v", b)
 				case upnp.GroupManagement_EventType:
 					b := evt.(upnp.GroupManagementEvent)
