@@ -36,8 +36,55 @@ import (
 	"strings"
 )
 
-type AVTransport struct {
+var (
+	AVTransport_EventType = registerEventType("AVTransport")
+)
+
+type AVTransportState struct {
+	LastChange string // TODO: Unpack
+}
+
+type AVTransportEvent struct {
+	AVTransportState
 	Svc *Service
+}
+
+func (this AVTransportEvent) Service() *Service {
+	return this.Svc
+}
+
+func (this AVTransportEvent) Type() int {
+	return AVTransport_EventType
+}
+
+type AVTransport struct {
+	AVTransportState
+	Svc *Service
+}
+
+func (this *AVTransport) BeginSet(svc *Service, channel chan Event) {
+}
+
+type avTransportUpdate_XML struct {
+	XMLName xml.Name `xml:"AVTransportState"`
+	Value   string   `xml:",innerxml"`
+}
+
+func (this *AVTransport) HandleProperty(svc *Service, value string, channel chan Event) error {
+	update := avTransportUpdate_XML{
+		Value: value,
+	}
+	if bytes, err := xml.Marshal(update); nil != err {
+		return err
+	} else {
+		xml.Unmarshal(bytes, &this.AVTransportState)
+	}
+	return nil
+}
+
+func (this *AVTransport) EndSet(svc *Service, channel chan Event) {
+	evt := AVTransportEvent{AVTransportState: this.AVTransportState, Svc: svc}
+	channel <- evt
 }
 
 //
