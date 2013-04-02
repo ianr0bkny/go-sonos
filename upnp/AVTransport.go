@@ -40,8 +40,34 @@ var (
 	AVTransport_EventType = registerEventType("AVTransport")
 )
 
+// <CurrentTrackMetaData val=\"&lt;DIDL-Lite xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot; xmlns:upnp=&quot;urn:schemas-upnp-org:metadata-1-0/upnp/&quot; xmlns:r=&quot;urn:schemas-rinconnetworks-com:metadata-1-0/&quot; xmlns=&quot;urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/&quot;&gt;&lt;item id=&quot;-1&quot; parentID=&quot;-1&quot; restricted=&quot;true&quot;&gt;&lt;res protocolInfo=&quot;x-file-cifs:*:audio/mpeg:*&quot; duration=&quot;0:11:05&quot;&gt;x-file-cifs://perseus/sonos/iTunes/Music/Unknown%20Artist/The%20Copland%20Collection%20-%20Orchestral%20%26%20Ba/1-12%20Copland_%20Our%20Town.mp3&lt;/res&gt;&lt;r:streamContent&gt;&lt;/r:streamContent&gt;&lt;r:radioShowMd&gt;&lt;/r:radioShowMd&gt;&lt;dc:title&gt;Copland: Our Town&lt;/dc:title&gt;&lt;upnp:class&gt;object.item.audioItem.musicTrack&lt;/upnp:class&gt;&lt;upnp:album&gt;The Copland Collection - Orchestral &amp;amp; Ballet Works, 1936-1948&lt;/upnp:album&gt;&lt;upnp:originalTrackNumber&gt;12&lt;/upnp:originalTrackNumber&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;\"/><r:NextTrackURI val=\"x-file-cifs://perseus/sonos/iTunes/Music/Unknown%20Artist/The%20Copland%20Collection%20-%20Orchestral%20%26%20Ba/1-13%20Copland_%20Las%20Agachadas.mp3\"/><r:NextTrackMetaData val=\"&lt;DIDL-Lite xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot; xmlns:upnp=&quot;urn:schemas-upnp-org:metadata-1-0/upnp/&quot; xmlns:r=&quot;urn:schemas-rinconnetworks-com:metadata-1-0/&quot; xmlns=&quot;urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/&quot;&gt;&lt;item id=&quot;-1&quot; parentID=&quot;-1&quot; restricted=&quot;true&quot;&gt;&lt;res protocolInfo=&quot;x-file-cifs:*:audio/mpeg:*&quot; duration=&quot;0:03:08&quot;&gt;x-file-cifs://perseus/sonos/iTunes/Music/Unknown%20Artist/The%20Copland%20Collection%20-%20Orchestral%20%26%20Ba/1-13%20Copland_%20Las%20Agachadas.mp3&lt;/res&gt;&lt;dc:title&gt;Copland: Las Agachadas&lt;/dc:title&gt;&lt;upnp:class&gt;object.item.audioItem.musicTrack&lt;/upnp:class&gt;&lt;upnp:album&gt;The Copland Collection - Orchestral &amp;amp; Ballet Works, 1936-1948&lt;/upnp:album&gt;&lt;upnp:originalTrackNumber&gt;13&lt;/upnp:originalTrackNumber&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;\"/><r:EnqueuedTransportURI val=\"x-rincon-playlist:RINCON_000E58741A8401400#A:COMPOSER/Copland,%20Aaron/The%20Copland%20Collection%20-%20Orchestral%20%26%20Ballet%20Works,%201936-1948\"/><r:EnqueuedTransportURIMetaData val=\"&lt;DIDL-Lite xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot; xmlns:upnp=&quot;urn:schemas-upnp-org:metadata-1-0/upnp/&quot; xmlns:r=&quot;urn:schemas-rinconnetworks-com:metadata-1-0/&quot; xmlns=&quot;urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/&quot;&gt;&lt;item id=&quot;A:COMPOSER/Copland,%20Aaron/The%20Copland%20Collection%20-%20Orchestral%20%26%20Ballet%20Works,%201936-1948&quot; parentID=&quot;A:COMPOSER/Copland,%20Aaron&quot; restricted=&quot;true&quot;&gt;&lt;dc:title&gt;The Copland Collection - Orchestral &amp;amp; Ballet Works, 1936-1948&lt;/dc:title&gt;&lt;upnp:class&gt;object.container.album.musicAlbum&lt;/upnp:class&gt;&lt;desc id=&quot;cdudn&quot; nameSpace=&quot;urn:schemas-rinconnetworks-com:metadata-1-0/&quot;&gt;RINCON_AssociatedZPUDN&lt;/desc&gt;&lt;/item&gt;&lt;/DIDL-Lite&gt;\"/><PlaybackStorageMedium val=\"NETWORK\"/><AVTransportURI val=\"x-rincon-queue:RINCON_000E58741A8401400#0\"/><AVTransportURIMetaData val=\"\"/><CurrentTransportActions val=\"Set, Play, Stop, Pause, Seek, Next, Previous\"/><TransportStatus val=\"OK\"/><r:SleepTimerGeneration val=\"0\"/><r:AlarmRunning val=\"0\"/><r:SnoozeRunning val=\"0\"/><r:RestartPending val=\"0\"/><TransportPlaySpeed val=\"NOT_IMPLEMENTED\"/><CurrentMediaDuration val=\"NOT_IMPLEMENTED\"/><RecordStorageMedium val=\"NOT_IMPLEMENTED\"/><PossiblePlaybackStorageMedia val=\"NONE, NETWORK\"/><PossibleRecordStorageMedia val=\"NOT_IMPLEMENTED\"/><RecordMediumWriteStatus val=\"NOT_IMPLEMENTED\"/><CurrentRecordQualityMode val=\"NOT_IMPLEMENTED\"/><PossibleRecordQualityModes val=\"NOT_IMPLEMENTED\"/><NextAVTransportURI val=\"NOT_IMPLEMENTED\"/><NextAVTransportURIMetaData val=\"NOT_IMPLEMENTED\"/></InstanceID></Event>
+
+type value_XML struct {
+	XMLName xml.Name
+	Val string  `xml:"val,attr"`
+}
+
+type instanceID_XML struct {
+	value_XML
+	TransportState value_XML
+	CurrentPlayMode value_XML
+	CurrentCrossfadeMode value_XML
+	NumberOfTracks value_XML
+	CurrentTrack value_XML
+	CurrentSection value_XML
+	CurrentTrackURI value_XML
+	CurrentTrackDuration value_XML
+	CurrentTrackMetaData value_XML // unpack
+}
+
+type event_XML struct {
+	XMLName xml.Name
+	InstanceID instanceID_XML
+}
+
 type AVTransportState struct {
 	LastChange string // TODO: Unpack
+	Event event_XML
 }
 
 type AVTransportEvent struct {
@@ -78,6 +104,7 @@ func (this *AVTransport) HandleProperty(svc *Service, value string, channel chan
 		return err
 	} else {
 		xml.Unmarshal(bytes, &this.AVTransportState)
+		xml.Unmarshal([]byte(this.AVTransportState.LastChange), &this.AVTransportState.Event)
 	}
 	return nil
 }
