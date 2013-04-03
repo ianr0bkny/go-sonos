@@ -40,55 +40,54 @@ var (
 	AVTransport_EventType = registerEventType("AVTransport")
 )
 
-type value_XML struct {
+type avTransport_Value_XML struct {
 	XMLName xml.Name
 	Val     string `xml:"val,attr"`
 }
 
-type instanceID_XML struct {
-	value_XML
-	TransportState               value_XML
-	CurrentPlayMode              value_XML
-	CurrentCrossfadeMode         value_XML
-	NumberOfTracks               value_XML
-	CurrentTrack                 value_XML
-	CurrentSection               value_XML
-	CurrentTrackURI              value_XML
-	CurrentTrackDuration         value_XML
-	CurrentTrackMetaData         value_XML // unpack
-	NextTrackURI                 value_XML
-	NextTrackMetaData            value_XML // unpack
-	EnqueuedTransportURI         value_XML
-	EnqueuedTransportURIMetaData value_XML // unpack?
-	PlaybackStorageMedium        value_XML
-	AVTransportURI               value_XML
-	AVTransportURIMetaData       value_XML // unpack?
-	CurrentTransportActions      value_XML
-	TransportStatus              value_XML
-	SleepTimerGeneration         value_XML
-	AlarmRunning                 value_XML
-	SnoozeRunning                value_XML
-	RestartPending               value_XML
-	TransportPlaySpeed           value_XML
-	CurrentMediaDuration         value_XML
-	RecordStorageMedium          value_XML
-	PossiblePlaybackStorageMedia value_XML
-	PossibleRecordStorageMedia   value_XML
-	RecordMediumWriteStatus      value_XML
-	CurrentRecordQualityMode     value_XML
-	PossibleRecordQualityModes   value_XML
-	NextAVTransportURI           value_XML
-	NextAVTransportURIMetaData   value_XML // unpack?
+type avTransport_InstanceID_XML struct {
+	avTransport_Value_XML
+	TransportState,
+	CurrentPlayMode,
+	CurrentCrossfadeMode,
+	NumberOfTracks,
+	CurrentTrack,
+	CurrentSection,
+	CurrentTrackURI,
+	CurrentTrackDuration,
+	CurrentTrackMetaData, /*unpack*/
+	NextTrackURI,
+	NextTrackMetaData, /*unpack*/
+	EnqueuedTransportURI,
+	EnqueuedTransportURIMetaData, /*unpack*/
+	PlaybackStorageMedium,
+	AVTransportURI,
+	AVTransportURIMetaData, /*unpack*/
+	CurrentTransportActions,
+	TransportStatus,
+	SleepTimerGeneration,
+	AlarmRunning,
+	SnoozeRunning,
+	RestartPending,
+	TransportPlaySpeed,
+	CurrentMediaDuration,
+	RecordStorageMedium,
+	PossiblePlaybackStorageMedia,
+	PossibleRecordStorageMedia,
+	RecordMediumWriteStatus,
+	CurrentRecordQualityMode,
+	PossibleRecordQualityModes,
+	NextAVTransportURI,
+	NextAVTransportURIMetaData/*unpack*/ avTransport_Value_XML
 }
 
-type event_XML struct {
+type avTransport_Event_XML struct {
 	XMLName    xml.Name
-	InstanceID instanceID_XML
+	InstanceID avTransport_InstanceID_XML
 }
 
 type AVTransportState struct {
-	LastChange string
-	Event      event_XML
+	LastChange avTransport_Event_XML
 }
 
 type AVTransportEvent struct {
@@ -118,14 +117,19 @@ type avTransportUpdate_XML struct {
 }
 
 func (this *AVTransport) HandleProperty(svc *Service, value string, channel chan Event) error {
+	type Response struct {
+		XMLName    xml.Name
+		LastChange string
+	}
 	update := avTransportUpdate_XML{
 		Value: value,
 	}
 	if bytes, err := xml.Marshal(update); nil != err {
 		return err
 	} else {
-		xml.Unmarshal(bytes, &this.AVTransportState)
-		xml.Unmarshal([]byte(this.AVTransportState.LastChange), &this.AVTransportState.Event)
+		doc := Response{}
+		xml.Unmarshal(bytes, &doc)
+		xml.Unmarshal([]byte(doc.LastChange), &this.AVTransportState.LastChange)
 	}
 	return nil
 }

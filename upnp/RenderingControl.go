@@ -39,8 +39,36 @@ var (
 	RenderingControl_EventType = registerEventType("RenderingControl")
 )
 
+type renderingControl_Value_XML struct {
+	XMLName xml.Name
+	Channel string `xml:"channel,attr"`
+	Val     string `xml:"val,attr"`
+}
+
+type renderingControl_InstanceID_XML struct {
+	renderingControl_Value_XML
+	Volume,
+	Mute,
+	Bass,
+	Treble,
+	Loudness,
+	OutputFixed,
+	HeadphoneConnected,
+	SpeakerSize,
+	SubGain,
+	SubCrossover,
+	SubPolarity,
+	SubEnabled []renderingControl_Value_XML
+	PresetNameList string
+}
+
+type renderingControl_Event_XML struct {
+	XMLName    xml.Name
+	InstanceID renderingControl_InstanceID_XML
+}
+
 type RenderingControlState struct {
-	LastChange string // TODO: Unpack
+	LastChange renderingControl_Event_XML
 }
 
 type RenderingControlEvent struct {
@@ -70,13 +98,19 @@ type renderingControlUpdate_XML struct {
 }
 
 func (this *RenderingControl) HandleProperty(svc *Service, value string, channel chan Event) error {
+	type Response struct {
+		XMLName    xml.Name
+		LastChange string
+	}
 	update := renderingControlUpdate_XML{
 		Value: value,
 	}
 	if bytes, err := xml.Marshal(update); nil != err {
 		return err
 	} else {
-		xml.Unmarshal(bytes, &this.RenderingControlState)
+		doc := Response{}
+		xml.Unmarshal(bytes, &doc)
+		xml.Unmarshal([]byte(doc.LastChange), &this.RenderingControlState.LastChange)
 	}
 	return nil
 }

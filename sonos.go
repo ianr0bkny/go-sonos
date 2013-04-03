@@ -1,20 +1,20 @@
-// 
+//
 // go-sonos
 // ========
-// 
+//
 // Copyright (c) 2012, Ian T. Richards <ianr@panix.com>
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
+//
 //   * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //   * Redistributions in binary form must reproduce the above copyright
 //     notice, this list of conditions and the following disclaimer in the
 //     documentation and/or other materials provided with the distribution.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -26,7 +26,7 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 
 //
 // A go-language implementation of the Sonos UPnP API.
@@ -36,7 +36,7 @@ package sonos
 import (
 	"github.com/ianr0bkny/go-sonos/ssdp"
 	"github.com/ianr0bkny/go-sonos/upnp"
-	"log"
+	_ "log"
 )
 
 const MUSIC_SERVICES = "schemas-upnp-org-MusicServices"
@@ -53,8 +53,6 @@ type Sonos struct {
 	upnp.RenderingControl
 	upnp.SystemProperties
 	upnp.ZoneGroupTopology
-	//
-	eventFactory sonosEventFactory
 }
 
 const (
@@ -80,20 +78,6 @@ const (
 		SVC_SYSTEM_PROPERTIES |
 		SVC_ZONE_GROUP_TOPOLOGY
 )
-
-type sonosEventFactory struct {
-}
-
-func (this *sonosEventFactory) BeginSet(svc *upnp.Service, channel chan upnp.Event) {
-}
-
-func (this *sonosEventFactory) HandleProperty(svc *upnp.Service, value string, channel chan upnp.Event) error {
-	log.Printf("UPDATE: %s", value)
-	return nil
-}
-
-func (this *sonosEventFactory) EndSet(svc *upnp.Service, channel chan upnp.Event) {
-}
 
 func sonosCheckServiceFlags(svc_type string, flags int) bool {
 	switch svc_type {

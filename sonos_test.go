@@ -1029,7 +1029,7 @@ func TestEvent(t *testing.T) {
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		//testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALARM_CLOCK/*|sonos.SVC_ZONE_GROUP_TOPOLOGY|sonos.SVC_SYSTEM_PROPERTIES*/)
-		testSonos = sonos.Connect(dev, reactor, sonos.SVC_AV_TRANSPORT)
+		testSonos = sonos.Connect(dev, reactor, sonos.SVC_RENDERING_CONTROL)
 		for {
 			select {
 			case evt := <-reactor.Channel():
