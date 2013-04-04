@@ -38,7 +38,6 @@ import (
 	"log"
 	"strings"
 	"testing"
-	"time"
 )
 
 const (
@@ -1021,56 +1020,89 @@ func TestGetZoneGroup(t *testing.T) {
 	}
 }
 
+func handleEvent_TestEvent(reactor upnp.Reactor, c chan bool) {
+	for {
+		select {
+		case evt := <-reactor.Channel():
+			switch evt.Type() {
+			case upnp.AlarmClock_EventType:
+				b := evt.(upnp.AlarmClockEvent)
+				log.Printf("%#v", b)
+			case upnp.AVTransport_EventType:
+				b := evt.(upnp.AVTransportEvent)
+				log.Printf("%#v", b)
+			case upnp.ConnectionManager_EventType:
+				b := evt.(upnp.ConnectionManagerEvent)
+				log.Printf("%#v", b)
+			case upnp.ContentDirectory_EventType:
+				b := evt.(upnp.ContentDirectoryEvent)
+				log.Printf("%#v", b)
+			case upnp.DeviceProperties_EventType:
+				b := evt.(upnp.DevicePropertiesEvent)
+				log.Printf("%#v", b)
+			case upnp.GroupManagement_EventType:
+				b := evt.(upnp.GroupManagementEvent)
+				log.Printf("%#v", b)
+			case upnp.MusicServices_EventType:
+				b := evt.(upnp.MusicServicesEvent)
+				log.Printf("%#v", b)
+			case upnp.RenderingControl_EventType:
+				b := evt.(upnp.RenderingControlEvent)
+				log.Printf("%#v", b)
+			case upnp.SystemProperties_EventType:
+				b := evt.(upnp.SystemPropertiesEvent)
+				log.Printf("%#v", b)
+			case upnp.ZoneGroupTopology_EventType:
+				b := evt.(upnp.ZoneGroupTopologyEvent)
+				log.Printf("%#v", b)
+			}
+		}
+	}
+	c <- true
+}
+
+func handleEvent_TestEventBrief(reactor upnp.Reactor, c chan bool) {
+	for {
+		select {
+		case evt := <-reactor.Channel():
+			switch evt.Type() {
+			case upnp.AlarmClock_EventType:
+				log.Printf("ALARM_CLOCK")
+			case upnp.AVTransport_EventType:
+				log.Printf("AV_TRANSPORT")
+			case upnp.ConnectionManager_EventType:
+				log.Printf("CONNECTION_MANAGER")
+			case upnp.ContentDirectory_EventType:
+				log.Printf("CONTENT_DIRECTORY")
+			case upnp.DeviceProperties_EventType:
+				log.Printf("DEVICE_PROPERTIES")
+			case upnp.GroupManagement_EventType:
+				log.Printf("GROUP_MANAGEMENT")
+			case upnp.MusicServices_EventType:
+				log.Printf("MUSIC_SERVICES")
+			case upnp.RenderingControl_EventType:
+				log.Printf("RENDERING_CONTROL")
+			case upnp.SystemProperties_EventType:
+				log.Printf("SYSTEM_PROPERTIES")
+			case upnp.ZoneGroupTopology_EventType:
+				log.Printf("ZONE_GROUP_TOPOLOGY")
+			}
+		}
+	}
+	c <- true
+}
+
 func TestEvent(t *testing.T) {
 	// Startup and listen to events
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+		exit_chan := make(chan bool)
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		//testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALARM_CLOCK/*|sonos.SVC_ZONE_GROUP_TOPOLOGY|sonos.SVC_SYSTEM_PROPERTIES*/)
-		testSonos = sonos.Connect(dev, reactor, sonos.SVC_RENDERING_CONTROL)
-		for {
-			select {
-			case evt := <-reactor.Channel():
-				switch evt.Type() {
-				case upnp.AlarmClock_EventType:
-					b := evt.(upnp.AlarmClockEvent)
-					log.Printf("%#v", b)
-				case upnp.AVTransport_EventType:
-					b := evt.(upnp.AVTransportEvent)
-					log.Printf("%#v", b)
-				case upnp.ConnectionManager_EventType:
-					b := evt.(upnp.ConnectionManagerEvent)
-					log.Printf("%#v", b)
-				case upnp.ContentDirectory_EventType:
-					b := evt.(upnp.ContentDirectoryEvent)
-					log.Printf("%#v", b)
-				case upnp.DeviceProperties_EventType:
-					b := evt.(upnp.DevicePropertiesEvent)
-					log.Printf("%#v", b)
-				case upnp.GroupManagement_EventType:
-					b := evt.(upnp.GroupManagementEvent)
-					log.Printf("%#v", b)
-				case upnp.MusicServices_EventType:
-					b := evt.(upnp.MusicServicesEvent)
-					log.Printf("%#v", b)
-				case upnp.RenderingControl_EventType:
-					b := evt.(upnp.RenderingControlEvent)
-					log.Printf("%#v", b)
-				case upnp.SystemProperties_EventType:
-					b := evt.(upnp.SystemPropertiesEvent)
-					log.Printf("%#v", b)
-				case upnp.ZoneGroupTopology_EventType:
-					b := evt.(upnp.ZoneGroupTopologyEvent)
-					log.Printf("%#v", b)
-				}
-			}
-		}
-		for i := 0; i < 900; i++ {
-			t.Logf("Heartbeat")
-			time.Sleep(1 * time.Second)
-		}
+		go handleEvent_TestEventBrief(reactor, exit_chan)
+		testSonos = sonos.Connect(dev, reactor, sonos.SVC_ALL)
+		<-exit_chan
 	} else {
 		log.Fatal("Could not create test instance")
 	}
