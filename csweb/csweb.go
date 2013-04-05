@@ -1,20 +1,20 @@
-// 
+//
 // go-sonos
 // ========
-// 
+//
 // Copyright (c) 2012, Ian T. Richards <ianr@panix.com>
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
-// 
+//
 //   * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //   * Redistributions in binary form must reproduce the above copyright
 //     notice, this list of conditions and the following disclaimer in the
 //     documentation and/or other materials provided with the distribution.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -26,7 +26,7 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 
 //
 // A server to demonstrate controlling Sonos from a web browser.
@@ -62,8 +62,7 @@ const (
 func initSonos(config *config.Config) *sonos.Sonos {
 	var s *sonos.Sonos
 	if dev := config.Lookup(CSWEB_DEVICE); nil != dev {
-		reactor := sonos.MakeReactor(CSWEB_NETWORK, CSWEB_EVENTING_PORT)
-		s = sonos.Connect(dev, reactor, sonos.SVC_CONTENT_DIRECTORY|sonos.SVC_AV_TRANSPORT|sonos.SVC_RENDERING_CONTROL)
+		s = sonos.Connect(dev, nil, sonos.SVC_CONTENT_DIRECTORY|sonos.SVC_AV_TRANSPORT|sonos.SVC_RENDERING_CONTROL)
 	} else {
 		log.Fatal("Could not create Sonos instance")
 	}
@@ -266,9 +265,9 @@ var controlHandlerMap = map[string]handlerFunc{
 	"previous":                handle_Previous,
 	"previous-section":        handle_PreviousSection,
 	"remove-track-from-queue": handle_RemoveTrackFromQueue,
-	"seek":                    handle_Seek,
-	"set-volume":              handle_SetVolume,
-	"stop":                    handle_Stop,
+	"seek":       handle_Seek,
+	"set-volume": handle_SetVolume,
+	"stop":       handle_Stop,
 }
 
 func handleControl(s *sonos.Sonos, w http.ResponseWriter, r *http.Request) {
@@ -400,5 +399,6 @@ func main() {
 		setupHttp(s)
 	}
 
+	log.Printf("Starting server loop ...")
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", CSWEB_HTTP_PORT), nil))
 }

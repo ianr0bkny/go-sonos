@@ -116,70 +116,90 @@ func MakeSonos(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (sonos 
 			for _, svc := range svc_list {
 				sonos.AlarmClock.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.AlarmClock)
+				if nil != reactor {
+					reactor.Subscribe(svc, &sonos.AlarmClock)
+				}
 				break
 			}
 		case "AVTransport":
 			for _, svc := range svc_list {
 				sonos.AVTransport.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.AVTransport)
+				if nil != reactor {
+					reactor.Subscribe(svc, &sonos.AVTransport)
+				}
 				break
 			}
 		case "ConnectionManager":
 			for _, svc := range svc_list {
 				sonos.ConnectionManager.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.ConnectionManager)
+				if nil != reactor {
+					reactor.Subscribe(svc, &sonos.ConnectionManager)
+				}
 				break
 			}
 		case "ContentDirectory":
 			for _, svc := range svc_list {
 				sonos.ContentDirectory.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.ContentDirectory)
+				if nil != reactor {
+					reactor.Subscribe(svc, &sonos.ContentDirectory)
+				}
 				break
 			}
 		case "DeviceProperties":
 			for _, svc := range svc_list {
 				sonos.DeviceProperties.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.DeviceProperties)
+				if nil != reactor {
+					reactor.Subscribe(svc, &sonos.DeviceProperties)
+				}
 				break
 			}
 		case "GroupManagement":
 			for _, svc := range svc_list {
 				sonos.GroupManagement.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.GroupManagement)
+				if nil != reactor {
+					reactor.Subscribe(svc, &sonos.GroupManagement)
+				}
 				break
 			}
 		case "MusicServices":
 			for _, svc := range svc_list {
 				sonos.MusicServices.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.MusicServices)
+				if nil != reactor {
+					reactor.Subscribe(svc, &sonos.MusicServices)
+				}
 				break
 			}
 		case "RenderingControl":
 			for _, svc := range svc_list {
 				sonos.RenderingControl.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.RenderingControl)
+				if nil != reactor {
+					reactor.Subscribe(svc, &sonos.RenderingControl)
+				}
 				break
 			}
 		case "SystemProperties":
 			for _, svc := range svc_list {
 				sonos.SystemProperties.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.SystemProperties)
+				if nil != reactor {
+					reactor.Subscribe(svc, &sonos.SystemProperties)
+				}
 				break
 			}
 		case "ZoneGroupTopology":
 			for _, svc := range svc_list {
 				sonos.ZoneGroupTopology.Svc = svc
 				svc.Describe()
-				reactor.Subscribe(svc, &sonos.ZoneGroupTopology)
+				if nil != reactor {
+					reactor.Subscribe(svc, &sonos.ZoneGroupTopology)
+				}
 				break
 			}
 		}
