@@ -55,8 +55,7 @@ func initTestSonos(flags int) {
 	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
 	if dev := c.Lookup(TEST_DEVICE); nil != dev {
-		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		testSonos = sonos.Connect(dev, reactor, flags)
+		testSonos = sonos.Connect(dev, nil, flags)
 	} else {
 		log.Fatal("Could not create test instance")
 	}
