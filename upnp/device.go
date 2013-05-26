@@ -39,6 +39,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"path"
 	"regexp"
 	"time"
 )
@@ -136,11 +137,18 @@ func upnpMakeDescribeDeviceJob(uri ssdp.Location) (job *upnpDescribeDeviceJob) {
 	return
 }
 
-func (this *upnpDescribeDeviceJob) BuildURL(path ssdp.Location) (url *url.URL, err error) {
+func (this *upnpDescribeDeviceJob) BuildURL(servicePath ssdp.Location) (url *url.URL, err error) {
 	if url, err = url.Parse(string(this.uri)); nil != err {
 		return
 	}
-	url.Path = string(path)
+	if len(servicePath) > 0 && servicePath[0] == '/' {
+		// We have an absolute path
+		url.Path = string(servicePath)
+	} else {
+		// We have a path relative to the location of the description
+		basePath, _ := path.Split(url.Path)
+		url.Path = path.Join(basePath, string(servicePath))
+	}
 	return
 }
 
