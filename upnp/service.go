@@ -273,11 +273,6 @@ func (this *upnpDescribeServiceJob) Parse() {
 
 func (this *upnpDescribeServiceJob) Describe() {
 	var err error
-	if this.svc.described {
-		return
-	} else {
-		this.svc.described = true
-	}
 	uri := this.svc.scpdURL.String()
 	log.Printf("Loading %s", string(uri))
 	if this.response, err = http.Get(string(uri)); nil == err {
@@ -288,11 +283,15 @@ func (this *upnpDescribeServiceJob) Describe() {
 }
 
 func (this *Service) Describe() (err error) {
+	if this.described {
+		return
+	}
 	job := upnpMakeDescribeServiceJob(this)
 	go job.Describe()
 	timeout := time.NewTimer(time.Duration(3) * time.Second)
 	select {
 	case <-job.result:
+		this.described = true
 	case err = <-job.err_result:
 	case <-timeout.C:
 	}
@@ -308,7 +307,7 @@ func (this *Service) findAction(action string) (act *upnpAction, err error) {
 				return
 			}
 		}
+		err = errors.New(fmt.Sprintf("No such method %s for service %s", action, this.serviceId))
 	}
-	err = errors.New(fmt.Sprintf("No such method %s for service %s", action, this.serviceId))
 	return
 }
