@@ -233,3 +233,15 @@ func (this *ZoneGroupTopology) GetZoneGroupAttributes() (*ZoneGroupAttributes, e
 	xml.Unmarshal([]byte(response), &doc)
 	return &doc.ZoneGroupAttributes, doc.Error()
 }
+
+func (this *ZoneGroupTopology) GetZoneGroupState() (zoneGroupState string, err error) {
+	type Response struct {
+		XMLName        xml.Name
+		ZoneGroupState string
+		upnpErrorResponse
+	}
+	response := this.Svc.CallVa("GetZoneGroupState")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.ZoneGroupState, doc.Error()
+}

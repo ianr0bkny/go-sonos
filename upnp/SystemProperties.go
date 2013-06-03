@@ -356,3 +356,40 @@ func (this *SystemProperties) RemoveX(variableName string) error {
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.Error()
 }
+
+func (this *SystemProperties) EnableRDM(rdmValue bool) error {
+	type Response struct {
+		XMLName xml.Name
+		upnpErrorResponse
+	}
+	args := []upnpArg{
+		{"RDMValue", rdmValue},
+	}
+	response := this.Svc.Call("EnableRDM", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.Error()
+}
+
+func (this *SystemProperties) GetRDM() (rdmValue bool, err error) {
+	type Response struct {
+		XMLName  xml.Name
+		RDMValue bool
+		upnpErrorResponse
+	}
+	response := this.Svc.CallVa("GetRDM")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.RDMValue, doc.Error()
+}
+
+func (this *SystemProperties) ApplyRDMDefaultSettings() error {
+	type Response struct {
+		XMLName xml.Name
+		upnpErrorResponse
+	}
+	response := this.Svc.CallVa("ApplyRDMDefaultSettings")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.Error()
+}

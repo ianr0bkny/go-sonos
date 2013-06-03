@@ -1106,3 +1106,13 @@ func TestEvent(t *testing.T) {
 		log.Fatal("Could not create test instance")
 	}
 }
+
+func TestGetZoneGroupState(t *testing.T) {
+	s := getTestSonos(sonos.SVC_ZONE_GROUP_TOPOLOGY)
+	if state, err := s.GetZoneGroupState(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf(state)
+	}
+
+}

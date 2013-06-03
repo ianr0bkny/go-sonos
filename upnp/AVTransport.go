@@ -1211,3 +1211,116 @@ func (this *AVTransport) DelegateGroupCoordinationTo(instanceId uint32, newCoord
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.Error()
 }
+
+func (this *AVTransport) SetNextAVTransportURI(instanceId uint32, nextURI, nextURIMetaData string) error {
+	type Response struct {
+		XMLName xml.Name
+		upnpErrorResponse
+	}
+	args := []upnpArg{
+		{"InstanceID", instanceId},
+		{"NextURI", nextURI},
+		{"NextURIMetaData", nextURIMetaData},
+	}
+	response := this.Svc.Call("SetNextAVTransportURI", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.Error()
+}
+
+type CreateSavedQueueIn struct {
+	Title               string
+	EnqueuedURI         string
+	EnqueuedURIMetaData string
+}
+
+type CreateSavedQueueOut struct {
+	NumTracksAdded   uint32
+	NewQueueLength   uint32
+	AssignedObjectID string
+	NewUpdateID      uint32
+}
+
+func (this *AVTransport) CreateSavedQueue(instanceId uint32, req *CreateSavedQueueIn) (*CreateSavedQueueOut, error) {
+	type Response struct {
+		XMLName xml.Name
+		CreateSavedQueueOut
+		upnpErrorResponse
+	}
+	args := []upnpArg{
+		{"InstanceID", instanceId},
+		{"Title", req.Title},
+		{"EnqueuedURI", req.EnqueuedURI},
+		{"EnqueuedURIMetaData", req.EnqueuedURIMetaData},
+	}
+	response := this.Svc.Call("CreateSavedQueue", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return &doc.CreateSavedQueueOut, doc.Error()
+}
+
+type AddURIToSavedQueueIn struct {
+	ObjectID            string
+	UpdateID            uint32
+	EnqueuedURI         string
+	EnqueuedURIMetaData string
+	AddAtIndex          uint32
+}
+
+type AddURIToSavedQueueOut struct {
+	NumTracksAdded uint32
+	NewQueueLength uint32
+	NewUpdateID    uint32
+}
+
+func (this *AVTransport) AddURIToSavedQueue(instanceId uint32, req *AddURIToSavedQueueIn) (*AddURIToSavedQueueOut, error) {
+	type Response struct {
+		XMLName xml.Name
+		AddURIToSavedQueueOut
+		upnpErrorResponse
+	}
+	args := []upnpArg{
+		{"InstanceID", instanceId},
+		{"ObjectID", req.ObjectID},
+		{"UpdateID", req.UpdateID},
+		{"EnqueuedURI", req.EnqueuedURI},
+		{"EnqueuedURIMetaData", req.EnqueuedURIMetaData},
+		{"AddAtIndex", req.AddAtIndex},
+	}
+	response := this.Svc.Call("AddURIToSavedQueue", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return &doc.AddURIToSavedQueueOut, doc.Error()
+}
+
+type ReorderTracksInSavedQueueIn struct {
+	ObjectID        string
+	UpdateID        uint32
+	TrackList       string // dunno anything about A_ARG_TYPE_TrackList
+	NewPositionList string // dunno anything about A_ARG_TYPE_TrackList
+}
+
+type ReorderTracksInSavedQueueOut struct {
+	QueueLengthChange uint32
+	NewQueueLength    uint32
+	NewUpdateID       uint32
+}
+
+func (this *AVTransport) ReorderTracksInSavedQueue(instanceId uint32, req *ReorderTracksInSavedQueueIn) (*ReorderTracksInSavedQueueOut, error) {
+	type Response struct {
+		XMLName xml.Name
+		ReorderTracksInSavedQueueOut
+		upnpErrorResponse
+	}
+	args := []upnpArg{
+		{"InstanceID", instanceId},
+		{"ObjectID", req.ObjectID},
+		{"UpdateID", req.UpdateID},
+		{"TrackList", req.TrackList},
+		{"NewPositionList", req.NewPositionList},
+	}
+	response := this.Svc.Call("ReorderTracksInSavedQueue", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return &doc.ReorderTracksInSavedQueueOut, doc.Error()
+}
