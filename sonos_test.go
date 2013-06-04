@@ -1112,6 +1112,6 @@ func TestGetZoneGroupState(t *testing.T) {
 	if state, err := s.GetZoneGroupState(); nil != err {
 		log.Fatal(err)
 	} else {
-		log.Printf(state)
+		log.Printf("%#v", state)
 	}
 }

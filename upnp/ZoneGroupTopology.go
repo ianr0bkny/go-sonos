@@ -40,7 +40,7 @@ var (
 )
 
 type ZoneGroupTopologyState struct {
-	ZoneGroupState          string // TODO: Unpack
+	ZoneGroupState          string
 	ThirdPartyMediaServersX string
 	AvailableSoftwareUpdate string // TODO: Unpack
 	AlarmRunSequence        string
@@ -234,7 +234,33 @@ func (this *ZoneGroupTopology) GetZoneGroupAttributes() (*ZoneGroupAttributes, e
 	return &doc.ZoneGroupAttributes, doc.Error()
 }
 
-func (this *ZoneGroupTopology) GetZoneGroupState() (zoneGroupState string, err error) {
+type ZoneGroupMember struct {
+	XMLName              xml.Name
+	UUID                 string `xml:"UUID,attr"`
+	Location             string `xml:"Location,attr"`
+	ZoneName             string `xml:"ZoneName,attr"`
+	Icon                 string `xml:"Icon,attr"`
+	Configuration        string `xml:"Configuration,attr"`
+	Invisible            string `xml:"Invisible,attr"`
+	IsZoneBridge         string `xml:"IsZoneBridge,attr"`
+	SoftwareVersion      string `xml:"SoftwareVersion,attr"`
+	MinCompatibleVersion string `xml:"MinCompatibleVersion,attr"`
+	BootSeq              string `xml:"BootSeq,attr"`
+}
+
+type ZoneGroup struct {
+	XMLName         xml.Name
+	Coordinator     string `xml:"Coordinator,attr"`
+	ID              string `xml:"ID,attr"`
+	ZoneGroupMember []ZoneGroupMember
+}
+
+type ZoneGroups struct {
+	XMLName   xml.Name
+	ZoneGroup []ZoneGroup
+}
+
+func (this *ZoneGroupTopology) GetZoneGroupState() (*ZoneGroups, error) {
 	type Response struct {
 		XMLName        xml.Name
 		ZoneGroupState string
@@ -243,5 +269,7 @@ func (this *ZoneGroupTopology) GetZoneGroupState() (zoneGroupState string, err e
 	response := this.Svc.CallVa("GetZoneGroupState")
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
-	return doc.ZoneGroupState, doc.Error()
+	state := ZoneGroups{}
+	xml.Unmarshal([]byte(doc.ZoneGroupState), &state)
+	return &state, doc.Error()
 }
