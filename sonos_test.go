@@ -1114,5 +1114,4 @@ func TestGetZoneGroupState(t *testing.T) {
 	} else {
 		log.Printf(state)
 	}
-
 }
