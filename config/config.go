@@ -105,6 +105,10 @@ func (this *configDevice) Product() string {
 	return this.product
 }
 
+func (this *configDevice) Name() string {
+	panic("Not implemented")
+}
+
 func (this *configDevice) Location() ssdp.Location {
 	return this.location
 }

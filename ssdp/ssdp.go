@@ -144,6 +144,8 @@ type ssdpServiceSet map[ServiceKey]Service
 type Device interface {
 	// The product name (e.g. "Sonos")
 	Product() string
+	// The device name (e.h. "ZonePlayer")
+	Name() string
 	// A URI that can be queried for device capabilities
 	Location() Location
 	// The device's Universally Unique ID
@@ -163,6 +165,10 @@ type ssdpDevice struct {
 
 func (this *ssdpDevice) Product() string {
 	return this.product
+}
+
+func (this *ssdpDevice) Name() string {
+	return this.name
 }
 
 func (this *ssdpDevice) Location() Location {
@@ -282,6 +288,8 @@ type Manager interface {
 	// After discovery is complete searches for devices implementing
 	// the services specified in query.
 	QueryServices(query ServiceQueryTerms) ServiceMap
+	// Return the list of devices that were found during discovery
+	Devices() DeviceMap
 	// Shuts down asynchronous subscriptions to device state
 	Close() error
 }
@@ -334,6 +342,10 @@ func (this *ssdpDefaultManager) QueryServices(query ServiceQueryTerms) (results 
 		}
 	}
 	return
+}
+
+func (this *ssdpDefaultManager) Devices() DeviceMap {
+	return this.deviceMap
 }
 
 func (this *ssdpDefaultManager) Close() (err error) {
