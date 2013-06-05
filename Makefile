@@ -48,3 +48,9 @@ wc ::
 longlines ::
 	egrep '.{120,}' *.go */*.go
 
+coverage ::
+	$(GO) test -test.run Coverage
+
+discovery ::
+	$(GO) test -test.run Discovery
+
