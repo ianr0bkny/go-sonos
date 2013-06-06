@@ -1115,3 +1115,6 @@ func TestGetZoneGroupState(t *testing.T) {
 		log.Printf("%#v", state)
 	}
 }
+
+func TestGrace(t *testing.T) {
+}
