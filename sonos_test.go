@@ -1117,4 +1117,18 @@ func TestGetZoneGroupState(t *testing.T) {
 }
 
 func TestGrace(t *testing.T) {
+	if mgr, err := sonos.Discover(TEST_NETWORK, TEST_DISCOVER_PORT); nil != err {
+		panic(err)
+	} else {
+		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
+		sonos.ConnectReciva(mgr, reactor, sonos.SVC_DEVICE_PROPERTIES)
+		/*
+		found := sonos.ConnectReciva(mgr, reactor, sonos.SVC_DEVICE_PROPERTIES)
+		for _, s := range found {
+			id, _ := s.GetHouseholdID()
+			name, _, _ := s.GetZoneAttributes()
+			t.Logf("Found device \"%s\",\"%s\"", id, name)
+		}
+		*/
+	}
 }
