@@ -31,6 +31,7 @@
 package sonos
 
 import (
+	"fmt"
 	"github.com/ianr0bkny/go-sonos/upnp"
 	"log"
 	"reflect"
@@ -61,13 +62,19 @@ func (this *coverageData) log(name string, missing bool) {
 	}
 }
 
-func Coverage(s *Sonos) {
-	sv := reflect.ValueOf(*s)
+func Coverage(s interface{}) {
+	sv := reflect.Indirect(reflect.ValueOf(s))
 	st := sv.Type()
 	total_cd := coverageData{}
 	for i := 0; i < st.NumField(); i++ {
 		superclass := sv.Field(i)
 		svc := superclass.FieldByName("Svc").Interface().(*upnp.Service)
+		if nil == svc {
+			cd := coverageData{}
+			cd.log(fmt.Sprintf("Service %s not implemented", superclass.Type().Name()), true)
+			total_cd.add(&cd)
+			continue
+		}
 		actions := svc.Actions()
 		superclass_type := reflect.PtrTo(superclass.Type())
 		cd := coverageData{total: len(actions)}

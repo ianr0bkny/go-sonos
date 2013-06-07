@@ -36,29 +36,66 @@ import (
 	"log"
 )
 
-type Reciva struct {
-}
-
-const RECIVA_RADIO = "reciva-com:service:RecivaRadio"
+const RECIVA_RADIO = "reciva-com-RecivaRadio"
 const RADIO = "Radio"
 
-func ConnectReciva(mgr ssdp.Manager, reactor upnp.Reactor, flags int) {
+type Reciva struct {
+	upnp.AVTransport
+	upnp.ConnectionManager
+	upnp.RenderingControl
+}
+
+func MakeReciva(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (reciva *Reciva) {
+	reciva = &Reciva{}
+	for svc_type, svc_list := range svc_map {
+		switch svc_type {
+		case "AVTransport":
+			for _, svc := range svc_list {
+				reciva.AVTransport.Svc = svc
+				svc.Describe()
+				if nil != reactor {
+					reactor.Subscribe(svc, &reciva.AVTransport)
+				}
+				break
+			}
+		case "ConnectionManager":
+			for _, svc := range svc_list {
+				reciva.ConnectionManager.Svc = svc
+				svc.Describe()
+				if nil != reactor {
+					reactor.Subscribe(svc, &reciva.ConnectionManager)
+				}
+				break
+			}
+		case "RenderingControl":
+			for _, svc := range svc_list {
+				reciva.RenderingControl.Svc = svc
+				svc.Describe()
+				if nil != reactor {
+					reactor.Subscribe(svc, &reciva.RenderingControl)
+				}
+				break
+			}
+		default:
+			log.Print(svc_type)
+		}
+	}
+	return
+}
+
+func ConnectReciva(mgr ssdp.Manager, reactor upnp.Reactor, flags int) (reciva []*Reciva) {
 	qry := ssdp.ServiceQueryTerms{
 		ssdp.ServiceKey(RECIVA_RADIO): -1,
 	}
 	res := mgr.QueryServices(qry)
 	if dev_list, has := res[RECIVA_RADIO]; has {
-		log.Printf("here")
 		for _, dev := range dev_list {
 			if RADIO == dev.Product() {
-				log.Printf("%#v", dev)
-				/*
 				if svc_map, err := upnp.Describe(dev.Location()); nil != err {
 					panic(err)
 				} else {
-					sonos = append(sonos, MakeSonos(svc_map, reactor, flags))
+					reciva = append(reciva, MakeReciva(svc_map, reactor, flags))
 				}
-				*/
 				break
 			}
 		}

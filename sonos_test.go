@@ -1117,11 +1117,16 @@ func TestGetZoneGroupState(t *testing.T) {
 }
 
 func TestGrace(t *testing.T) {
+	log.SetFlags(log.Ltime | log.Lshortfile)
 	if mgr, err := sonos.Discover(TEST_NETWORK, TEST_DISCOVER_PORT); nil != err {
 		panic(err)
 	} else {
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		sonos.ConnectReciva(mgr, reactor, sonos.SVC_DEVICE_PROPERTIES)
+		radios := sonos.ConnectReciva(mgr, reactor, sonos.SVC_DEVICE_PROPERTIES)
+		for _, radio := range radios {
+			sonos.Coverage(radio)
+			break
+		}
 		/*
 		found := sonos.ConnectReciva(mgr, reactor, sonos.SVC_DEVICE_PROPERTIES)
 		for _, s := range found {
