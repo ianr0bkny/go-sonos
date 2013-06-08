@@ -33,7 +33,7 @@ package sonos
 import (
 	"github.com/ianr0bkny/go-sonos/ssdp"
 	"github.com/ianr0bkny/go-sonos/upnp"
-	"log"
+	_ "log"
 )
 
 const RECIVA_RADIO = "reciva-com-RecivaRadio"
@@ -67,6 +67,33 @@ func MakeReciva(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (reciv
 				}
 				break
 			}
+		case "Playlist":
+			for _, svc := range svc_list {
+				//reciva.RenderingControl.Svc = svc
+				svc.Describe()
+				if nil != reactor {
+					//reactor.Subscribe(svc, &reciva.RenderingControl)
+				}
+				break
+			}
+		case "RecivaRadio":
+			for _, svc := range svc_list {
+				//reciva.RenderingControl.Svc = svc
+				svc.Describe()
+				if nil != reactor {
+					//reactor.Subscribe(svc, &reciva.RenderingControl)
+				}
+				break
+			}
+		case "RecivaSimpleRemote":
+			for _, svc := range svc_list {
+				//reciva.RenderingControl.Svc = svc
+				svc.Describe()
+				if nil != reactor {
+					//reactor.Subscribe(svc, &reciva.RenderingControl)
+				}
+				break
+			}
 		case "RenderingControl":
 			for _, svc := range svc_list {
 				reciva.RenderingControl.Svc = svc
@@ -76,14 +103,12 @@ func MakeReciva(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (reciv
 				}
 				break
 			}
-		default:
-			log.Print(svc_type)
 		}
 	}
 	return
 }
 
-func ConnectReciva(mgr ssdp.Manager, reactor upnp.Reactor, flags int) (reciva []*Reciva) {
+func ConnectAnyReciva(mgr ssdp.Manager, reactor upnp.Reactor, flags int) (reciva []*Reciva) {
 	qry := ssdp.ServiceQueryTerms{
 		ssdp.ServiceKey(RECIVA_RADIO): -1,
 	}
@@ -99,6 +124,15 @@ func ConnectReciva(mgr ssdp.Manager, reactor upnp.Reactor, flags int) (reciva []
 				break
 			}
 		}
+	}
+	return
+}
+
+func ConnectReciva(dev ssdp.Device, reactor upnp.Reactor, flags int) (reciva *Reciva) {
+	if svc_map, err := upnp.Describe(dev.Location()); nil != err {
+		panic(err)
+	} else {
+		reciva = MakeReciva(svc_map, reactor, flags)
 	}
 	return
 }

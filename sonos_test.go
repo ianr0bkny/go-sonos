@@ -42,7 +42,8 @@ import (
 
 const (
 	TEST_CONFIG        = "/home/ianr/.go-sonos"
-	TEST_DEVICE        = "kitchen"
+	TEST_SONOS         = "kitchen"
+	TEST_RECIVA        = "basement"
 	TEST_DISCOVER_PORT = "13104"
 	TEST_EVENTING_PORT = "13106"
 	TEST_NETWORK       = "eth0"
@@ -54,7 +55,7 @@ func initTestSonos(flags int) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
-	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+	if dev := c.Lookup(TEST_SONOS); nil != dev {
 		testSonos = sonos.Connect(dev, nil, flags)
 	} else {
 		log.Fatal("Could not create test instance")
@@ -66,6 +67,26 @@ func getTestSonos(flags int) *sonos.Sonos {
 		initTestSonos(flags)
 	}
 	return testSonos
+}
+
+var testReciva *sonos.Reciva
+
+func initTestReciva(flags int) {
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	c := config.MakeConfig(TEST_CONFIG)
+	c.Init()
+	if dev := c.Lookup(TEST_RECIVA); nil != dev {
+		testReciva = sonos.ConnectReciva(dev, nil, flags)
+	} else {
+		log.Fatal("Could not create test instance")
+	}
+}
+
+func getTestReciva(flags int) *sonos.Reciva {
+	if nil == testReciva {
+		initTestReciva(flags)
+	}
+	return testReciva
 }
 
 //
@@ -1096,7 +1117,7 @@ func TestEvent(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
-	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+	if dev := c.Lookup(TEST_SONOS); nil != dev {
 		exit_chan := make(chan bool)
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		go handleEvent_TestEventBrief(reactor, exit_chan)
@@ -1117,23 +1138,6 @@ func TestGetZoneGroupState(t *testing.T) {
 }
 
 func TestGrace(t *testing.T) {
-	log.SetFlags(log.Ltime | log.Lshortfile)
-	if mgr, err := sonos.Discover(TEST_NETWORK, TEST_DISCOVER_PORT); nil != err {
-		panic(err)
-	} else {
-		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
-		radios := sonos.ConnectReciva(mgr, reactor, sonos.SVC_DEVICE_PROPERTIES)
-		for _, radio := range radios {
-			sonos.Coverage(radio)
-			break
-		}
-		/*
-		found := sonos.ConnectReciva(mgr, reactor, sonos.SVC_DEVICE_PROPERTIES)
-		for _, s := range found {
-			id, _ := s.GetHouseholdID()
-			name, _, _ := s.GetZoneAttributes()
-			t.Logf("Found device \"%s\",\"%s\"", id, name)
-		}
-		*/
-	}
+	r := getTestReciva(sonos.SVC_ALL)
+	sonos.Coverage(r)
 }
