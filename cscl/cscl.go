@@ -99,11 +99,20 @@ func discover(flags *Args) {
 	} else {
 		query := ssdp.ServiceQueryTerms{
 			ssdp.ServiceKey(sonos.MUSIC_SERVICES): -1,
+			ssdp.ServiceKey(sonos.RECIVA_RADIO): -1,
 		}
 		res := mgr.QueryServices(query)
 		if dev_list, has := res[sonos.MUSIC_SERVICES]; has {
 			for _, dev := range dev_list {
 				if sonos.SONOS == dev.Product() {
+					fmt.Printf("%s %s\n", string(dev.UUID()), dev.Location())
+					CONFIG.AddBookmark(string(dev.UUID()), dev.Product(), dev.Location(), dev.UUID())
+				}
+			}
+		}
+		if dev_list, has := res[sonos.RECIVA_RADIO]; has {
+			for _, dev := range dev_list {
+				if sonos.RADIO == dev.Product() {
 					fmt.Printf("%s %s\n", string(dev.UUID()), dev.Location())
 					CONFIG.AddBookmark(string(dev.UUID()), dev.Product(), dev.Location(), dev.UUID())
 				}
