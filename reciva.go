@@ -45,6 +45,7 @@ type Reciva struct {
 	upnp.ConnectionManager
 	upnp.RenderingControl
 	reciva.RecivaSimpleRemote
+	reciva.RecivaRadio
 }
 
 func MakeReciva(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (reciva *Reciva) {
@@ -80,10 +81,10 @@ func MakeReciva(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (reciv
 			}
 		case "RecivaRadio":
 			for _, svc := range svc_list {
-				//reciva.RenderingControl.Svc = svc
+				reciva.RecivaRadio.Svc = svc
 				svc.Describe()
 				if nil != reactor {
-					//reactor.Subscribe(svc, &reciva.RenderingControl)
+					reactor.Subscribe(svc, &reciva.RecivaRadio)
 				}
 				break
 			}
