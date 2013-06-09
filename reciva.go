@@ -31,7 +31,8 @@
 package sonos
 
 import (
-	"github.com/ianr0bkny/go-sonos/reciva"
+	"github.com/ianr0bkny/go-sonos/linn-co-uk"
+	"github.com/ianr0bkny/go-sonos/reciva-com"
 	"github.com/ianr0bkny/go-sonos/ssdp"
 	"github.com/ianr0bkny/go-sonos/upnp"
 	_ "log"
@@ -46,6 +47,7 @@ type Reciva struct {
 	upnp.RenderingControl
 	reciva.RecivaSimpleRemote
 	reciva.RecivaRadio
+	linn.Playlist
 }
 
 func MakeReciva(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (reciva *Reciva) {
@@ -72,10 +74,10 @@ func MakeReciva(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (reciv
 			}
 		case "Playlist":
 			for _, svc := range svc_list {
-				//reciva.RenderingControl.Svc = svc
+				reciva.Playlist.Svc = svc
 				svc.Describe()
 				if nil != reactor {
-					//reactor.Subscribe(svc, &reciva.RenderingControl)
+					reactor.Subscribe(svc, &reciva.Playlist)
 				}
 				break
 			}
