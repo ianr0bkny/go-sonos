@@ -584,3 +584,35 @@ func (this *RenderingControl) SetChannelMap(instanceId uint32, channelMap string
 	err = doc.Error()
 	return
 }
+
+/* Reciva */
+func (this *RenderingControl) ListPresets(instanceId uint32) (presets string, err error) {
+	type Response struct {
+		XMLName xml.Name
+		upnpErrorResponse
+		CurrentPresetNameList string
+	}
+	args := []upnpArg{
+		{"InstanceID", instanceId},
+	}
+	response := this.Svc.Call("ListPresets", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.CurrentPresetNameList, doc.Error()
+}
+
+/* Reciva */
+func (this *RenderingControl) SelectPreset(instanceId uint32, presetName string) error {
+	type Response struct {
+		XMLName xml.Name
+		upnpErrorResponse
+	}
+	args := []upnpArg{
+		{"InstanceID", instanceId},
+		{"PresetName", presetName},
+	}
+	response := this.Svc.Call("SelectPreset", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.Error()
+}

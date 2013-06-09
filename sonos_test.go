@@ -1141,3 +1141,12 @@ func TestGrace(t *testing.T) {
 	r := getTestReciva(sonos.SVC_ALL)
 	sonos.Coverage(r)
 }
+
+func TestListPresets(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if presets, err := r.ListPresets(0); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("PRESET: %v", presets)
+	}
+}
