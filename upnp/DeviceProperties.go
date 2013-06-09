@@ -102,9 +102,9 @@ const (
 func (this *DeviceProperties) SetLEDState(desiredLEDState string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"DesiredLEDState", desiredLEDState},
 	}
 	response := this.Svc.Call("SetLEDState", args)
@@ -118,7 +118,7 @@ func (this *DeviceProperties) GetLEDState() (currentLEDState string, err error) 
 	type Response struct {
 		XMLName         xml.Name
 		CurrentLEDState string
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("GetLEDState")
 	doc := Response{}
@@ -131,9 +131,9 @@ func (this *DeviceProperties) GetLEDState() (currentLEDState string, err error) 
 func (this *DeviceProperties) SetInvisible(desiredInvisible bool) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"DesiredInvisible", desiredInvisible},
 	}
 	response := this.Svc.Call("SetInvisible", args)
@@ -147,7 +147,7 @@ func (this *DeviceProperties) GetInvisible() (currentInvisible bool, err error) 
 	type Response struct {
 		XMLName          xml.Name
 		CurrentInvisible bool
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("GetInvisible")
 	doc := Response{}
@@ -160,9 +160,9 @@ func (this *DeviceProperties) GetInvisible() (currentInvisible bool, err error) 
 func (this *DeviceProperties) AddBondedZones(channelMapSet string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"ChannelMapSet", channelMapSet},
 	}
 	response := this.Svc.Call("AddBondedZones", args)
@@ -175,9 +175,9 @@ func (this *DeviceProperties) AddBondedZones(channelMapSet string) (err error) {
 func (this *DeviceProperties) RemoveBondedZones(channelMapSet string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"ChannelMapSet", channelMapSet},
 	}
 	response := this.Svc.Call("RemoveBondedZones", args)
@@ -190,9 +190,9 @@ func (this *DeviceProperties) RemoveBondedZones(channelMapSet string) (err error
 func (this *DeviceProperties) CreateStereoPair(channelMapSet string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"ChannelMapSet", channelMapSet},
 	}
 	response := this.Svc.Call("CreateStereoPair", args)
@@ -205,9 +205,9 @@ func (this *DeviceProperties) CreateStereoPair(channelMapSet string) (err error)
 func (this *DeviceProperties) SeparateStereoPair(channelMapSet string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"ChannelMapSet", channelMapSet},
 	}
 	response := this.Svc.Call("SeparateStereoPair", args)
@@ -220,9 +220,9 @@ func (this *DeviceProperties) SeparateStereoPair(channelMapSet string) (err erro
 func (this *DeviceProperties) SetZoneAttributes(desiredZoneName, desiredIcon string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"DesiredZoneName,", desiredZoneName},
 		{"DesiredIcon,", desiredIcon},
 	}
@@ -238,7 +238,7 @@ func (this *DeviceProperties) GetZoneAttributes() (currentZoneName, currentIcon 
 		XMLName         xml.Name
 		CurrentZoneName string
 		CurrentIcon     string
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("GetZoneAttributes")
 	doc := Response{}
@@ -253,7 +253,7 @@ func (this *DeviceProperties) GetHouseholdID() (currentHouseholdId string, err e
 	type Response struct {
 		XMLName            xml.Name
 		CurrentHouseholdID string
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("GetHouseholdID")
 	doc := Response{}
@@ -293,7 +293,7 @@ func (this *DeviceProperties) GetZoneInfo() (*ZoneInfo, error) {
 	type Response struct {
 		XMLName xml.Name
 		ZoneInfo
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("GetZoneInfo")
 	doc := Response{}
@@ -304,9 +304,9 @@ func (this *DeviceProperties) GetZoneInfo() (*ZoneInfo, error) {
 func (this *DeviceProperties) SetAutoplayLinkedZones(includeLinkedZones bool) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"IncludeLinkedZones", includeLinkedZones},
 	}
 	response := this.Svc.Call("SetAutoplayLinkedZones", args)
@@ -320,7 +320,7 @@ func (this *DeviceProperties) GetAutoplayLinkedZones() (includeLinkedZones bool,
 	type Response struct {
 		XMLName            xml.Name
 		IncludeLinkedZones bool
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("GetAutoplayLinkedZones")
 	doc := Response{}
@@ -333,9 +333,9 @@ func (this *DeviceProperties) GetAutoplayLinkedZones() (includeLinkedZones bool,
 func (this *DeviceProperties) SetAutoplayRoomUUID(roomUUID string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"RoomUUID", roomUUID},
 	}
 	response := this.Svc.Call("SetAutoplayRoomUUID", args)
@@ -349,7 +349,7 @@ func (this *DeviceProperties) GetAutoplayRoomUUID() (roomUUID string, err error)
 	type Response struct {
 		XMLName  xml.Name
 		RoomUUID string
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("GetAutoplayRoomUUID")
 	doc := Response{}
@@ -362,9 +362,9 @@ func (this *DeviceProperties) GetAutoplayRoomUUID() (roomUUID string, err error)
 func (this *DeviceProperties) SetAutoplayVolume(volume uint16) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"Volume", volume},
 	}
 	response := this.Svc.Call("SetAutoplayVolume", args)
@@ -378,7 +378,7 @@ func (this *DeviceProperties) GetAutoplayVolume() (currentVolume uint16, err err
 	type Response struct {
 		XMLName       xml.Name
 		CurrentVolume uint16
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("GetAutoplayVolume")
 	doc := Response{}
@@ -391,9 +391,9 @@ func (this *DeviceProperties) GetAutoplayVolume() (currentVolume uint16, err err
 func (this *DeviceProperties) ImportSetting(settingID uint32, settingURI string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"SettingID", settingID},
 		{"SettingURI", settingURI},
 	}
@@ -407,9 +407,9 @@ func (this *DeviceProperties) ImportSetting(settingID uint32, settingURI string)
 func (this *DeviceProperties) SetUseAutoplayVolume(useVolume bool) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"UseVolume", useVolume},
 	}
 	response := this.Svc.Call("SetUseAutoplayVolume", args)
@@ -423,7 +423,7 @@ func (this *DeviceProperties) GetUseAutoplayVolume() (useVolume bool, err error)
 	type Response struct {
 		XMLName   xml.Name
 		UseVolume bool
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("GetUseAutoplayVolume")
 	doc := Response{}
@@ -436,9 +436,9 @@ func (this *DeviceProperties) GetUseAutoplayVolume() (useVolume bool, err error)
 func (this *DeviceProperties) AddHTSatellite(htSatChanMapSet string) error {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"HTSatChanMapSet", htSatChanMapSet},
 	}
 	response := this.Svc.Call("AddHTSatellite", args)
@@ -450,9 +450,9 @@ func (this *DeviceProperties) AddHTSatellite(htSatChanMapSet string) error {
 func (this *DeviceProperties) RemoveHTSatellite(satRoomUUID string) error {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"SatRoomUUID", satRoomUUID},
 	}
 	response := this.Svc.Call("RemoveHTSatellite", args)

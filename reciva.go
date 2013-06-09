@@ -31,6 +31,7 @@
 package sonos
 
 import (
+	"github.com/ianr0bkny/go-sonos/reciva"
 	"github.com/ianr0bkny/go-sonos/ssdp"
 	"github.com/ianr0bkny/go-sonos/upnp"
 	_ "log"
@@ -43,6 +44,7 @@ type Reciva struct {
 	upnp.AVTransport
 	upnp.ConnectionManager
 	upnp.RenderingControl
+	reciva.RecivaSimpleRemote
 }
 
 func MakeReciva(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (reciva *Reciva) {
@@ -87,10 +89,10 @@ func MakeReciva(svc_map upnp.ServiceMap, reactor upnp.Reactor, flags int) (reciv
 			}
 		case "RecivaSimpleRemote":
 			for _, svc := range svc_list {
-				//reciva.RenderingControl.Svc = svc
+				reciva.RecivaSimpleRemote.Svc = svc
 				svc.Describe()
 				if nil != reactor {
-					//reactor.Subscribe(svc, &reciva.RenderingControl)
+					reactor.Subscribe(svc, &reciva.RecivaSimpleRemote)
 				}
 				break
 			}
