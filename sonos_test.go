@@ -1150,3 +1150,12 @@ func TestListPresets(t *testing.T) {
 		log.Printf("PRESET: %v", presets)
 	}
 }
+
+func TestIdArray(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if token, array, err := r.IdArray(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("--> %v %v", token, array)
+	}
+}

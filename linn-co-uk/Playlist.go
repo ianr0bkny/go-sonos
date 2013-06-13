@@ -31,6 +31,7 @@
 package linn
 
 import (
+	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/upnp"
 )
 
@@ -46,4 +47,17 @@ func (this *Playlist) HandleProperty(svc *upnp.Service, value string, channel ch
 }
 
 func (this *Playlist) EndSet(svc *upnp.Service, channel chan upnp.Event) {
+}
+
+func (this *Playlist) IdArray() (aIdArrayToken uint32, aIdArray string, err error) {
+	type Response struct {
+		XMLName       xml.Name
+		AIdArrayToken uint32 `xml:"aIdArrayToken"`
+		AIdArray      string `xml:"aIdArray"`
+		upnp.ErrorResponse
+	}
+	response := this.Svc.CallVa("IdArray")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.AIdArrayToken, doc.AIdArray, doc.Error()
 }
