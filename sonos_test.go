@@ -1182,3 +1182,32 @@ func TestPowerState(t *testing.T) {
 		log.Printf("Power state is (%v)", state)
 	}
 }
+
+func TestDisplayLanguage(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if lang, iso, err := r.GetCurrentDisplayLanguage(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Language = %v", lang)
+		log.Printf("ISO: %v", iso)
+	}
+}
+
+func TestDisplayLanguageList(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if lang, iso, err := r.GetDisplayLanguages(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Language = %v", lang)
+		log.Printf("ISO: %v", iso)
+	}
+}
+
+func TestGetNumberOfPresets(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if n, err := r.GetNumberOfPresets(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Number of presets: %v", n)
+	}
+}

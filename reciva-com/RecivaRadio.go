@@ -49,6 +49,44 @@ func (this *RecivaRadio) HandleProperty(svc *upnp.Service, value string, channel
 func (this *RecivaRadio) EndSet(svc *upnp.Service, channel chan upnp.Event) {
 }
 
+func (this *RecivaRadio) GetNumberOfPresets() (retNumberOfPresetsValue uint32, err error) {
+	type Response struct {
+		XMLName                 xml.Name
+		RetNumberOfPresetsValue uint32
+		upnp.ErrorResponse
+	}
+	response := this.Svc.CallVa("GetNumberOfPresets")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.RetNumberOfPresetsValue, doc.Error()
+}
+
+func (this *RecivaRadio) GetDisplayLanguages() (retLanguageListValue, retIsoCodeListValue string, err error) {
+	type Response struct {
+		XMLName              xml.Name
+		RetLanguageListValue string
+		RetIsoCodeListValue  string
+		upnp.ErrorResponse
+	}
+	response := this.Svc.CallVa("GetDisplayLanguages")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.RetLanguageListValue, doc.RetIsoCodeListValue, doc.Error()
+}
+
+func (this *RecivaRadio) GetCurrentDisplayLanguage() (retLanguageValue, retIsoCodeValue string, err error) {
+	type Response struct {
+		XMLName          xml.Name
+		RetLanguageValue string
+		RetIsoCodeValue  string
+		upnp.ErrorResponse
+	}
+	response := this.Svc.CallVa("GetCurrentDisplayLanguage")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.RetLanguageValue, doc.RetIsoCodeValue, doc.Error()
+}
+
 func (this *RecivaRadio) GetPowerState() (retPowerStateValue string, err error) {
 	type Response struct {
 		XMLName            xml.Name
