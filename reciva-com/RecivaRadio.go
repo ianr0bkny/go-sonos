@@ -31,6 +31,7 @@
 package reciva
 
 import (
+	"encoding/xml"
 	"github.com/ianr0bkny/go-sonos/upnp"
 )
 
@@ -46,4 +47,31 @@ func (this *RecivaRadio) HandleProperty(svc *upnp.Service, value string, channel
 }
 
 func (this *RecivaRadio) EndSet(svc *upnp.Service, channel chan upnp.Event) {
+}
+
+func (this *RecivaRadio) GetPowerState() (retPowerStateValue string, err error) {
+	type Response struct {
+		XMLName            xml.Name
+		RetPowerStateValue string
+		upnp.ErrorResponse
+	}
+	response := this.Svc.CallVa("GetPowerState")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.RetPowerStateValue, doc.Error()
+}
+
+func (this *RecivaRadio) SetPowerState(newPowerStateValue string) (retPowerStateValue string, err error) {
+	type Response struct {
+		XMLName            xml.Name
+		RetPowerStateValue string
+		upnp.ErrorResponse
+	}
+	args := []upnp.Arg{
+		{"NewPowerStateValue", newPowerStateValue},
+	}
+	response := this.Svc.Call("SetPowerState", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.RetPowerStateValue, doc.Error()
 }

@@ -1153,16 +1153,32 @@ func TestListPresets(t *testing.T) {
 
 func TestIdArray(t *testing.T) {
 	r := getTestReciva(sonos.SVC_ALL)
-	/*
 	if token, array, err := r.IdArray(); nil != err {
 		log.Fatal(err)
 	} else {
 		log.Printf("--> %v %v", token, array)
 	}
-	*/
+}
+
+func TestTracksMax(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
 	if tracksMax, err := r.TracksMax(); nil != err {
 		log.Fatal(err)
 	} else {
 		log.Printf("%v", tracksMax)
+	}
+}
+
+func TestPowerState(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if state, err := r.GetPowerState(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Power state is (%v)", state)
+	}
+	if state, err := r.SetPowerState("On"); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Power state is (%v)", state)
 	}
 }
