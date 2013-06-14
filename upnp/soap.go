@@ -175,6 +175,7 @@ func (this *Service) Call(action string, args Args) (response string) {
 			panic(err)
 		}
 		doc := soapResponseEnvelope{}
+		//log.Printf("%v", string(body))
 		xml.Unmarshal(body, &doc)
 		response = doc.Body.Data
 	}
