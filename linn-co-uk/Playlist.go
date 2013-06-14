@@ -61,3 +61,15 @@ func (this *Playlist) IdArray() (aIdArrayToken uint32, aIdArray string, err erro
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.AIdArrayToken, doc.AIdArray, doc.Error()
 }
+
+func (this *Playlist) TracksMax() (aTracksMax uint32, err error) {
+	type Response struct {
+		XMLName    xml.Name
+		ATracksMax uint32 `xml:"aTracksMax"`
+		upnp.ErrorResponse
+	}
+	response := this.Svc.CallVa("IdArray")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.ATracksMax, doc.Error()
+}
