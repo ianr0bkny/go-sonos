@@ -1211,3 +1211,21 @@ func TestGetNumberOfPresets(t *testing.T) {
 		log.Printf("Number of presets: %v", n)
 	}
 }
+
+func TestRecivaGetDateTime(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if n, err := r.GetDateTime(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Date-time: %v", n)
+	}
+}
+
+func TestRecivaGetTimeZone(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if n, err := r.GetTimeZone(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Timezone: %v", n)
+	}
+}

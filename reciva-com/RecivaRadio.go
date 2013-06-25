@@ -49,6 +49,30 @@ func (this *RecivaRadio) HandleProperty(svc *upnp.Service, value string, channel
 func (this *RecivaRadio) EndSet(svc *upnp.Service, channel chan upnp.Event) {
 }
 
+func (this *RecivaRadio) GetDateTime() (retDataTimeValue string, err error) {
+	type Response struct {
+		XMLName          xml.Name
+		RetDateTimeValue string
+		upnp.ErrorResponse
+	}
+	response := this.Svc.CallVa("GetDateTime")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.RetDateTimeValue, doc.Error()
+}
+
+func (this *RecivaRadio) GetTimeZone() (retTimeZoneValue string, err error) {
+	type Response struct {
+		XMLName          xml.Name
+		RetTimeZoneValue string
+		upnp.ErrorResponse
+	}
+	response := this.Svc.CallVa("GetTimeZone")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.RetTimeZoneValue, doc.Error()
+}
+
 func (this *RecivaRadio) GetNumberOfPresets() (retNumberOfPresetsValue uint32, err error) {
 	type Response struct {
 		XMLName                 xml.Name
