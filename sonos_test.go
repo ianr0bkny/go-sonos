@@ -1176,7 +1176,7 @@ func TestPowerState(t *testing.T) {
 	} else {
 		log.Printf("Power state is (%v)", state)
 	}
-	if state, err := r.SetPowerState("On"); nil != err {
+	if state, err := r.SetPowerState("Off"); nil != err {
 		log.Fatal(err)
 	} else {
 		log.Printf("Power state is (%v)", state)
