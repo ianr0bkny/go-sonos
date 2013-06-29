@@ -161,6 +161,7 @@ func (this *Service) Call(action string, args Args) (response string) {
 	req.Header.Set("CONTENT-TYPE", soapContentType)
 	req.Header.Set("USER-AGENT", soapUserAgent)
 	req.Header.Set("SOAPACTION", fmt.Sprintf("\"%s#%s\"", soapBuildNamespace(this), action))
+	req.Header.Set("CONNECTION", "KEEP-ALIVE")
 	//req.Write(os.Stdout)
 	//body.Seek(0, 0)
 	if nil != err {
