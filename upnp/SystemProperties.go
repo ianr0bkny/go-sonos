@@ -88,9 +88,9 @@ func (this *SystemProperties) EndSet(svc *Service, channel chan Event) {
 func (this *SystemProperties) SetString(variableName, stringValue string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"VariableName", variableName},
 		{"StringValue", stringValue},
 	}
@@ -104,9 +104,9 @@ func (this *SystemProperties) SetString(variableName, stringValue string) (err e
 func (this *SystemProperties) SetStringX(variableName, stringValue string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"VariableName", variableName},
 		{"StringValue", stringValue},
 	}
@@ -121,9 +121,9 @@ func (this *SystemProperties) GetString(variableName string) (stringValue string
 	type Response struct {
 		XMLName     xml.Name
 		StringValue string
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"VariableName", variableName},
 	}
 	response := this.Svc.Call("GetString", args)
@@ -138,9 +138,9 @@ func (this *SystemProperties) GetStringX(variableName string) (stringValue strin
 	type Response struct {
 		XMLName     xml.Name
 		StringValue string
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"VariableName", variableName},
 	}
 	response := this.Svc.Call("GetStringX", args)
@@ -154,9 +154,9 @@ func (this *SystemProperties) GetStringX(variableName string) (stringValue strin
 func (this *SystemProperties) Remove(variableName string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"VariableName", variableName},
 	}
 	response := this.Svc.Call("Remove", args)
@@ -170,9 +170,9 @@ func (this *SystemProperties) GetWebCode(accountType uint32) (webCode string, er
 	type Response struct {
 		XMLName xml.Name
 		WebCode string
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"AccountType", accountType},
 	}
 	response := this.Svc.Call("GetWebCode", args)
@@ -186,9 +186,9 @@ func (this *SystemProperties) GetWebCode(accountType uint32) (webCode string, er
 func (this *SystemProperties) ProvisionTrialAccount(accountType uint32) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"AccountType", accountType},
 	}
 	response := this.Svc.Call("ProvisionTrialAccount", args)
@@ -203,9 +203,9 @@ func (this *SystemProperties) ProvisionCredentialedTrialAccountX(accountType uin
 	type Response struct {
 		XMLName   xml.Name
 		IsExpired bool
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"AccountType", accountType},
 		{"AccountID", accountId},
 		{"AccountPassword", accountPassword},
@@ -221,9 +221,9 @@ func (this *SystemProperties) ProvisionCredentialedTrialAccountX(accountType uin
 func (this *SystemProperties) MigrateTrialAccountX(accountType uint32, accountId, accountPassword string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"AccountType", accountType},
 		{"AccountID", accountId},
 		{"AccountPassword", accountPassword},
@@ -238,9 +238,9 @@ func (this *SystemProperties) MigrateTrialAccountX(accountType uint32, accountId
 func (this *SystemProperties) AddAccountX(accountType uint32, accountId, accountPassword string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"AccountType", accountType},
 		{"AccountID", accountId},
 		{"AccountPassword", accountPassword},
@@ -255,9 +255,9 @@ func (this *SystemProperties) AddAccountX(accountType uint32, accountId, account
 func (this *SystemProperties) AddAccountWithCredentialsX(accountType uint32, accountToken, accountKey string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"AccountType", accountType},
 		{"AccountToken", accountToken},
 		{"AccountKey", accountKey},
@@ -272,9 +272,9 @@ func (this *SystemProperties) AddAccountWithCredentialsX(accountType uint32, acc
 func (this *SystemProperties) RemoveAccount(accountType uint32, accountId string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"AccountType", accountType},
 		{"AccountID", accountId},
 	}
@@ -288,9 +288,9 @@ func (this *SystemProperties) RemoveAccount(accountType uint32, accountId string
 func (this *SystemProperties) EditAccountPasswordX(accountType uint32, accountId, newAccountPassword string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"AccountType", accountType},
 		{"AccountID", accountId},
 		{"NewAccountPassword", newAccountPassword},
@@ -305,9 +305,9 @@ func (this *SystemProperties) EditAccountPasswordX(accountType uint32, accountId
 func (this *SystemProperties) EditAccountMd(accountType uint32, accountId, accountMd string) (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"AccountType", accountType},
 		{"AccountID", accountId},
 		{"AccountMD", accountMd},
@@ -322,7 +322,7 @@ func (this *SystemProperties) EditAccountMd(accountType uint32, accountId, accou
 func (this *SystemProperties) DoPostUpdateTasks() (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("DoPostUpdateTasks")
 	doc := Response{}
@@ -334,7 +334,7 @@ func (this *SystemProperties) DoPostUpdateTasks() (err error) {
 func (this *SystemProperties) ResetThirdPartyCredentials() (err error) {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("ResetThirdPartyCredentials")
 	doc := Response{}
@@ -346,9 +346,9 @@ func (this *SystemProperties) ResetThirdPartyCredentials() (err error) {
 func (this *SystemProperties) RemoveX(variableName string) error {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"VariableName", variableName},
 	}
 	response := this.Svc.Call("RemoveX", args)
@@ -360,9 +360,9 @@ func (this *SystemProperties) RemoveX(variableName string) error {
 func (this *SystemProperties) EnableRDM(rdmValue bool) error {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
-	args := []upnpArg{
+	args := []Arg{
 		{"RDMValue", rdmValue},
 	}
 	response := this.Svc.Call("EnableRDM", args)
@@ -375,7 +375,7 @@ func (this *SystemProperties) GetRDM() (rdmValue bool, err error) {
 	type Response struct {
 		XMLName  xml.Name
 		RDMValue bool
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("GetRDM")
 	doc := Response{}
@@ -386,7 +386,7 @@ func (this *SystemProperties) GetRDM() (rdmValue bool, err error) {
 func (this *SystemProperties) ApplyRDMDefaultSettings() error {
 	type Response struct {
 		XMLName xml.Name
-		upnpErrorResponse
+		ErrorResponse
 	}
 	response := this.Svc.CallVa("ApplyRDMDefaultSettings")
 	doc := Response{}

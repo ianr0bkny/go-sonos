@@ -42,7 +42,8 @@ import (
 
 const (
 	TEST_CONFIG        = "/home/ianr/.go-sonos"
-	TEST_DEVICE        = "kitchen"
+	TEST_SONOS         = "kitchen"
+	TEST_RECIVA        = "basement"
 	TEST_DISCOVER_PORT = "13104"
 	TEST_EVENTING_PORT = "13106"
 	TEST_NETWORK       = "eth0"
@@ -54,7 +55,7 @@ func initTestSonos(flags int) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
-	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+	if dev := c.Lookup(TEST_SONOS); nil != dev {
 		testSonos = sonos.Connect(dev, nil, flags)
 	} else {
 		log.Fatal("Could not create test instance")
@@ -66,6 +67,26 @@ func getTestSonos(flags int) *sonos.Sonos {
 		initTestSonos(flags)
 	}
 	return testSonos
+}
+
+var testReciva *sonos.Reciva
+
+func initTestReciva(flags int) {
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	c := config.MakeConfig(TEST_CONFIG)
+	c.Init()
+	if dev := c.Lookup(TEST_RECIVA); nil != dev {
+		testReciva = sonos.ConnectReciva(dev, nil, flags)
+	} else {
+		log.Fatal("Could not create test instance")
+	}
+}
+
+func getTestReciva(flags int) *sonos.Reciva {
+	if nil == testReciva {
+		initTestReciva(flags)
+	}
+	return testReciva
 }
 
 //
@@ -1096,7 +1117,7 @@ func TestEvent(t *testing.T) {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	c := config.MakeConfig(TEST_CONFIG)
 	c.Init()
-	if dev := c.Lookup(TEST_DEVICE); nil != dev {
+	if dev := c.Lookup(TEST_SONOS); nil != dev {
 		exit_chan := make(chan bool)
 		reactor := sonos.MakeReactor(TEST_NETWORK, TEST_EVENTING_PORT)
 		go handleEvent_TestEventBrief(reactor, exit_chan)
@@ -1113,5 +1134,98 @@ func TestGetZoneGroupState(t *testing.T) {
 		log.Fatal(err)
 	} else {
 		log.Printf("%#v", state)
+	}
+}
+
+func TestGrace(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	sonos.Coverage(r)
+}
+
+func TestListPresets(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if presets, err := r.ListPresets(0); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("PRESET: %v", presets)
+	}
+}
+
+func TestIdArray(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if token, array, err := r.IdArray(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("--> %v %v", token, array)
+	}
+}
+
+func TestTracksMax(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if tracksMax, err := r.TracksMax(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("%v", tracksMax)
+	}
+}
+
+func TestPowerState(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if state, err := r.GetPowerState(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Power state is (%v)", state)
+	}
+	if state, err := r.SetPowerState("Off"); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Power state is (%v)", state)
+	}
+}
+
+func TestDisplayLanguage(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if lang, iso, err := r.GetCurrentDisplayLanguage(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Language = %v", lang)
+		log.Printf("ISO: %v", iso)
+	}
+}
+
+func TestDisplayLanguageList(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if lang, iso, err := r.GetDisplayLanguages(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Language = %v", lang)
+		log.Printf("ISO: %v", iso)
+	}
+}
+
+func TestGetNumberOfPresets(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if n, err := r.GetNumberOfPresets(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Number of presets: %v", n)
+	}
+}
+
+func TestRecivaGetDateTime(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if n, err := r.GetDateTime(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Date-time: %v", n)
+	}
+}
+
+func TestRecivaGetTimeZone(t *testing.T) {
+	r := getTestReciva(sonos.SVC_ALL)
+	if n, err := r.GetTimeZone(); nil != err {
+		log.Fatal(err)
+	} else {
+		log.Printf("Timezone: %v", n)
 	}
 }
