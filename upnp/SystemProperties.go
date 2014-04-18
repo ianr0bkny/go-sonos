@@ -393,3 +393,19 @@ func (this *SystemProperties) ApplyRDMDefaultSettings() error {
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.Error()
 }
+
+func (this *SystemProperties) RefreshAccountCredentialsX(accountType uint32, accountToken, accountKey string) error {
+	type Response struct {
+		XMLName xml.Name
+		ErrorResponse
+	}
+	args := []Arg{
+		{"AccountType", accountType},
+		{"AccountToken,", accountToken,},
+		{"AccountKey,", accountKey},
+	}
+	response := this.Svc.Call("RefreshAccountCredentialsX", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.Error()
+}
