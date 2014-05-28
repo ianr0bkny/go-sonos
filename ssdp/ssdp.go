@@ -265,6 +265,10 @@ type ssdpResponseMessage struct {
 	x_rincon_bootseq   string
 	x_rincon_household string
 	x_user_agent       string
+	content_length     string
+	bootid_upnp_org    string
+	configid_upnp_org  string
+	x_av_server_info   string
 }
 
 type ssdpResponseQueue chan *ssdpResponseMessage
@@ -552,8 +556,17 @@ func (this *ssdpDefaultManager) ssdpHandleResponse(raw *ssdpRawMessage) *ssdpRes
 			msg.al = value
 		case "01-Nls":
 			msg._01_nls = value
+		case "Content-Length":
+			msg.content_length = value
+		case "Bootid.upnp.org":
+			msg.bootid_upnp_org = value
+		case "Configid.upnp.org":
+			msg.configid_upnp_org = value
+		case "X-Av-Server-Info":
+			msg.x_av_server_info = value
 		default:
 			log.Printf("No support for field `%s' (value `%s')", key, value)
+			log.Printf("%v", raw)
 		}
 	}
 	return msg
