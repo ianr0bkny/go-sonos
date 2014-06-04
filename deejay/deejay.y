@@ -35,7 +35,7 @@ import (
 	"bufio"
 	"bytes"
 	"io"
-	"log"
+	_ "log"
 	"os"
 	"strconv"
 	"unicode"
@@ -58,7 +58,7 @@ type Script struct {
 	cmds []Cmd
 }
 
-var SCRIPT Script
+var interp Interp
 
 %}
 
@@ -278,20 +278,25 @@ func (this *Lexer) Error(s string) {
 }
 
 func execute(script Script) {
-	log.Printf("%#v", script)
+	for _, cmd := range script.cmds {
+		interp.execute(cmd)
+	}
 }
 
 func main() {
 	bin := bufio.NewReader(os.Stdin)
 	for {
-		if bytes, err := bin.ReadBytes('\n'); nil != err {
+		if raw, err := bin.ReadBytes('\n'); nil != err {
 			if io.EOF == err {
 				break
 			} else {
 				panic(err)
 			}
 		} else {
-			yyParse(&Lexer{line: bytes})
+			if i := bytes.Index(raw, []byte("#")); -1 != i {
+				raw = raw[:i]
+			}
+			yyParse(&Lexer{line: raw})
 		}
 	}
 }
