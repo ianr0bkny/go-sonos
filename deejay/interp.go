@@ -32,6 +32,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"github.com/ianr0bkny/go-sonos"
 	"github.com/ianr0bkny/go-sonos/config"
 	_ "log"
@@ -46,17 +47,23 @@ type Interp struct {
 	State
 }
 
-type Handler func(this *Interp, args []Arg) error
+type HandlerFn func(this *Interp, args []Arg) error
+
+type Handler struct {
+	fn  HandlerFn
+	sig string
+}
+
 type HandlerMap map[string]Handler
 
 var handlerMap HandlerMap
 
 func init() {
 	handlerMap = map[string]Handler{
-		"config": (*Interp).do_config,
-		"mute":   (*Interp).do_mute,
-		"unmute": (*Interp).do_unmute,
-		"select": (*Interp).do_select,
+		"config": Handler{(*Interp).do_config, "s"},
+		"mute":   Handler{fn: (*Interp).do_mute},
+		"unmute": Handler{fn: (*Interp).do_unmute},
+		"select": Handler{(*Interp).do_select, "s"},
 	}
 }
 
@@ -85,9 +92,32 @@ func (this *Interp) do_select(args []Arg) (err error) {
 	return
 }
 
+var argTypeMap = map[rune]int{
+	's': STRING,
+	'i': NUMBER,
+	'f': NUMBER,
+}
+
+func (this *Interp) checkArgs(cmd Cmd, handler Handler) {
+	if len(cmd.args) != len(handler.sig) {
+		panic("wrong number of arguments")
+	} else if 0 < len(handler.sig) {
+		for i, c := range handler.sig {
+			if id, exists := argTypeMap[c]; exists {
+				if id != cmd.args[i].id {
+					panic(fmt.Sprintf("wrong type for argument %d", i+1))
+				}
+			} else {
+				panic(fmt.Sprintf("unknown argument type character %c", c))
+			}
+		}
+	}
+}
+
 func (this *Interp) execute(cmd Cmd) {
 	if handler, has := handlerMap[cmd.name]; has {
-		if err := handler(this, cmd.args); nil != err {
+		this.checkArgs(cmd, handler)
+		if err := handler.fn(this, cmd.args); nil != err {
 			panic(err)
 		}
 	} else {
