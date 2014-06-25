@@ -95,7 +95,7 @@ func init() {
 
 const (
 	ssdpBroadcastGroup   = "239.255.255.250:1900"
-	ssdpBroadcastVersion = "udp4"
+	ssdpBroadcastVersion = "udp"
 )
 
 // Type protection for a device URI
