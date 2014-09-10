@@ -281,8 +281,8 @@ func (this *upnpDefaultReactor) ServeHTTP(writer http.ResponseWriter, request *h
 func MakeReactor() Reactor {
 	reactor := &upnpDefaultReactor{}
 	reactor.eventMap = make(upnpEventMap)
-	reactor.subscrChan = make(chan *upnpEventRecord)
-	reactor.unpackChan = make(chan *upnpEvent)
-	reactor.eventChan = make(chan Event)
+	reactor.subscrChan = make(chan *upnpEventRecord, 1)
+	reactor.unpackChan = make(chan *upnpEvent, 1)
+	reactor.eventChan = make(chan Event, 1)
 	return reactor
 }
