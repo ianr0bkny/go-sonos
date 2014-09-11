@@ -283,6 +283,6 @@ func MakeReactor() Reactor {
 	reactor.eventMap = make(upnpEventMap)
 	reactor.subscrChan = make(chan *upnpEventRecord, 1)
 	reactor.unpackChan = make(chan *upnpEvent, 1)
-	reactor.eventChan = make(chan Event, 1)
+	reactor.eventChan = make(chan Event, 10)
 	return reactor
 }
