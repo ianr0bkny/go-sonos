@@ -34,6 +34,7 @@ import (
 	"github.com/ianr0bkny/go-sonos"
 	"github.com/ianr0bkny/go-sonos/config"
 	"github.com/ianr0bkny/go-sonos/didl"
+	"github.com/ianr0bkny/go-sonos/ssdp"
 	"github.com/ianr0bkny/go-sonos/upnp"
 	"log"
 	"strings"
@@ -1227,5 +1228,47 @@ func TestRecivaGetTimeZone(t *testing.T) {
 		log.Fatal(err)
 	} else {
 		log.Printf("Timezone: %v", n)
+	}
+}
+
+////////////////////////////////////////////////////////
+// Issue #4
+////////////////////////////////////////////////////////
+func read_events(c chan upnp.Event) {
+	for {
+		select {
+		case <-c:
+		}
+	}
+}
+
+func TestIssue_4(t *testing.T) {
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	log.Printf("Discovery: Starting")
+	mgr, err := sonos.Discover("eth0", "13104")
+	if nil != err {
+		panic(err)
+	}
+	log.Printf("Discovery: Done; Reactor: Starting")
+	reactor := sonos.MakeReactor("eth0", "13106")
+	go read_events(reactor.Channel()) ///// <------------
+	log.Printf("Reactor: Running; Query: Starting")
+	qry := ssdp.ServiceQueryTerms{
+		ssdp.ServiceKey(sonos.MUSIC_SERVICES): -1,
+	}
+	res := mgr.QueryServices(qry)
+	log.Printf("Query: Done; Connect: Starting")
+	if dev_list, has := res[sonos.MUSIC_SERVICES]; has {
+		for _, dev := range dev_list {
+			if sonos.SONOS == dev.Product() {
+				if _, err := upnp.Describe(dev.Location()); nil != err {
+					panic(err)
+				} else {
+					sonos.Connect(dev, reactor, sonos.SVC_ALL)
+					log.Printf("Connect: Done")
+					break
+				}
+			}
+		}
 	}
 }
