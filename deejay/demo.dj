@@ -1,6 +1,0 @@
-config("/home/ianr/.go-sonos")
-select("kitchen")
-mute()
-#select("Living Room", 1, true);select("Bedroom", 2, false);group()
-#mute()
-#unmute()

@@ -35,16 +35,12 @@ all ::
 	$(GO) install -v
 	$(GO) install -v $(PACKAGE)/cscl
 	$(GO) install -v $(PACKAGE)/csweb
-	$(GO) tool yacc -o deejay/deejay.go -v deejay/y.output deejay/deejay.y
-	$(GO) install -v $(PACKAGE)/deejay
 
 clean ::
 	$(GO) clean -i -x
 	$(GO) clean -i -x $(PACKAGE)/cscl
 	$(GO) clean -i -x $(PACKAGE)/csweb
-	$(GO) clean -i -x $(PACKAGE)/deejay
 	rm -rf $(GOPATH)/pkg/*/$(PACKAGE)
-	rm -f deejay/deejay.go deejay/y.output
 
 wc ::
 	wc -l *.go */*.go
