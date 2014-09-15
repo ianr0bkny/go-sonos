@@ -9,7 +9,7 @@ title: go-sonos
 
 ### Example
 
-{% highlight go linenos %}
+{% highlight go %}
 mgr := ssdp.MakeManager()
 mgr.Discover("eth0", "13104", false)
 qry := ssdp.ServiceQueryTerms{
