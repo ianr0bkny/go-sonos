@@ -41,7 +41,7 @@ type Device interface {
 {% endhighlight %}
 
 Structs implementing ssdp.Device describe a UPnP device on the network,
-which may provide a number of services.
+which can provide any number of services.
 
 ### Manager
 ******
