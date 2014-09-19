@@ -27,7 +27,15 @@ title: go-sonos
 * Close() error
 -->
 
-### Device
+# go-sonos
+******
+
+go-sonos is a [Go language](http://golang.org/ "The Go Programming Language") library for accessing [UPnP](http://en.wikipedia.org/wiki/Universal_Plug_and_Play "Universal Plug and Play - Wikipedia, the free encyclopedia") devices, including [Sonos](http://www.sonos.com "Sonos WIRELESS Hifi") wireless music devices.
+
+## Discovery
+******
+
+### interface Device
 ******
 
 {% highlight go %}
@@ -43,7 +51,7 @@ type Device interface {
 Structs implementing ssdp.Device describe a UPnP device on the network,
 which can provide any number of services.
 
-### Manager
+### interface Manager
 ******
 
 {% highlight go %}
@@ -65,14 +73,14 @@ devices on the network.
 mgr := ssdp.MakeManager()
 {% endhighlight %}
 
-### ServiceKey
+### type ServiceKey
 ******
 
 {% highlight go %}
 type ServiceKey string
 {% endhighlight %}
 
-Typo protection for an SSDP service key
+Type protection for an SSDP service key
 
 #### Example
 ******
@@ -80,7 +88,7 @@ Typo protection for an SSDP service key
 ssdp.ServiceKey("schemas-upnp-org-MusicServices")
 {% endhighlight %}
 
-### ServiceQueryTerms
+### type ServiceQueryTerms
 ******
 
 {% highlight go %}
