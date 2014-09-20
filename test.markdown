@@ -48,7 +48,7 @@ type Device interface {
 }
 {% endhighlight %}
 
-Structs implementing ssdp.Device describe a UPnP device on the network,
+Types implementing ssdp.Device describe a UPnP device on the network,
 which can provide any number of services.
 
 ### interface Manager
@@ -63,7 +63,7 @@ type Manager interface {
 }
 {% endhighlight %}
 
-Structs implementing ssdp.Manager provide access to the Simple Service
+Types implementing ssdp.Manager provide access to the Simple Service
 Discovery Protocol (SSDP), which allows control points to discover UPnP
 devices on the network.
 
