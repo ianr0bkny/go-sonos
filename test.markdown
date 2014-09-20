@@ -3,30 +3,6 @@ layout: default
 title: go-sonos
 ---
 
-<!--
-# Documentation
-******
-
-## Discovery [go-sonos/ssdp]
-******
-* MakeManager() ssdp.Manager
-
-### ssdp.Manager interface
-******
-* Discover(ifiname, port string, subscribe bool) error
-	* device
-		* The network device to query for UPnP devices via SSDP [e.g. 'eth0'];
-	* port
-		* A free port to use to listen for responses;
-	* subscribe [unimplemented]
-		* Listen to asynchronous updates after the initial query is complete;
-* QueryServices(query ServiceQueryTerms) ServiceMap
-	* query
-		* Query terms, consisting of pairs of service keys and minimim required versions;
-* Devices() DeviceMap
-* Close() error
--->
-
 # go-sonos
 ******
 
@@ -34,6 +10,23 @@ go-sonos is a [Go language](http://golang.org/ "The Go Programming Language") li
 
 ## Discovery
 ******
+
+### Example
+******
+{% highlight go %}
+mgr := ssdp.MakeManager()
+mgr.Discover("eth0", "13104", false)
+qry := ssdp.ServiceQueryTerms{
+        ssdp.ServiceKey("schemas-upnp-org-MusicServices"): -1,
+}
+result := mgr.QueryServices(qry)
+if device_list, has := result["schemas-upnp-org-MusicServices"]; has {
+        for _, device := range device_list {
+                ...
+        }
+}
+mgr.Close()
+{% endhighlight %}
 
 ### interface Device
 ******
@@ -50,6 +43,24 @@ type Device interface {
 
 Types implementing ssdp.Device describe a UPnP device on the network,
 which can provide any number of services.
+
+### type DeviceMap
+******
+
+{% highlight go %}
+type DeviceMap map[UUID]Device
+{% endhighlight %}
+
+Indexes leaf devices by UUID
+
+### type Location
+******
+
+{% highlight go %}
+type Location string
+{% endhighlight %}
+
+Type protection for a device URI
 
 ### interface Manager
 ******
@@ -73,6 +84,17 @@ devices on the network.
 mgr := ssdp.MakeManager()
 {% endhighlight %}
 
+### interface Service
+******
+
+{% highlight go %}
+type Service interface {
+    Version() int64
+}
+{% endhighlight %}
+
+Types implementing ssd.Service provide an abstraction of a UPnP service.
+
 ### type ServiceKey
 ******
 
@@ -84,6 +106,7 @@ Type protection for an SSDP service key
 
 #### Example
 ******
+
 {% highlight go %}
 ssdp.ServiceKey("schemas-upnp-org-MusicServices")
 {% endhighlight %}
@@ -100,6 +123,7 @@ and is used to query the ssdp.Manager database for matching services.
 
 #### Example
 ******
+
 {% highlight go %}
 query := ssdp.ServiceQueryTerms{
         ssdp.ServiceKey("schemas-upnp-org-MusicServices"): -1,
@@ -107,23 +131,12 @@ query := ssdp.ServiceQueryTerms{
 result := mgr.QueryServices(qry)
 {% endhighlight %}
 
-
-<!--
-### Example
+### type UUID
 ******
+
 {% highlight go %}
-mgr := ssdp.MakeManager()
-mgr.Discover("eth0", "13104", false)
-qry := ssdp.ServiceQueryTerms{
-        ssdp.ServiceKey("schemas-upnp-org-MusicServices"): -1,
-}
-result := mgr.QueryServices(qry)
-if device_list, has := result["schemas-upnp-org-MusicServices"]; has {
-        for _, device := range device_list {
-                ...
-        }
-}
-mgr.Close()
+type UUID string
 {% endhighlight %}
--->
+
+Type protection for a Universally Unique ID
 
