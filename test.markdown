@@ -17,13 +17,13 @@ go-sonos is a [Go language](http://golang.org/ "The Go Programming Language") li
 mgr := ssdp.MakeManager()
 mgr.Discover("eth0", "13104", false)
 qry := ssdp.ServiceQueryTerms{
-        ssdp.ServiceKey("schemas-upnp-org-MusicServices"): -1,
+	ssdp.ServiceKey("schemas-upnp-org-MusicServices"): -1,
 }
 result := mgr.QueryServices(qry)
 if device_list, has := result["schemas-upnp-org-MusicServices"]; has {
-        for _, device := range device_list {
-                ...
-        }
+	for _, device := range device_list {
+		...
+	}
 }
 mgr.Close()
 {% endhighlight %}
@@ -43,6 +43,24 @@ type Device interface {
 
 Types implementing ssdp.Device describe a UPnP device on the network,
 which can provide any number of services.
+
+#### Methods
+******
+{% highlight go %}
+Product() string
+{% endhighlight %}
+{% highlight go %}
+Name() string
+{% endhighlight %}
+{% highlight go %}
+Location() Location
+{% endhighlight %}
+{% highlight go %}
+UUID() UUID
+{% endhighlight %}
+{% highlight go %}
+Service(key ServiceKey) (service Service, has bool)
+{% endhighlight %}
 
 ### type DeviceMap
 ******
@@ -78,6 +96,21 @@ Types implementing ssdp.Manager provide access to the Simple Service
 Discovery Protocol (SSDP), which allows control points to discover UPnP
 devices on the network.
 
+#### Methods
+******
+{% highlight go %}
+Discover(ifiname, port string, subscribe bool) error
+{% endhighlight %}
+{% highlight go %}
+QueryServices(query ServiceQueryTerms) ServiceMap
+{% endhighlight %}
+{% highlight go %}
+Devices() DeviceMap
+{% endhighlight %}
+{% highlight go %}
+Close() error
+{% endhighlight %}
+
 #### Example
 ******
 {% highlight go %}
@@ -89,11 +122,17 @@ mgr := ssdp.MakeManager()
 
 {% highlight go %}
 type Service interface {
-    Version() int64
+	Version() int64
 }
 {% endhighlight %}
 
 Types implementing ssd.Service provide an abstraction of a UPnP service.
+
+#### Methods
+******
+{% highlight go %}
+Version() int64
+{% endhighlight %}
 
 ### type ServiceKey
 ******
@@ -126,7 +165,7 @@ and is used to query the ssdp.Manager database for matching services.
 
 {% highlight go %}
 query := ssdp.ServiceQueryTerms{
-        ssdp.ServiceKey("schemas-upnp-org-MusicServices"): -1,
+	ssdp.ServiceKey("schemas-upnp-org-MusicServices"): -1,
 }
 result := mgr.QueryServices(qry)
 {% endhighlight %}
