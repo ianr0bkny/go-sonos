@@ -20,8 +20,8 @@ qry := ssdp.ServiceQueryTerms{
 	ssdp.ServiceKey("schemas-upnp-org-MusicServices"): -1,
 }
 result := mgr.QueryServices(qry)
-if device_list, has := result["schemas-upnp-org-MusicServices"]; has {
-	for _, device := range device_list {
+if dev_list, has := result["schemas-upnp-org-MusicServices"]; has {
+	for _, dev := range dev_list {
 		...
 	}
 }
