@@ -401,11 +401,77 @@ func (this *SystemProperties) RefreshAccountCredentialsX(accountType uint32, acc
 	}
 	args := []Arg{
 		{"AccountType", accountType},
-		{"AccountToken,", accountToken,},
+		{"AccountToken,", accountToken},
 		{"AccountKey,", accountKey},
 	}
 	response := this.Svc.Call("RefreshAccountCredentialsX", args)
 	doc := Response{}
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.Error()
+}
+
+type A_ARG_TYPE_AccountType uint32
+type A_ARG_TYPE_AccountCredential string
+type A_ARG_TYPE_OAuthDeviceID string
+type A_ARG_TYPE_AccountUDN string
+
+func (this *SystemProperties) AddOAuthAccountX(accountType A_ARG_TYPE_AccountType, accountToken, accountKey A_ARG_TYPE_AccountCredential,
+	oauthDeviceID A_ARG_TYPE_OAuthDeviceID) (accountUDN A_ARG_TYPE_AccountUDN, err error) {
+	type Response struct {
+		XMLName    xml.Name
+		AccountUDN A_ARG_TYPE_AccountUDN
+		ErrorResponse
+	}
+	args := []Arg{
+		{"AccountType", accountType},
+		{"AccountToken,", accountToken},
+		{"AccountKey,", accountKey},
+		{"OAuthDeviceID,", oauthDeviceID},
+	}
+	response := this.Svc.Call("AddOAuthAccountX", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	accountUDN = doc.AccountUDN
+	err = doc.Error()
+	return
+}
+
+type A_ARG_TYPE_AccountNickname string
+
+func (this *SystemProperties) SetAccountNicknameX(accountUDN A_ARG_TYPE_AccountUDN, accountNickname A_ARG_TYPE_AccountNickname) error {
+	type Response struct {
+		XMLName xml.Name
+		ErrorResponse
+	}
+	args := []Arg{
+		{"AccountUDN,", accountUDN},
+		{"AccountNickname,", accountNickname},
+	}
+	response := this.Svc.Call("SetAccountNicknameX", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.Error()
+}
+
+type A_ARG_TYPE_AccountID string
+type A_ARG_TYPE_AccountPassword string
+
+func (this *SystemProperties) ReplaceAccountX(accountUDN A_ARG_TYPE_AccountUDN, newAccountID A_ARG_TYPE_AccountID,
+	newAccountPassword A_ARG_TYPE_AccountPassword) (newAccountUDN A_ARG_TYPE_AccountUDN, err error) {
+	type Response struct {
+		XMLName       xml.Name
+		NewAccountUDN A_ARG_TYPE_AccountUDN
+		ErrorResponse
+	}
+	args := []Arg{
+		{"AccountUDN", accountUDN},
+		{"NewAccountID,", newAccountID},
+		{"NewAccountPassword,", newAccountPassword},
+	}
+	response := this.Svc.Call("ReplaceAccountX", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	newAccountUDN = doc.NewAccountUDN
+	err = doc.Error()
+	return
 }
