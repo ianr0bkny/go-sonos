@@ -144,6 +144,8 @@ type ssdpServiceSet map[ServiceKey]Service
 type Device interface {
 	// The product name (e.g. "Sonos")
 	Product() string
+	// The product version (e.g. "28.1-83040 (BR100)")
+	ProductVersion() string
 	// The device name (e.h. "ZonePlayer")
 	Name() string
 	// A URI that can be queried for device capabilities
@@ -165,6 +167,10 @@ type ssdpDevice struct {
 
 func (this *ssdpDevice) Product() string {
 	return this.product
+}
+
+func (this *ssdpDevice) ProductVersion() string {
+	return this.productVersion
 }
 
 func (this *ssdpDevice) Name() string {
