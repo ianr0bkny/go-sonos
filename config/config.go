@@ -83,6 +83,8 @@ type Bookmark struct {
 	Alias string `json:"alias,omitempty"`
 	// The name of the device's product, e.g. 'Sonos'
 	Product string `json:"product,omitempty"`
+	// The product version (e.g. "28.1-83040 (BR100)")
+	ProductVersion string `json:"productVersion,omitempty"`
 	// The last know location of the device
 	Location ssdp.Location `json:"location,omitempty"`
 	// The device's UUID
@@ -96,13 +98,18 @@ type Bookmark struct {
 type Bookmarks map[string]Bookmark
 
 type configDevice struct {
-	product  string
-	location ssdp.Location
-	uuid     ssdp.UUID
+	product        string
+	productVersion string
+	location       ssdp.Location
+	uuid           ssdp.UUID
 }
 
 func (this *configDevice) Product() string {
 	return this.product
+}
+
+func (this *configDevice) ProductVersion() string {
+	return this.productVersion
 }
 
 func (this *configDevice) Name() string {
@@ -185,11 +192,11 @@ func (this *Config) saveBookmarks() {
 // device's UUID.  When adding a device @ident and @uuid should be the same;
 // when adding an alias @ident and @uuid will be different.
 //
-func (this *Config) AddBookmark(ident, product string, location ssdp.Location, uuid ssdp.UUID) {
+func (this *Config) AddBookmark(ident, product, productVersion string, location ssdp.Location, uuid ssdp.UUID) {
 	if ident != string(uuid) {
-		this.Bookmarks[ident] = Bookmark{ident, product, location, uuid}
+		this.Bookmarks[ident] = Bookmark{ident, product, productVersion, location, uuid}
 	} else {
-		this.Bookmarks[ident] = Bookmark{"", product, location, uuid}
+		this.Bookmarks[ident] = Bookmark{"", product, productVersion, location, uuid}
 	}
 }
 
@@ -198,7 +205,7 @@ func (this *Config) AddBookmark(ident, product string, location ssdp.Location, u
 //
 func (this *Config) AddAlias(uuid ssdp.UUID, alias string) {
 	old := this.Bookmarks[string(uuid)]
-	this.AddBookmark(alias, "", ssdp.Location(""), old.UUID)
+	this.AddBookmark(alias, "", "", ssdp.Location(""), old.UUID)
 }
 
 //
@@ -270,7 +277,7 @@ func (this *Config) lookupImpl(ident string, history map[string]bool) (dev ssdp.
 			if 0 < len(bookmark.Alias) {
 				dev = this.lookupImpl(string(bookmark.UUID), history)
 			} else {
-				dev = &configDevice{bookmark.Product, bookmark.Location, bookmark.UUID}
+				dev = &configDevice{bookmark.Product, bookmark.ProductVersion, bookmark.Location, bookmark.UUID}
 			}
 		}
 	}

@@ -106,7 +106,7 @@ func discover(flags *Args) {
 			for _, dev := range dev_list {
 				if sonos.SONOS == dev.Product() {
 					fmt.Printf("%s %s\n", string(dev.UUID()), dev.Location())
-					CONFIG.AddBookmark(string(dev.UUID()), dev.Product(), dev.Location(), dev.UUID())
+					CONFIG.AddBookmark(string(dev.UUID()), dev.Product(), dev.ProductVersion(), dev.Location(), dev.UUID())
 				}
 			}
 		}
@@ -114,7 +114,7 @@ func discover(flags *Args) {
 			for _, dev := range dev_list {
 				if sonos.RADIO == dev.Product() {
 					fmt.Printf("%s %s\n", string(dev.UUID()), dev.Location())
-					CONFIG.AddBookmark(string(dev.UUID()), dev.Product(), dev.Location(), dev.UUID())
+					CONFIG.AddBookmark(string(dev.UUID()), dev.Product(), dev.ProductVersion(), dev.Location(), dev.UUID())
 				}
 			}
 		}
