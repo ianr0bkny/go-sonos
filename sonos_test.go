@@ -1079,7 +1079,6 @@ func handleEvent_TestEvent(reactor upnp.Reactor, c chan bool) {
 			}
 		}
 	}
-	c <- true
 }
 
 func handleEvent_TestEventBrief(reactor upnp.Reactor, c chan bool) {
@@ -1110,7 +1109,6 @@ func handleEvent_TestEventBrief(reactor upnp.Reactor, c chan bool) {
 			}
 		}
 	}
-	c <- true
 }
 
 func TestEvent(t *testing.T) {
