@@ -99,7 +99,7 @@ func discover(flags *Args) {
 	} else {
 		query := ssdp.ServiceQueryTerms{
 			ssdp.ServiceKey(sonos.MUSIC_SERVICES): -1,
-			ssdp.ServiceKey(sonos.RECIVA_RADIO): -1,
+			ssdp.ServiceKey(sonos.RECIVA_RADIO):   -1,
 		}
 		res := mgr.QueryServices(query)
 		if dev_list, has := res[sonos.MUSIC_SERVICES]; has {
