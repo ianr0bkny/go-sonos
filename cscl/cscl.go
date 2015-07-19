@@ -135,6 +135,25 @@ func devices(flags *Args, args []string) (err error) {
 	return
 }
 
+func queue(flags *Args, args []string) (err error) {
+	if 1 != len(args) {
+		log.Fatal("usage: cscl queue alias")
+	}
+	if dev := CONFIG.Lookup(args[0]); nil != dev {
+		s := sonos.Connect(dev, nil, sonos.SVC_CONTENT_DIRECTORY)
+		if q, err := s.GetQueueContents(); nil != err {
+			log.Fatal("GetQueueContents: %#v", err)
+		} else {
+			for _, track := range q {
+				log.Printf("%s\n", track.Title())
+			}
+		}
+	} else {
+		log.Fatal("unknown device")
+	}
+	return
+}
+
 func unalias(flags *Args, args []string) (err error) {
 	switch len(args) {
 	case 0:
@@ -199,6 +218,8 @@ func main() {
 			devices(&args, flag.Args()[1:])
 		case "discover":
 			discover(&args)
+		case "queue":
+			queue(&args, flag.Args()[1:])
 		case "unalias":
 			unalias(&args, flag.Args()[1:])
 		default:
