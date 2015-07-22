@@ -54,3 +54,5 @@ coverage ::
 discovery ::
 	$(GO) test -test.run Discovery
 
+examples ::
+	$(GO) install -v $(PACKAGE)/examples/discovery
