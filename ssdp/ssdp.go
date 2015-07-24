@@ -155,6 +155,8 @@ type Device interface {
 	// Search for a service in the device's capabilities; same
 	// return semantics as querying a map
 	Service(key ServiceKey) (service Service, has bool)
+	// Return a list of services implemented by this device
+	Services() []ServiceKey
 }
 
 type ssdpDevice struct {
@@ -188,6 +190,16 @@ func (this *ssdpDevice) UUID() UUID {
 func (this *ssdpDevice) Service(key ServiceKey) (service Service, has bool) {
 	service, has = this.services[key]
 	return
+}
+
+func (this *ssdpDevice) Services() []ServiceKey {
+	i := 0
+	keys := make([]ServiceKey, len(this.services))
+	for key, _ := range this.services {
+		keys[i] = key
+		i += 1
+	}
+	return keys
 }
 
 // Indexes leaf devices by UUID

@@ -128,6 +128,10 @@ func (this *configDevice) Service(key ssdp.ServiceKey) (service ssdp.Service, ha
 	return
 }
 
+func (this *configDevice) Services() (keys []ssdp.ServiceKey) {
+	return
+}
+
 //
 // Create a configuration object where @dir is the path to the
 // configuration directory.  Note that Init() must be called in order to
