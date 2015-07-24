@@ -31,7 +31,7 @@
 GO = go
 PACKAGE = github.com/ianr0bkny/go-sonos
 
-all ::
+all :: examples
 	$(GO) install -v
 	$(GO) install -v $(PACKAGE)/cscl
 	$(GO) install -v $(PACKAGE)/csweb
@@ -40,6 +40,9 @@ clean ::
 	$(GO) clean -i -x
 	$(GO) clean -i -x $(PACKAGE)/cscl
 	$(GO) clean -i -x $(PACKAGE)/csweb
+	$(GO) clean -i -x $(PACKAGE)/examples/devices
+	$(GO) clean -i -x $(PACKAGE)/examples/discovery
+	$(GO) clean -i -x $(PACKAGE)/examples/googletv
 	rm -rf $(GOPATH)/pkg/*/$(PACKAGE)
 
 wc ::
@@ -57,3 +60,4 @@ discovery ::
 examples ::
 	$(GO) install -v $(PACKAGE)/examples/devices
 	$(GO) install -v $(PACKAGE)/examples/discovery
+	$(GO) install -v $(PACKAGE)/examples/googletv
