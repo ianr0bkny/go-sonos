@@ -586,6 +586,7 @@ func (this *RenderingControl) SetChannelMap(instanceId uint32, channelMap string
 }
 
 /* Reciva */
+/* NSZ-GS7 */
 func (this *RenderingControl) ListPresets(instanceId uint32) (presets string, err error) {
 	type Response struct {
 		XMLName xml.Name
@@ -602,6 +603,7 @@ func (this *RenderingControl) ListPresets(instanceId uint32) (presets string, er
 }
 
 /* Reciva */
+/* NSZ-GS7 */
 func (this *RenderingControl) SelectPreset(instanceId uint32, presetName string) error {
 	type Response struct {
 		XMLName xml.Name

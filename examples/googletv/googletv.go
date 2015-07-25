@@ -30,11 +30,17 @@
 package main
 
 import (
+	"github.com/ianr0bkny/go-sonos"
 	"github.com/ianr0bkny/go-sonos/ssdp"
 	"log"
+	"strings"
 )
 
-// This code locates a Google TV device on the network
+const (
+	instanceId  = 0
+)
+
+// This code locates a GoogleTV device on the network
 func main() {
 	log.Print("go-sonos example discovery\n")
 
@@ -48,6 +54,72 @@ func main() {
 			for _, key := range keys {
 				log.Printf("\t%s\n", key)
 			}
+
+			s := sonos.Connect(dev, nil, sonos.SVC_CONNECTION_MANAGER|sonos.SVC_RENDERING_CONTROL|sonos.SVC_AV_TRANSPORT)
+
+			if source, sink, err := s.GetProtocolInfo(); nil != err {
+				panic(err)
+			} else {
+				log.Printf("Source: %v", source)
+				for _, sink := range strings.Split(sink, ",") {
+					log.Printf("Sink: %v", sink)
+				}
+			}
+
+			if connection_ids, err := s.GetCurrentConnectionIDs(); nil != err {
+				panic(err)
+			} else {
+				log.Printf("ConnectionIDs: %v", connection_ids)
+			}
+
+			if presets, err := s.ListPresets(instanceId); nil != err {
+				panic(err)
+			} else {
+				log.Printf("Preset: %v", presets)
+			}
+
+			if media_info, err := s.GetMediaInfo(instanceId); nil != err {
+				panic(err)
+			} else {
+				log.Printf("%v", media_info)
+			}
+
+			if transport_info, err := s.GetTransportInfo(instanceId); nil != err {
+				panic(err)
+			} else {
+				log.Printf("%v", transport_info)
+			}
+
+			if position_info, err := s.GetPositionInfo(instanceId); nil != err {
+				panic(err)
+			} else {
+				log.Printf("%v", position_info)
+			}
+
+			if device_capabilities, err := s.GetDeviceCapabilities(instanceId); nil != err {
+				panic(err)
+			} else {
+				log.Printf("%v", device_capabilities)
+			}
+
+			if transport_settings, err := s.GetTransportSettings(instanceId); nil != err {
+				panic(err)
+			} else {
+				log.Printf("%v", transport_settings)
+			}
+
+			if actions, err := s.GetCurrentTransportActions(instanceId); nil != err {
+				panic(err)
+			} else {
+				log.Printf("%v", actions)
+			}
+
+			/*TODO*/
+			/*
+			if err := s.SetAVTransportURI(instanceId, uri, metadata); nil != err {
+				panic(err)
+			}
+			*/
 		}
 	}
 	mgr.Close()
