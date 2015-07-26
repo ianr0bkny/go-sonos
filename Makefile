@@ -58,6 +58,7 @@ discovery ::
 	$(GO) test -test.run Discovery
 
 examples ::
+	$(GO) install -v $(PACKAGE)/examples/browse
 	$(GO) install -v $(PACKAGE)/examples/devices
 	$(GO) install -v $(PACKAGE)/examples/discovery
 	$(GO) install -v $(PACKAGE)/examples/googletv
