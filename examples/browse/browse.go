@@ -54,6 +54,8 @@ func main() {
 		for _, dev := range dev_list {
 			log.Printf("%s %s %s %s %s\n", dev.Product(), dev.ProductVersion(), dev.Name(), dev.Location(), dev.UUID())
 			s := sonos.Connect(dev, nil, sonos.SVC_CONTENT_DIRECTORY)
+
+			//Method 1
 			if tracks, err := s.GetAlbumTracks("The Beatles"); nil != err {
 				panic(err)
 			} else {
@@ -67,6 +69,23 @@ func main() {
 							for _, object := range objects {
 								log.Printf("--> %#v", object)
 							}
+						}
+					}
+				}
+			}
+
+			//Method 2
+			if tracks, err := s.GetTrackFromAlbum("The Beatles", "Long, Long, Long"); nil != err {
+				panic(err)
+			} else {
+				for _, track := range tracks {
+					log.Printf("%#v", track)
+					log.Printf("%#v", track.Res())
+					if objects, err := s.GetMetadata(track.ID()); nil != err {
+						panic(err)
+					} else {
+						for _, object := range objects {
+							log.Printf("--> %#v", object)
 						}
 					}
 				}
