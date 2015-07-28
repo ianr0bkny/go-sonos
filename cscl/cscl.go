@@ -142,7 +142,7 @@ func queue(flags *Args, args []string) (err error) {
 	if dev := CONFIG.Lookup(args[0]); nil != dev {
 		s := sonos.Connect(dev, nil, sonos.SVC_CONTENT_DIRECTORY)
 		if q, err := s.GetQueueContents(); nil != err {
-			log.Fatal("GetQueueContents: %#v", err)
+			log.Fatalf("GetQueueContents: %#v", err)
 		} else {
 			for _, track := range q {
 				log.Printf("%s\n", track.Title())

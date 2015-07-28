@@ -63,3 +63,37 @@ examples ::
 	$(GO) install -v $(PACKAGE)/examples/devices
 	$(GO) install -v $(PACKAGE)/examples/discovery
 	$(GO) install -v $(PACKAGE)/examples/googletv
+
+fmt ::
+	$(GO) fmt -x $(PACKAGE) \
+		$(PACKAGE)/ssdp \
+		$(PACKAGE)/config \
+		$(PACKAGE)/cscl \
+		$(PACKAGE)/csweb \
+		$(PACKAGE)/didl \
+		$(PACKAGE)/model \
+		$(PACKAGE)/upnp \
+		$(PACKAGE)/reciva-com \
+		$(PACKAGE)/linn-co-uk \
+		$(PACKAGE)/examples/browse \
+		$(PACKAGE)/examples/composers \
+		$(PACKAGE)/examples/devices \
+		$(PACKAGE)/examples/discovery \
+		$(PACKAGE)/examples/googletv
+
+vet ::
+	$(GO) vet -x $(PACKAGE) \
+		$(PACKAGE)/ssdp \
+		$(PACKAGE)/config \
+		$(PACKAGE)/cscl \
+		$(PACKAGE)/csweb \
+		$(PACKAGE)/didl \
+		$(PACKAGE)/model \
+		$(PACKAGE)/upnp \
+		$(PACKAGE)/reciva-com \
+		$(PACKAGE)/linn-co-uk \
+		$(PACKAGE)/examples/browse \
+		$(PACKAGE)/examples/composers \
+		$(PACKAGE)/examples/devices \
+		$(PACKAGE)/examples/discovery \
+		$(PACKAGE)/examples/googletv

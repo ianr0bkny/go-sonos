@@ -37,7 +37,7 @@ import (
 )
 
 const (
-	instanceId  = 0
+	instanceId = 0
 )
 
 // This code locates a GoogleTV device on the network
@@ -116,9 +116,9 @@ func main() {
 
 			/*TODO*/
 			/*
-			if err := s.SetAVTransportURI(instanceId, uri, metadata); nil != err {
-				panic(err)
-			}
+				if err := s.SetAVTransportURI(instanceId, uri, metadata); nil != err {
+					panic(err)
+				}
 			*/
 		}
 	}
