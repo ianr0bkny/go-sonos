@@ -28,28 +28,40 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 
-GO = go
+     GO = go
 PACKAGE = github.com/ianr0bkny/go-sonos
+   GOOS = $(shell go env GOOS)
+ GOARCH = $(shell go env GOARCH)
 
-all :: examples
-	$(GO) install -v
-	$(GO) install -v $(PACKAGE)/cscl
-	$(GO) install -v $(PACKAGE)/csweb
+PACKAGE_LIST = \
+	$(PACKAGE) \
+	$(PACKAGE)/config \
+	$(PACKAGE)/cscl \
+	$(PACKAGE)/csweb \
+	$(PACKAGE)/didl \
+	$(PACKAGE)/examples/browse \
+	$(PACKAGE)/examples/composers \
+	$(PACKAGE)/examples/devices \
+	$(PACKAGE)/examples/discovery \
+	$(PACKAGE)/examples/googletv \
+	$(PACKAGE)/linn-co-uk \
+	$(PACKAGE)/model \
+	$(PACKAGE)/reciva-com \
+	$(PACKAGE)/ssdp \
+	$(PACKAGE)/upnp
+
+all ::
+	$(GO) install -v $(PACKAGE_LIST)
 
 clean ::
-	$(GO) clean -i -x
-	$(GO) clean -i -x $(PACKAGE)/cscl
-	$(GO) clean -i -x $(PACKAGE)/csweb
-	$(GO) clean -i -x $(PACKAGE)/examples/devices
-	$(GO) clean -i -x $(PACKAGE)/examples/discovery
-	$(GO) clean -i -x $(PACKAGE)/examples/googletv
-	rm -rf $(GOPATH)/pkg/*/$(PACKAGE)
+	$(GO) clean -i -x $(PACKAGE_LIST)
+	rm -rf $(GOPATH)/pkg/$(GOOS)_$(GOARCH)/$(PACKAGE)
 
 wc ::
-	wc -l *.go */*.go
+	wc -l *.go */*.go examples/*/*.go
 
 longlines ::
-	egrep '.{120,}' *.go */*.go
+	egrep '.{120,}' *.go */*.go examples/*/*.go
 
 coverage ::
 	$(GO) test -test.run Coverage
@@ -57,43 +69,8 @@ coverage ::
 discovery ::
 	$(GO) test -test.run Discovery
 
-examples ::
-	$(GO) install -v $(PACKAGE)/examples/browse
-	$(GO) install -v $(PACKAGE)/examples/composers
-	$(GO) install -v $(PACKAGE)/examples/devices
-	$(GO) install -v $(PACKAGE)/examples/discovery
-	$(GO) install -v $(PACKAGE)/examples/googletv
-
 fmt ::
-	$(GO) fmt -x $(PACKAGE) \
-		$(PACKAGE)/ssdp \
-		$(PACKAGE)/config \
-		$(PACKAGE)/cscl \
-		$(PACKAGE)/csweb \
-		$(PACKAGE)/didl \
-		$(PACKAGE)/model \
-		$(PACKAGE)/upnp \
-		$(PACKAGE)/reciva-com \
-		$(PACKAGE)/linn-co-uk \
-		$(PACKAGE)/examples/browse \
-		$(PACKAGE)/examples/composers \
-		$(PACKAGE)/examples/devices \
-		$(PACKAGE)/examples/discovery \
-		$(PACKAGE)/examples/googletv
+	$(GO) fmt -x $(PACKAGE_LIST)
 
 vet ::
-	$(GO) vet -x $(PACKAGE) \
-		$(PACKAGE)/ssdp \
-		$(PACKAGE)/config \
-		$(PACKAGE)/cscl \
-		$(PACKAGE)/csweb \
-		$(PACKAGE)/didl \
-		$(PACKAGE)/model \
-		$(PACKAGE)/upnp \
-		$(PACKAGE)/reciva-com \
-		$(PACKAGE)/linn-co-uk \
-		$(PACKAGE)/examples/browse \
-		$(PACKAGE)/examples/composers \
-		$(PACKAGE)/examples/devices \
-		$(PACKAGE)/examples/discovery \
-		$(PACKAGE)/examples/googletv
+	$(GO) vet -x $(PACKAGE_LIST)
