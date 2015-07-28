@@ -47,9 +47,10 @@ const (
 	//
 	ObjectID_Queue_AVT_Instance_0 = "Q:0"
 	//
-	ObjectID_Attribute_Genres = "A:GENRE"
-	ObjectID_Attribute_Album  = "A:ALBUM"
-	ObjectID_Attribute_Artist = "A:ARTIST"
+	ObjectID_Attribute_Genres    = "A:GENRE"
+	ObjectID_Attribute_Album     = "A:ALBUM"
+	ObjectID_Attribute_Artist    = "A:ARTIST"
+	ObjectID_Attribute_Composers = "A:COMPOSER"
 )
 
 func (this *Sonos) GetRootLevelChildren() (objects []model.Object, err error) {
@@ -164,6 +165,24 @@ func (this *Sonos) GetAllGenres() (objects []model.Object, err error) {
 	var result *upnp.BrowseResult
 	req := &upnp.BrowseRequest{
 		ObjectID:      ObjectID_Attribute_Genres,
+		BrowseFlag:    upnp.BrowseFlag_BrowseDirectChildren,
+		Filter:        upnp.BrowseFilter_All,
+		StartingIndex: 0,
+		RequestCount:  0,
+		SortCriteria:  upnp.BrowseSortCriteria_None,
+	}
+	if result, err = this.Browse(req); nil != err {
+		return
+	} else {
+		objects = model.ObjectStream(result.Doc)
+	}
+	return
+}
+
+func (this *Sonos) GetAllComposers() (objects []model.Object, err error) {
+	var result *upnp.BrowseResult
+	req := &upnp.BrowseRequest{
+		ObjectID:      ObjectID_Attribute_Composers,
 		BrowseFlag:    upnp.BrowseFlag_BrowseDirectChildren,
 		Filter:        upnp.BrowseFilter_All,
 		StartingIndex: 0,

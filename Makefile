@@ -59,6 +59,7 @@ discovery ::
 
 examples ::
 	$(GO) install -v $(PACKAGE)/examples/browse
+	$(GO) install -v $(PACKAGE)/examples/composers
 	$(GO) install -v $(PACKAGE)/examples/devices
 	$(GO) install -v $(PACKAGE)/examples/discovery
 	$(GO) install -v $(PACKAGE)/examples/googletv
