@@ -88,10 +88,6 @@ func alias(flags *Args, args []string) (err error) {
 	return
 }
 
-func coverage(flags *Args, args []string) (err error) {
-	return
-}
-
 func discover(flags *Args) {
 	port := fmt.Sprintf("%d", *flags.discoveryPort)
 	if mgr, err := sonos.Discover(*flags.discoveryDevice, port); nil != err {
@@ -181,7 +177,6 @@ func Usage() {
 	fmt.Fprintf(os.Stderr, "            <command> [args ...]\n\n")
 	fmt.Fprintf(os.Stderr, "The available commands are:\n")
 	fmt.Fprintf(os.Stderr, "   alias      Add an alias binding\n")
-	fmt.Fprintf(os.Stderr, "   coverage   Report Sonos API coverage statistics\n")
 	fmt.Fprintf(os.Stderr, "   devices    Report devices found during discovery\n")
 	fmt.Fprintf(os.Stderr, "   discover   Start SSDP device discovery\n")
 	fmt.Fprintf(os.Stderr, "   unalias    Remove an alias binding\n")
@@ -212,8 +207,6 @@ func main() {
 		switch cmd {
 		case "alias":
 			alias(&args, flag.Args()[1:])
-		case "coverage":
-			coverage(&args, flag.Args()[1:])
 		case "devices":
 			devices(&args, flag.Args()[1:])
 		case "discover":
