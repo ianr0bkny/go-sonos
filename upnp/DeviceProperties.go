@@ -460,3 +460,49 @@ func (this *DeviceProperties) RemoveHTSatellite(satRoomUUID string) error {
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.Error()
 }
+
+func (this *DeviceProperties) EnterConfigMode(mode, options string) (state string, err error) {
+	type Response struct {
+		XMLName xml.Name
+		State string
+		ErrorResponse
+	}
+	args := []Arg{
+		{"Mode", mode},
+		{"Options", options},
+	}
+	response := this.Svc.Call("EnterConfigMode", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	state = doc.State
+	err = doc.Error()
+	return
+}
+
+func (this *DeviceProperties) ExitConfigMode(options string) error {
+	type Response struct {
+		XMLName xml.Name
+		ErrorResponse
+	}
+	args := []Arg{
+		{"Options", options},
+	}
+	response := this.Svc.Call("ExitConfigMode", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.Error()
+}
+
+func (this *DeviceProperties) GetButtonState() (state string, err error) {
+	type Response struct {
+		XMLName xml.Name
+		State string
+		ErrorResponse
+	}
+	response := this.Svc.CallVa("GetButtonState")
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	state = doc.State
+	err = doc.Error()
+	return
+}
