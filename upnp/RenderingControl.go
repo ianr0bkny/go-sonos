@@ -618,3 +618,53 @@ func (this *RenderingControl) SelectPreset(instanceId uint32, presetName string)
 	xml.Unmarshal([]byte(response), &doc)
 	return doc.Error()
 }
+
+func (this *RenderingControl) SetSonarCalibrationX(instanceId uint32, calibrationId, sonarCoefficients string) error {
+	type Response struct {
+		XMLName xml.Name
+		ErrorResponse
+	}
+	args := []Arg{
+		{"InstanceID", instanceId},
+		{"CalibrationID", calibrationId},
+		{"SonarCoefficients", sonarCoefficients},
+	}
+	response := this.Svc.Call("SetSonarCalibrationX", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.Error()
+}
+
+func (this *RenderingControl) GetSonarStatus(instanceId uint32) (sonarEnabled, sonarCalibrationAvailable bool, err error) {
+	type Response struct {
+		XMLName xml.Name
+		SonarEnabled bool
+		SonarCalibrationAvailable bool
+		ErrorResponse
+	}
+	args := []Arg{
+		{"InstanceID", instanceId},
+	}
+	response:= this.Svc.Call("GetSonarStatus", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	sonarEnabled = doc.SonarEnabled
+	sonarCalibrationAvailable = doc.SonarCalibrationAvailable
+	err = doc.Error()
+	return
+}
+
+func (this *RenderingControl) SetSonarStatus(instanceId uint32, sonarEnabled bool) error {
+	type Response struct {
+		XMLName xml.Name
+		ErrorResponse
+	}
+	args := []Arg{
+		{"InstanceID", instanceId},
+		{"SonarEnabled", sonarEnabled},
+	}
+	response:= this.Svc.Call("SetSonarStatus", args)
+	doc := Response{}
+	xml.Unmarshal([]byte(response), &doc)
+	return doc.Error()
+}
