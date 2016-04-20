@@ -624,7 +624,13 @@ func (this *ssdpDefaultManager) ssdpUnicastDiscoverImpl(ifi *net.Interface, port
 		err = errors.New(fmt.Sprintf("No addresses found for interface %s", ifi.Name))
 		return
 	}
-	lip := addrs[0].(*net.IPNet).IP
+	var lip net.IP
+	for _, addr := range addrs {
+		if nil != addr.(*net.IPNet).IP.DefaultMask() {
+			lip = addr.(*net.IPNet).IP
+			break;
+		}
+	}
 	laddr, err := net.ResolveUDPAddr(ssdpBroadcastVersion, net.JoinHostPort(lip.String(), port))
 	if nil != err {
 		return
