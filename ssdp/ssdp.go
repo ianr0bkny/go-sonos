@@ -282,10 +282,13 @@ type ssdpResponseMessage struct {
 	usn                string
 	x_rincon_bootseq   string
 	x_rincon_household string
+	x_rincon_variant   string
+	x_rincon_wifimode  string
 	x_user_agent       string
 	content_length     string
 	bootid_upnp_org    string
 	configid_upnp_org  string
+	household_smartspeaker_audio string
 	x_av_server_info   string
 }
 
@@ -570,6 +573,10 @@ func (this *ssdpDefaultManager) ssdpHandleResponse(raw *ssdpRawMessage) *ssdpRes
 			msg.x_rincon_bootseq = value
 		case "X-Rincon-Household":
 			msg.x_rincon_household = value
+		case "X-Rincon-Variant":
+			msg.x_rincon_variant = value
+		case "X-Rincon-Wifimode":
+			msg.x_rincon_wifimode = value
 		case "Al":
 			msg.al = value
 		case "01-Nls":
@@ -580,6 +587,8 @@ func (this *ssdpDefaultManager) ssdpHandleResponse(raw *ssdpRawMessage) *ssdpRes
 			msg.bootid_upnp_org = value
 		case "Configid.upnp.org":
 			msg.configid_upnp_org = value
+		case "Household.smartspeaker.audio":
+			msg.household_smartspeaker_audio = value
 		case "X-Av-Server-Info":
 			msg.x_av_server_info = value
 		default:
